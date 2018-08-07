@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<robot name="irb4600_workspace" xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Includes -->
+  <xacro:include filename="$(find abb_irb4600_support)/urdf/irb4600_60_205_macro.xacro"/> <!-- Robot Arm -->
+  <xacro:include filename="$(find workcell1_support)/urdf/sander.xacro"/> <!-- Sanding Tool -->
+
+  <!-- Constants  -->
+
+  <!-- Components -->
+  <xacro:abb_irb4600_60_205 prefix=""/>
+  <xacro:sander prefix="sander_"/>
+
+  <!-- Links -->
+  <link name="world_frame"/>
+
+  <!-- Joints -->
+  <joint name="world_to_base_link" type="fixed"> <!-- Connects world & robot -->
+    <parent link="world_frame"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="robot_to_sander" type="fixed"> <!-- Connects robot & tool -->
+    <parent link="tool0"/>
+    <child link="sander_base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+</robot>
