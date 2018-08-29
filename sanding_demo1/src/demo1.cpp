@@ -165,7 +165,7 @@ static trajopt::TrajOptProbPtr makeProblem(tesseract::BasicEnvConstPtr env)
 
   // Populate Basic Info
   pci.basic_info.n_steps = geometric_path.size();
-  pci.basic_info.manip = "manipulator_rail_tool";
+  pci.basic_info.manip = "my_robot";
   pci.basic_info.start_fixed = false;
 
   // Create Kinematic Object
@@ -251,6 +251,12 @@ int main(int argc, char** argv)
 
   addObject(*env);
 
+  if (!env->addManipulator("world_frame", "sander_tcp", "my_robot"))
+  {
+    ROS_ERROR("Could not create group");
+    return -2;
+  }
+
   // initial conditions?
   auto names = env->getJointNames();
   env->setState(names, std::vector<double>(names.size(), 0.0));
@@ -271,7 +277,7 @@ int main(int argc, char** argv)
 
   // To & From Vector of parameters
   trajectory_msgs::JointTrajectory out;
-  out.joint_names = env->getJointNames();
+  out.joint_names = env->getManipulator("my_robot")->getJointNames();
   for (int i = 0; i < result.rows(); ++i)
   {
     trajectory_msgs::JointTrajectoryPoint jtp;
