@@ -19,9 +19,9 @@ static bool addObject(tesseract::tesseract_ros::KDLEnv& env)
 
   obj->name = "part";
   obj->visual.shapes.push_back(box);
-  obj->visual.shape_poses.push_back(Eigen::Affine3d::Identity());
+  obj->visual.shape_poses.push_back(Eigen::Isometry3d::Identity());
   obj->collision.shapes.push_back(box);
-  obj->collision.shape_poses.push_back(Eigen::Affine3d::Identity());
+  obj->collision.shape_poses.push_back(Eigen::Isometry3d::Identity());
   obj->collision.collision_object_types.push_back(tesseract::CollisionObjectType::UseShapeType);
 
   // This call adds the object to the scene's "database" but does not actuall connect it
@@ -97,16 +97,16 @@ static bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory
   return ac.sendGoalAndWait(goal) == actionlib::SimpleClientGoalState::SUCCEEDED;
 }
 
-static EigenSTL::vector_Affine3d makePath()
+static EigenSTL::vector_Isometry3d makePath()
 {
-  EigenSTL::vector_Affine3d v;
-  Eigen::Affine3d origin = Eigen::Affine3d::Identity();
+  EigenSTL::vector_Isometry3d v;
+  Eigen::Isometry3d origin = Eigen::Isometry3d::Identity();
   origin.translation() = Eigen::Vector3d(0.5, 0, 0.5);
 
 
   for (int r = 0; r < 10; ++r)
   {
-    EigenSTL::vector_Affine3d this_pass;
+    EigenSTL::vector_Isometry3d this_pass;
     for (int i = -10; i <= 10; ++i)
     {
       auto p = origin * Eigen::Translation3d(r * 0.1, i * 0.05, 0) * Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY());
@@ -133,10 +133,10 @@ static EigenSTL::vector_Affine3d makePath()
   return v;
 }
 
-static EigenSTL::vector_Affine3d makePath2()
+static EigenSTL::vector_Isometry3d makePath2()
 {
-  EigenSTL::vector_Affine3d v;
-  Eigen::Affine3d origin = Eigen::Affine3d::Identity();
+  EigenSTL::vector_Isometry3d v;
+  Eigen::Isometry3d origin = Eigen::Isometry3d::Identity();
   origin.translation() = Eigen::Vector3d(1.0, 0, 0.5);
 
   double angle_step = M_PI * 2 / 30;
@@ -210,7 +210,7 @@ static trajopt::TrajOptProbPtr makeProblem(tesseract::BasicEnvConstPtr env)
 
   pci.cost_infos.push_back(collision);
 
-  auto to_wxyz = [](const Eigen::Affine3d& p) {
+  auto to_wxyz = [](const Eigen::Isometry3d& p) {
     Eigen::Quaterniond q (p.linear());
     Eigen::Vector4d wxyz;
     wxyz(0) = q.w();

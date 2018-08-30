@@ -25,9 +25,9 @@ static bool addObject(tesseract::tesseract_ros::KDLEnv& env)
 
   obj->name = "part";
   obj->visual.shapes.push_back(shape);
-  obj->visual.shape_poses.push_back(Eigen::Affine3d::Identity());
+  obj->visual.shape_poses.push_back(Eigen::Isometry3d::Identity());
   obj->collision.shapes.push_back(shape);
-  obj->collision.shape_poses.push_back(Eigen::Affine3d::Identity());
+  obj->collision.shape_poses.push_back(Eigen::Isometry3d::Identity());
   obj->collision.collision_object_types.push_back(tesseract::CollisionObjectType::UseShapeType);
 
   // This call adds the object to the scene's "database" but does not actuall connect it
@@ -103,10 +103,10 @@ static bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory
   return ac.sendGoalAndWait(goal) == actionlib::SimpleClientGoalState::SUCCEEDED;
 }
 
-static EigenSTL::vector_Affine3d makePath()
+static EigenSTL::vector_Isometry3d makePath()
 {
-  EigenSTL::vector_Affine3d v;
-  Eigen::Affine3d origin = Eigen::Affine3d::Identity();
+  EigenSTL::vector_Isometry3d v;
+  Eigen::Isometry3d origin = Eigen::Isometry3d::Identity();
   origin.translation() = Eigen::Vector3d(1.0, 0, 0.5);
 
   // Create slices of the cylinder
@@ -116,11 +116,11 @@ static EigenSTL::vector_Affine3d makePath()
   for (std::size_t i = 0; i < n_slices; ++i)
   {
     const double z = i * slice_height;
-    const Eigen::Affine3d slice_center = origin * Eigen::Translation3d(0.0, 0.0, z);
+    const Eigen::Isometry3d slice_center = origin * Eigen::Translation3d(0.0, 0.0, z);
     for (double r = 0.0; r <= 2 * M_PI; r += M_PI / 12.0)
     {
       Eigen::Vector3d offset (radius * std::cos(r), radius * std::sin(r), 0.);
-      Eigen::Affine3d pose = slice_center * Eigen::Translation3d(offset);
+      Eigen::Isometry3d pose = slice_center * Eigen::Translation3d(offset);
 
       Eigen::Vector3d z_axis = -(pose.translation() - slice_center.translation()).normalized();
       Eigen::Vector3d y_axis = Eigen::Vector3d(-std::sin(r), std::cos(r), 0.0).normalized();
@@ -149,7 +149,7 @@ static EigenSTL::vector_Affine3d makePath()
 
 
 static trajopt::TrajOptProbPtr makeProblem(tesseract::BasicEnvConstPtr env,
-                                           const EigenSTL::vector_Affine3d& geometric_path)
+                                           const EigenSTL::vector_Isometry3d& geometric_path)
 {
   trajopt::ProblemConstructionInfo pci (env);
 
@@ -200,7 +200,7 @@ static trajopt::TrajOptProbPtr makeProblem(tesseract::BasicEnvConstPtr env,
 
   pci.cost_infos.push_back(collision);
 
-  auto to_wxyz = [](const Eigen::Affine3d& p) {
+  auto to_wxyz = [](const Eigen::Isometry3d& p) {
     Eigen::Quaterniond q (p.linear());
     Eigen::Vector4d wxyz;
     wxyz(0) = q.w();
