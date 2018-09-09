@@ -30,7 +30,7 @@ std::vector<descartes_light::PositionSamplerPtr> makePath()
 
 } // anon ns
 
-int main(int argc, char** argv)
+int main()
 {
   // Define our vertex samplers
   const auto path = makePath();
@@ -46,7 +46,8 @@ int main(int argc, char** argv)
   }
 
   // Search for edges
-  if (!graph_builder.search())
+  std::vector<double> solution;
+  if (!graph_builder.search(solution))
   {
     std::cerr << "Search for graph completion failed\n";
     return 1;

@@ -16,7 +16,7 @@ public:
   bool build(const std::vector<PositionSamplerPtr>& trajectory,
              EdgeEvaluatorPtr edge_eval);
 
-  bool search();
+  bool search(std::vector<double>& solution);
 
 private:
   LadderGraph<double> graph_;

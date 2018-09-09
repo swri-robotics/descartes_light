@@ -19,9 +19,9 @@
 #ifndef DESCARTES_LADDER_GRAPH_DAG_SEARCH_H
 #define DESCARTES_LADDER_GRAPH_DAG_SEARCH_H
 
-#include "descartes_planner/ladder_graph.h"
+#include "descartes_light/ladder_graph.h"
 
-namespace descartes_planner
+namespace descartes_light
 {
 
 // Directed Acyclic graph search
@@ -31,14 +31,14 @@ public:
   using predecessor_t = unsigned;
   using size_type = std::size_t;
 
-  explicit DAGSearch(const LadderGraph& graph);
+  explicit DAGSearch(const LadderGraph<double>& graph);
 
   double run();
 
   std::vector<predecessor_t> shortestPath() const;
 
 private:
-  const LadderGraph& graph_;
+  const LadderGraph<double>& graph_;
 
   struct SolutionRung
   {

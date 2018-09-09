@@ -1,9 +1,9 @@
-#include "descartes_planner/ladder_graph_dag_search.h"
+#include "descartes_light/ladder_graph_dag_search.h"
 
-namespace descartes_planner
+namespace descartes_light
 {
 
-DAGSearch::DAGSearch(const LadderGraph &graph)
+DAGSearch::DAGSearch(const LadderGraph<double> &graph)
   : graph_(graph)
 {
   // On creating an object, let's allocate everything we need

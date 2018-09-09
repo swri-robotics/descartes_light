@@ -1,4 +1,5 @@
 #include "descartes_light/descartes_light.h"
+#include "descartes_light/ladder_graph_dag_search.h"
 #include <iostream>
 
 static void reportFailedEdges(const std::vector<std::size_t>& indices)
@@ -66,7 +67,23 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
   return failed_edge_samplers.empty() && failed_vertex_samplers.empty();
 }
 
-bool descartes_light::Solver::search()
+bool descartes_light::Solver::search(std::vector<double>& solution)
 {
-  return false;
+  DAGSearch s (graph_);
+  const auto cost = s.run();
+
+  if (cost == std::numeric_limits<double>::max())
+    return false;
+
+  const auto indices = s.shortestPath();
+
+  for (std::size_t i = 0; i < indices.size(); ++i)
+  {
+    const auto* pose = graph_.vertex(i, indices[i]);
+    solution.insert(end(solution), pose, pose + 6);
+  }
+
+  std::cout << "Solution found w/ cost = " << cost << "\n";
+
+  return true;
 }
