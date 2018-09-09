@@ -5,6 +5,9 @@ add_compile_options(-std=c++11 -Wall -Wextra)
 
 find_package(catkin REQUIRED COMPONENTS
   opw_kinematics
+  control_msgs
+  roscpp # Demo
+  actionlib # Demo
 )
 
 catkin_package(
