@@ -18,7 +18,8 @@ public:
 class CartesianPointSampler : public PositionSampler
 {
 public:
-  CartesianPointSampler(const Eigen::Isometry3d& tool_pose);
+  CartesianPointSampler(const Eigen::Isometry3d& tool_pose,
+                        const KinematicsInterface& robot_kin);
 
   bool sample(std::vector<double>& solution_set) override;
 

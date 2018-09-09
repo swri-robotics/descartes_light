@@ -1,5 +1,30 @@
 #include "descartes_light/descartes_light.h"
+#include <iostream>
 
+static void reportFailedEdges(const std::vector<std::size_t>& indices)
+{
+  if (indices.empty())
+    std::cout << "No failed edges\n";
+  else
+  {
+    std::cout << "Failed edges:\n";
+    for (const auto& i : indices)
+      std::cout << "\t" << i << "\n";
+  }
+}
+
+
+static void reportFailedVertices(const std::vector<std::size_t>& indices)
+{
+  if (indices.empty())
+    std::cout << "No failed vertices\n";
+  else
+  {
+    std::cout << "Failed vertices:\n";
+    for (const auto& i : indices)
+      std::cout << "\t" << i << "\n";
+  }
+}
 
 descartes_light::Solver::Solver(std::size_t dof)
   : graph_{dof}
@@ -35,10 +60,13 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
       failed_edge_samplers.push_back(i-1);
   }
 
+  reportFailedVertices(failed_vertex_samplers);
+  reportFailedEdges(failed_edge_samplers);
+
   return failed_edge_samplers.empty() && failed_vertex_samplers.empty();
 }
 
 bool descartes_light::Solver::search()
 {
-
+  return false;
 }
