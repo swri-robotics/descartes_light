@@ -28,6 +28,21 @@ private:
   KinematicsInterface kin_;
 };
 
+class AxialSymmetricSampler : public PositionSampler
+{
+public:
+  AxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
+                        const KinematicsInterface& robot_kin,
+                        const double radial_sample_resolution);
+
+  bool sample(std::vector<double>& solution_set) override;
+
+private:
+  Eigen::Isometry3d tool_pose_;
+  KinematicsInterface kin_;
+  double radial_sample_res_;
+};
+
 using PositionSamplerPtr = std::shared_ptr<PositionSampler>;
 
 

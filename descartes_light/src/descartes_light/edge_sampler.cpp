@@ -10,18 +10,17 @@ static void considerEdge(const double* start, const double* end, std::size_t nex
 {
   const static std::vector<double> vel_limits {1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
 
-  descartes_light::Edge edge;
-  edge.idx = next_idx;
-  edge.cost = 0.0f;
+//  descartes_light::Edge edge;
+  double cost = 0.0;
   for (int i = 0; i < 6; ++i)
   {
     double step = end[i] - start[i];
-    if (step > vel_limits[i]) return;
+    if (std::abs(step) > vel_limits[i]) return;
 
-    edge.cost += (step * step);
+    cost += std::pow(step, 2);
   }
 
-  out.push_back(edge);
+  out.push_back({static_cast<float>(cost), next_idx});
 }
 
 bool descartes_light::DistanceEdgeEvaluator::evaluate(const Rung_<double>& from, const Rung_<double>& to,

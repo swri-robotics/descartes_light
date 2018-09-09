@@ -3,7 +3,6 @@
 #include <opw_kinematics/opw_parameters_examples.h>
 
 #include <control_msgs/FollowJointTrajectoryAction.h>
-//#include <ros/console.h>
 #include <actionlib/client/simple_action_client.h>
 
 namespace
