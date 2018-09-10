@@ -34,15 +34,15 @@ std::vector<descartes_light::PositionSamplerPtr> makePath()
                                                       Eigen::Isometry3d::Identity(),
                                                       Eigen::Isometry3d::Identity());
 
-  Eigen::Isometry3d reference = Eigen::Isometry3d::Identity() * Eigen::Translation3d(1.0, -1.0, 0.5) *
-                                Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY());
+  Eigen::Isometry3d reference = Eigen::Isometry3d::Identity() * Eigen::Translation3d(0.8, -1.0, 0.5) *
+                                Eigen::AngleAxisd(M_PI * 0.75, Eigen::Vector3d::UnitY());
 
   std::vector<descartes_light::PositionSamplerPtr> result;
   for (int i = 0; i < 10 * 2; ++i)
   {
     result.push_back(
-          std::make_shared<descartes_light::CartesianPointSampler>(
-            reference * Eigen::Translation3d(0, i * 0.1, 0), kin_interface));
+          std::make_shared<descartes_light::AxialSymmetricSampler>(
+            reference * Eigen::Translation3d(0, i * 0.1, 0), kin_interface, 0.1));
   }
 
   return result;

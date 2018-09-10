@@ -1,5 +1,6 @@
 #include "descartes_light/kinematic_interface.h"
 #include <opw_kinematics/opw_utilities.h>
+#include <iostream>
 
 descartes_light::KinematicsInterface::KinematicsInterface(const opw_kinematics::Parameters<double>& params,
                                                           const Eigen::Isometry3d& world_to_base,
@@ -31,6 +32,8 @@ bool descartes_light::KinematicsInterface::ik(const Eigen::Isometry3d& p, std::v
       solution_set.insert(end(solution_set), sol, sol + 6);
     }
   }
+
+  std::cout << "sols: " << solution_set.size() << "\n";
 
   return !solution_set.empty();
 }

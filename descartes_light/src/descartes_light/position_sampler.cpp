@@ -21,7 +21,19 @@ bool descartes_light::CartesianPointSampler::sample(std::vector<double>& solutio
   for (std::size_t i = 0; i < n_sols; ++i)
   {
     // TODO: Collision?
-    solution_set.insert(end(solution_set), begin(buffer), end(buffer));
+    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+    buffer[i*6 + 5] += 2 * M_PI;
+    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+    buffer[i*6 + 5] -= 4 * M_PI;
+    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+    buffer[i*6 + 5] += 2 * M_PI;
+
+//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+    buffer[i*6 + 3] += 2 * M_PI;
+    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+    buffer[i*6 + 3] -= 4 * M_PI;
+    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+
   }
 
   return !solution_set.empty();
@@ -55,7 +67,11 @@ bool descartes_light::AxialSymmetricSampler::sample(std::vector<double>& solutio
     for (std::size_t i = 0; i < n_sols; ++i)
     {
       // TODO: Collision?
-      solution_set.insert(end(solution_set), begin(buffer), end(buffer));
+      solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+      buffer[i*6 + 5] += 2 * M_PI;
+      solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+      buffer[i*6 + 5] -= 4 * M_PI;
+      solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
     }
     buffer.clear();
 
