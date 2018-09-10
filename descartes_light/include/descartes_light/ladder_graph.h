@@ -39,6 +39,8 @@ namespace descartes_light
 
 struct Edge
 {
+  Edge() noexcept = default;
+  Edge(float cost, unsigned index) noexcept : cost{cost}, idx{index} {}
   float cost; // transition cost from vertex who owns this object to 'idx' in next rung
   unsigned idx; // from THIS rung to 'idx' into the NEXT rung
 };
