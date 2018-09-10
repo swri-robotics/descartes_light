@@ -1,6 +1,8 @@
 #include "descartes_light/position_sampler.h"
 #include <iostream>
 
+const static std::size_t opw_dof = 6;
+
 descartes_light::CartesianPointSampler::CartesianPointSampler(const Eigen::Isometry3d& tool_pose,
                                                               const KinematicsInterface& robot_kin,
                                                               const CollisionInterfacePtr collision)
@@ -16,28 +18,16 @@ bool descartes_light::CartesianPointSampler::sample(std::vector<double>& solutio
   kin_.ik(tool_pose_, buffer);
 
   const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
-    return v.size() / 6;
+    return v.size() / opw_dof;
   };
 
   const auto n_sols = nSamplesInBuffer(buffer);
 
   for (std::size_t i = 0; i < n_sols; ++i)
   {
-    // TODO: Collision?
-    if (isCollisionFree(buffer.data() + i * 6))
-      solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-//    buffer[i*6 + 5] += 2 * M_PI;
-//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-//    buffer[i*6 + 5] -= 4 * M_PI;
-//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-//    buffer[i*6 + 5] += 2 * M_PI;
-
-//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-//    buffer[i*6 + 3] += 2 * M_PI;
-//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-//    buffer[i*6 + 3] -= 4 * M_PI;
-//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-
+    const auto* sol_data = buffer.data() + i * opw_dof;
+    if (isCollisionFree(sol_data))
+      solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
   }
 
   return !solution_set.empty();
@@ -45,7 +35,7 @@ bool descartes_light::CartesianPointSampler::sample(std::vector<double>& solutio
 
 bool descartes_light::CartesianPointSampler::isCollisionFree(const double* vertex)
 {
-  return collision_->validate(vertex, 6);
+  return collision_->validate(vertex, opw_dof);
 }
 
 descartes_light::AxialSymmetricSampler::AxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
@@ -58,34 +48,29 @@ descartes_light::AxialSymmetricSampler::AxialSymmetricSampler(const Eigen::Isome
 
 bool descartes_light::AxialSymmetricSampler::sample(std::vector<double>& solution_set)
 {
-//  std::cout << "**************************************\n\n";
   std::vector<double> buffer;
 
   const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
-    return v.size() / 6;
+    return v.size() / opw_dof;
   };
 
   double angle = -M_PI;
 
-  while (angle <= M_PI)
+  while (angle <= M_PI) // loop over each waypoint
   {
     Eigen::Isometry3d p = tool_pose_ * Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ());
-//    std::cout << p.matrix() << "\n\n";
     kin_.ik(p, buffer);
+
     const auto n_sols = nSamplesInBuffer(buffer);
     for (std::size_t i = 0; i < n_sols; ++i)
     {
-      // TODO: Collision?
-      solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-      buffer[i*6 + 5] += 2 * M_PI;
-      solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-      buffer[i*6 + 5] -= 4 * M_PI;
-      solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+      const auto* sol_data = buffer.data() + i * opw_dof;
+      solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
     }
     buffer.clear();
 
     angle += radial_sample_res_;
-  }
+  } // redundancy resolution loop
 
   return !solution_set.empty();
 }

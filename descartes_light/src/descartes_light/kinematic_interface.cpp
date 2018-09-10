@@ -24,16 +24,13 @@ bool descartes_light::KinematicsInterface::ik(const Eigen::Isometry3d& p, std::v
     double* sol = sols.data() + 6 * i;
     if (opw_kinematics::isValid(sol))
     {
-      opw_kinematics::harmonizeTowardZero(sol);
+      opw_kinematics::harmonizeTowardZero(sol); // Modifies 'sol' in place
 
-      // TODO: Iterate checks
-
+      // TODO: Joint limits?
       // If good then add to solution set
       solution_set.insert(end(solution_set), sol, sol + 6);
     }
   }
-
-  std::cout << "sols: " << solution_set.size() << "\n";
 
   return !solution_set.empty();
 }

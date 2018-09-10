@@ -14,7 +14,6 @@ static void reportFailedEdges(const std::vector<std::size_t>& indices)
   }
 }
 
-
 static void reportFailedVertices(const std::vector<std::size_t>& indices)
 {
   if (indices.empty())
@@ -29,9 +28,7 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 
 descartes_light::Solver::Solver(std::size_t dof)
   : graph_{dof}
-{
-
-}
+{}
 
 bool descartes_light::Solver::build(const std::vector<descartes_light::PositionSamplerPtr>& trajectory,
                                     EdgeEvaluatorPtr edge_eval)
@@ -80,7 +77,7 @@ bool descartes_light::Solver::search(std::vector<double>& solution)
   for (std::size_t i = 0; i < indices.size(); ++i)
   {
     const auto* pose = graph_.vertex(i, indices[i]);
-    solution.insert(end(solution), pose, pose + 6);
+    solution.insert(end(solution), pose, pose + graph_.dof());
   }
 
   std::cout << "Solution found w/ cost = " << cost << "\n";
