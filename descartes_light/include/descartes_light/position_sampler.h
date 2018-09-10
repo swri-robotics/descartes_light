@@ -12,6 +12,7 @@ class PositionSampler
 {
 public:
   virtual ~PositionSampler() {}
+
   virtual bool sample(std::vector<double>& solution_set) = 0;
 };
 

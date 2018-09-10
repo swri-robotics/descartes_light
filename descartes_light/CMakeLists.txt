@@ -30,6 +30,7 @@ include_directories(
 
 # Core Library
 add_library(${PROJECT_NAME}
+  src/${PROJECT_NAME}/collision_checker.cpp
   src/${PROJECT_NAME}/descartes_light.cpp
   src/${PROJECT_NAME}/edge_sampler.cpp
   src/${PROJECT_NAME}/kinematic_interface.cpp
