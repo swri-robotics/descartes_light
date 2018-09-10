@@ -2,6 +2,7 @@
 #define DESCARTES_LIGHT_COLLISION_CHECKER_H
 
 #include <memory>
+#include <tesseract_core/basic_env.h>
 
 namespace descartes_light
 {
@@ -21,10 +22,21 @@ class TesseractCollision : public CollisionInterface
 {
 public:
 
+  TesseractCollision(tesseract::BasicEnvPtr collision_env);
+
   bool validate(const double* pos, std::size_t size) override;
 
-  CollisionInterface* clone() const override;
+  TesseractCollision* clone() const override;
+
+  tesseract::BasicEnvPtr& environment() { return collision_env_; }
+  const tesseract::BasicEnvPtr& environment() const { return collision_env_; }
+
+private:
+  tesseract::BasicEnvPtr collision_env_;
+  tesseract::DiscreteContactManagerBasePtr contact_manager_;
 };
+
+using CollisionInterfacePtr = std::shared_ptr<CollisionInterface>;
 
 }
 

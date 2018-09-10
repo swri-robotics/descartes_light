@@ -1,9 +1,12 @@
 #include "descartes_light/position_sampler.h"
 #include <iostream>
 
-descartes_light::CartesianPointSampler::CartesianPointSampler(const Eigen::Isometry3d& tool_pose, const KinematicsInterface& robot_kin)
+descartes_light::CartesianPointSampler::CartesianPointSampler(const Eigen::Isometry3d& tool_pose,
+                                                              const KinematicsInterface& robot_kin,
+                                                              const CollisionInterfacePtr collision)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
+  , collision_(std::move(collision))
 {
 }
 
@@ -21,22 +24,28 @@ bool descartes_light::CartesianPointSampler::sample(std::vector<double>& solutio
   for (std::size_t i = 0; i < n_sols; ++i)
   {
     // TODO: Collision?
-    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-    buffer[i*6 + 5] += 2 * M_PI;
-    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-    buffer[i*6 + 5] -= 4 * M_PI;
-    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-    buffer[i*6 + 5] += 2 * M_PI;
+    if (isCollisionFree(buffer.data() + i * 6))
+      solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+//    buffer[i*6 + 5] += 2 * M_PI;
+//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+//    buffer[i*6 + 5] -= 4 * M_PI;
+//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+//    buffer[i*6 + 5] += 2 * M_PI;
 
 //    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-    buffer[i*6 + 3] += 2 * M_PI;
-    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
-    buffer[i*6 + 3] -= 4 * M_PI;
-    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+//    buffer[i*6 + 3] += 2 * M_PI;
+//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
+//    buffer[i*6 + 3] -= 4 * M_PI;
+//    solution_set.insert(end(solution_set), begin(buffer) + i * 6, begin(buffer) + (i+1) * 6);
 
   }
 
   return !solution_set.empty();
+}
+
+bool descartes_light::CartesianPointSampler::isCollisionFree(const double* vertex)
+{
+  return collision_->validate(vertex, 6);
 }
 
 descartes_light::AxialSymmetricSampler::AxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,

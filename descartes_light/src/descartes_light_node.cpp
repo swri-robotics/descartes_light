@@ -4,9 +4,39 @@
 
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <actionlib/client/simple_action_client.h>
+#include <descartes_light/collision_checker.h>
+
+#include <urdf_parser/urdf_parser.h>
+#include <srdfdom/model.h>
+#include <tesseract_ros/kdl/kdl_env.h>
 
 namespace
 {
+
+static tesseract::BasicEnvPtr loadEnvironment()
+{
+  ros::NodeHandle nh; // We're going to load the model from the parameter server...
+  std::string urdf_string, srdf_string;
+
+  const std::string robot_description ("robot_description");
+
+  if (!nh.getParam(robot_description, urdf_string)) return nullptr;
+  if (!nh.getParam(robot_description + "_semantic", srdf_string)) return nullptr;
+
+  // BUILD URDF & SRDF MODELS //
+  auto urdf_model = urdf::parseURDF(urdf_string);
+  if (!urdf_model) return nullptr;
+
+  srdf::ModelSharedPtr srdf_model = srdf::ModelSharedPtr(new srdf::Model);
+  if (!srdf_model->initString(*urdf_model, srdf_string)) return nullptr;
+
+  // TESSERACT //
+  tesseract::tesseract_ros::KDLEnvPtr kdl_env =
+      tesseract::tesseract_ros::KDLEnvPtr(new tesseract::tesseract_ros::KDLEnv);
+  if (!kdl_env->init(urdf_model, srdf_model)) return nullptr;
+
+  return kdl_env;
+}
 
 static bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory)
 {
@@ -25,7 +55,7 @@ static bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory
   return ac.sendGoalAndWait(goal) == actionlib::SimpleClientGoalState::SUCCEEDED;
 }
 
-std::vector<descartes_light::PositionSamplerPtr> makePath()
+std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::CollisionInterfacePtr coll_env)
 {
   // The current setup requires that our cartesian sampler is aware of the robot
   // kinematics
@@ -38,11 +68,12 @@ std::vector<descartes_light::PositionSamplerPtr> makePath()
                                 Eigen::AngleAxisd(M_PI * 0.75, Eigen::Vector3d::UnitY());
 
   std::vector<descartes_light::PositionSamplerPtr> result;
-  for (int i = 0; i < 10 * 2; ++i)
+  for (int i = 0; i < 100 * 2; ++i)
   {
     result.push_back(
-          std::make_shared<descartes_light::AxialSymmetricSampler>(
-            reference * Eigen::Translation3d(0, i * 0.1, 0), kin_interface, 0.1));
+          std::make_shared<descartes_light::CartesianPointSampler>(
+            reference * Eigen::Translation3d(0, i * 0.01, 0), kin_interface,
+            std::shared_ptr<descartes_light::CollisionInterface>(coll_env->clone())));
   }
 
   return result;
@@ -53,8 +84,15 @@ std::vector<descartes_light::PositionSamplerPtr> makePath()
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "test");
+
+  // Load our env
+  auto env_ptr = loadEnvironment();
+  if (!env_ptr) return 1;
+
+  auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr);
+
   // Define our vertex samplers
-  const auto path = makePath();
+  const auto path = makePath(collision_checker);
 
   // What logic to connect edges?
   auto edge_eval = std::make_shared<descartes_light::DistanceEdgeEvaluator>();
@@ -85,7 +123,7 @@ int main(int argc, char** argv)
     trajectory.points.push_back(pt);
   }
 
-  executeTrajectory(trajectory);
+//  executeTrajectory(trajectory);
 
   return 0;
 }

@@ -1,13 +1,14 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(descartes_light)
 
-add_compile_options(-std=c++11 -Wall -Wextra)
+add_compile_options(-std=c++11 -Wall -Wextra -fno-omit-frame-pointer)
 
 find_package(catkin REQUIRED COMPONENTS
   opw_kinematics
   control_msgs
   roscpp # Demo
   actionlib # Demo
+  tesseract_ros
 )
 
 catkin_package(
@@ -17,6 +18,7 @@ catkin_package(
     descartes_light
   CATKIN_DEPENDS
     opw_kinematics
+    tesseract_ros
 )
 
 ###########
