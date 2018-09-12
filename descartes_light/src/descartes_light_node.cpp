@@ -84,6 +84,7 @@ std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::Colli
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "test");
+  ros::NodeHandle nh;
 
   // Load our env
   auto env_ptr = loadEnvironment();
@@ -92,13 +93,19 @@ int main(int argc, char** argv)
   auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr);
 
   // Define our vertex samplers
+  ros::WallTime t1 = ros::WallTime::now();
   const auto path = makePath(collision_checker);
+  ros::WallTime t2 = ros::WallTime::now();
+  ROS_ERROR_STREAM("DELTA T: " << (t2 - t1).toSec());
 
   // What logic to connect edges?
-  auto edge_eval = std::make_shared<descartes_light::DistanceEdgeEvaluator>();
+  auto edge_eval = std::make_shared<descartes_light::DistanceEdgeEvaluator>(std::vector<double>(6, 1.1));
 
   descartes_light::Solver graph_builder (6);
-  if (!graph_builder.build(path, edge_eval))
+  const static double time_per_point = 0.25;
+  if (!graph_builder.build(path,
+                           std::vector<descartes_core::TimingConstraint>(path.size(), time_per_point),
+                           edge_eval))
   {
     std::cerr << "Failed to build graph\n";
     return 1;
@@ -119,11 +126,11 @@ int main(int argc, char** argv)
   {
     trajectory_msgs::JointTrajectoryPoint pt;
     pt.positions.assign(solution.begin() + i * 6, solution.begin() + (i + 1) * 6);
-    pt.time_from_start = ros::Duration(i * 0.5);
+    pt.time_from_start = ros::Duration(i * time_per_point);
     trajectory.points.push_back(pt);
   }
 
-//  executeTrajectory(trajectory);
+  executeTrajectory(trajectory);
 
   return 0;
 }

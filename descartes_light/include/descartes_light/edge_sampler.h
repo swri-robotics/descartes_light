@@ -19,10 +19,12 @@ public:
 class DistanceEdgeEvaluator : public EdgeEvaluator
 {
 public:
-  DistanceEdgeEvaluator();
+  DistanceEdgeEvaluator(const std::vector<double>& velocity_limits);
 
   bool evaluate(const Rung_<double>& from, const Rung_<double>& to,
                           std::vector<LadderGraph<double>::EdgeList>& edges) override;
+
+  std::vector<double> velocity_limits_;
 };
 
 using EdgeEvaluatorPtr = std::shared_ptr<EdgeEvaluator>;

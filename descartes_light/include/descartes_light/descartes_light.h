@@ -14,6 +14,7 @@ public:
   Solver(std::size_t dof);
 
   bool build(const std::vector<PositionSamplerPtr>& trajectory,
+             const std::vector<descartes_core::TimingConstraint>& times,
              EdgeEvaluatorPtr edge_eval);
 
   bool search(std::vector<double>& solution);

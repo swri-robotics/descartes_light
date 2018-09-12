@@ -29,7 +29,9 @@ using TrajectoryID = std::size_t;
 
 struct TimingConstraint
 {
-  double upper, lower;
+  TimingConstraint() : upper(0.0) {}
+  TimingConstraint(double time) : upper(time) {}
+  double upper;
 };
 
 }

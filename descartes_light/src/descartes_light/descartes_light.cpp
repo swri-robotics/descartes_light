@@ -31,6 +31,7 @@ descartes_light::Solver::Solver(std::size_t dof)
 {}
 
 bool descartes_light::Solver::build(const std::vector<descartes_light::PositionSamplerPtr>& trajectory,
+                                    const std::vector<descartes_core::TimingConstraint>& times,
                                     EdgeEvaluatorPtr edge_eval)
 {
   graph_.resize(trajectory.size());
@@ -43,7 +44,10 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
   {
     std::vector<double> vertex_data;
     if (trajectory[i]->sample(vertex_data))
+    {
       graph_.getRung(i).data = std::move(vertex_data);
+      graph_.getRung(i).timing = times[i];
+    }
     else
       failed_vertex_samplers.push_back(i);
   }
