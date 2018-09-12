@@ -39,13 +39,17 @@ class AxialSymmetricSampler : public PositionSampler
 public:
   AxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
                         const KinematicsInterface& robot_kin,
-                        const double radial_sample_resolution);
+                        const double radial_sample_resolution,
+                        const CollisionInterfacePtr collision);
 
   bool sample(std::vector<double>& solution_set) override;
 
 private:
+  bool isCollisionFree(const double* vertex);
+
   Eigen::Isometry3d tool_pose_;
   KinematicsInterface kin_;
+  CollisionInterfacePtr collision_;
   double radial_sample_res_;
 };
 

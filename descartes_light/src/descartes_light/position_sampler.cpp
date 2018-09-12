@@ -40,9 +40,11 @@ bool descartes_light::CartesianPointSampler::isCollisionFree(const double* verte
 
 descartes_light::AxialSymmetricSampler::AxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
                                                               const descartes_light::KinematicsInterface& robot_kin,
-                                                              const double radial_sample_resolution)
+                                                              const double radial_sample_resolution,
+                                                              const CollisionInterfacePtr collision)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
+  , collision_(collision)
   , radial_sample_res_(radial_sample_resolution)
 {}
 
@@ -65,7 +67,8 @@ bool descartes_light::AxialSymmetricSampler::sample(std::vector<double>& solutio
     for (std::size_t i = 0; i < n_sols; ++i)
     {
       const auto* sol_data = buffer.data() + i * opw_dof;
-      solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
+      if (isCollisionFree(sol_data))
+        solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
     }
     buffer.clear();
 
@@ -73,4 +76,9 @@ bool descartes_light::AxialSymmetricSampler::sample(std::vector<double>& solutio
   } // redundancy resolution loop
 
   return !solution_set.empty();
+}
+
+bool descartes_light::AxialSymmetricSampler::isCollisionFree(const double* vertex)
+{
+  return collision_->validate(vertex, opw_dof);
 }

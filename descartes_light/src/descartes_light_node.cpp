@@ -71,8 +71,8 @@ std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::Colli
   for (int i = 0; i < 100 * 2; ++i)
   {
     result.push_back(
-          std::make_shared<descartes_light::CartesianPointSampler>(
-            reference * Eigen::Translation3d(0, i * 0.01, 0), kin_interface,
+          std::make_shared<descartes_light::AxialSymmetricSampler>(
+            reference * Eigen::Translation3d(0, i * 0.01, 0), kin_interface, 0.1,
             std::shared_ptr<descartes_light::CollisionInterface>(coll_env->clone())));
   }
 
