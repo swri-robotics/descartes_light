@@ -35,7 +35,17 @@ bool descartes_light::TesseractCollision::validate(const double* pos, std::size_
   contact_manager_->contactTest(results);
 
   // 4. Analyze results
-  return results.empty();
+  const bool no_contacts = results.empty();
+
+#define DEBUG_PRINT
+#ifdef DEBUG_PRINT
+  for (const auto& contact : results)
+  {
+    std::cout << "Contact: " << contact.first.first << " - " << contact.first.second << "\n";
+  }
+#endif
+
+  return no_contacts;
 }
 
 descartes_light::TesseractCollision* descartes_light::TesseractCollision::clone() const
