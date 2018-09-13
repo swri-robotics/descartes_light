@@ -90,7 +90,9 @@ int main(int argc, char** argv)
   auto env_ptr = loadEnvironment();
   if (!env_ptr) return 1;
 
-  auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr, "manipulator");
+  const auto group_name = "manipulator";
+
+  auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr, group_name);
 
   // Define our vertex samplers
   ros::WallTime t1 = ros::WallTime::now();
@@ -121,7 +123,7 @@ int main(int argc, char** argv)
 
   // To joint trajectory
   trajectory_msgs::JointTrajectory trajectory;
-  trajectory.joint_names = {"joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"};
+  trajectory.joint_names = env_ptr->getManipulator(group_name)->getJointNames();
   for (std::size_t i = 0; i < solution.size() / 6; ++i)
   {
     trajectory_msgs::JointTrajectoryPoint pt;
