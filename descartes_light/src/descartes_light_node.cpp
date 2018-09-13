@@ -90,7 +90,7 @@ int main(int argc, char** argv)
   auto env_ptr = loadEnvironment();
   if (!env_ptr) return 1;
 
-  auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr);
+  auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr, "manipulator");
 
   // Define our vertex samplers
   ros::WallTime t1 = ros::WallTime::now();

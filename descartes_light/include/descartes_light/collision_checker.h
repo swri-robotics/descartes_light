@@ -21,8 +21,7 @@ public:
 class TesseractCollision : public CollisionInterface
 {
 public:
-
-  TesseractCollision(tesseract::BasicEnvPtr collision_env);
+  TesseractCollision(tesseract::BasicEnvPtr collision_env, const std::string& group_name);
 
   bool validate(const double* pos, std::size_t size) override;
 
@@ -33,6 +32,7 @@ public:
 
 private:
   tesseract::BasicEnvPtr collision_env_;
+  tesseract::BasicKinConstPtr kin_group_;
   tesseract::DiscreteContactManagerBasePtr contact_manager_;
 };
 

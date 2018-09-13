@@ -1,11 +1,19 @@
 #include "descartes_light/collision_checker.h"
 
-descartes_light::TesseractCollision::TesseractCollision(tesseract::BasicEnvPtr collision_env)
+descartes_light::TesseractCollision::TesseractCollision(tesseract::BasicEnvPtr collision_env,
+                                                        const std::string& group_name)
   : collision_env_(std::move(collision_env))
   , contact_manager_(collision_env_->getDiscreteContactManager())
 {
+  kin_group_ = collision_env_->getManipulator(group_name);
+
+  if (!kin_group_)
+  {
+    throw std::runtime_error("Group " + group_name + " not found in scene");
+  }
+
   tesseract::ContactRequest cr;
-  cr.link_names = {"joint_1", "joint_2", "joint_3", "joint_4", "joint_5", "joint_6"};
+  cr.link_names = kin_group_->getLinkNames();
   cr.type = tesseract::ContactRequestTypes::FIRST;
 
   contact_manager_->setContactRequest(cr);
@@ -16,8 +24,8 @@ bool descartes_light::TesseractCollision::validate(const double* pos, std::size_
   // Happens in two phases:
   // 1. Compute the transform of all objects
   Eigen::Map<const Eigen::VectorXd> joint_angles(pos, long(size));
-  const auto& link_names = contact_manager_->getContactRequest().link_names;
-  tesseract::EnvStatePtr env_state = collision_env_->getState(link_names, joint_angles);
+  const auto& joint_names = kin_group_->getJointNames();
+  tesseract::EnvStatePtr env_state = collision_env_->getState(joint_names, joint_angles);
 
   // 2. Update the scene
   contact_manager_->setCollisionObjectsTransform(env_state->transforms);
