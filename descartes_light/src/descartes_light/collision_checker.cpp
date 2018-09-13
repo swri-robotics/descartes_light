@@ -15,6 +15,8 @@ descartes_light::TesseractCollision::TesseractCollision(tesseract::BasicEnvPtr c
   tesseract::ContactRequest cr;
   cr.link_names = kin_group_->getLinkNames();
   cr.type = tesseract::ContactRequestTypes::FIRST;
+  cr.isContactAllowed = std::bind(&TesseractCollision::isContactAllowed, this, std::placeholders::_1,
+                                  std::placeholders::_2);
 
   contact_manager_->setContactRequest(cr);
 }
@@ -53,4 +55,9 @@ descartes_light::TesseractCollision* descartes_light::TesseractCollision::clone(
   auto ptr = new TesseractCollision(*this);
   ptr->contact_manager_= this->contact_manager_->clone();
   return ptr;
+}
+
+bool descartes_light::TesseractCollision::isContactAllowed(const std::string &a, const std::string &b) const
+{
+  return collision_env_->getAllowedCollisionMatrix()->isCollisionAllowed(a ,b);
 }

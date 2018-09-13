@@ -31,6 +31,8 @@ public:
   const tesseract::BasicEnvPtr& environment() const { return collision_env_; }
 
 private:
+  bool isContactAllowed(const std::string& a, const std::string& b) const;
+
   tesseract::BasicEnvPtr collision_env_;
   tesseract::BasicKinConstPtr kin_group_;
   tesseract::DiscreteContactManagerBasePtr contact_manager_;
