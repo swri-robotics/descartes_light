@@ -3,10 +3,10 @@
 
 const static std::size_t opw_dof = 7;
 
-descartes_light::ExternalAxisSampler::ExternalAxisSampler(const Eigen::Isometry3d& tool_pose,
+descartes_light::ExternalAxisSampler::ExternalAxisSampler(const Eigen::Isometry3d& tool_in_positioner,
                                                           const KinematicsInterface& robot_kin,
                                                           const CollisionInterfacePtr collision)
-  : tool_pose_(tool_pose)
+  : tool_pose_(tool_in_positioner)
   , kin_(robot_kin)
   , collision_(std::move(collision))
 {
@@ -14,20 +14,32 @@ descartes_light::ExternalAxisSampler::ExternalAxisSampler(const Eigen::Isometry3
 
 bool descartes_light::ExternalAxisSampler::sample(std::vector<double>& solution_set)
 {
-  std::vector<double> buffer;
-  kin_.ik(tool_pose_, buffer);
+  // We need to translate the tool pose to the "robot" frame
+  // We need some strategy for moving the positioner around to generate many of these frames
+  //    - In the simple case, we can sample the positioner limits evenly but this will often
+  //      lead to terrible performance
 
-  const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
-    return v.size() / opw_dof;
+  auto to_robot_frame = [] (const Eigen::Isometry3d& pose_in_positioner, const double positioner_angle)
+  {
+    return Eigen::Translation3d(1.25, 0, 0) * Eigen::AngleAxisd(positioner_angle, Eigen::Vector3d::UnitZ()) *
+           pose_in_positioner;
   };
 
-  const auto n_sols = nSamplesInBuffer(buffer);
-
-  for (std::size_t i = 0; i < n_sols; ++i)
+  // So we just loop
+  const static double discretization = M_PI / 12.;
+  for (double angle = -M_PI; angle <= M_PI; angle += discretization)
   {
-    const auto* sol_data = buffer.data() + i * opw_dof;
-    if (isCollisionFree(sol_data))
-      solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
+    std::vector<double> buffer;
+    kin_.ik(to_robot_frame(tool_pose_, angle), buffer);
+
+    // Now test the solutions
+    const auto n_sols = buffer.size() / opw_dof;
+    for (std::size_t i = 0; i < n_sols; ++i)
+    {
+      const auto* sol_data = buffer.data() + i * opw_dof;
+      if (isCollisionFree(sol_data))
+        solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
+    }
   }
 
   return !solution_set.empty();

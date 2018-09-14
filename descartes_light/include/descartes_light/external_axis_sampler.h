@@ -9,7 +9,7 @@ namespace descartes_light
 class ExternalAxisSampler : public PositionSampler
 {
 public:
-  ExternalAxisSampler(const Eigen::Isometry3d& tool_pose_on_axis,
+  ExternalAxisSampler(const Eigen::Isometry3d& tool_in_positioner,
                       const KinematicsInterface& robot_kin,
                       const CollisionInterfacePtr collision);
 

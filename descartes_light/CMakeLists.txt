@@ -37,6 +37,7 @@ add_library(${PROJECT_NAME}
   src/${PROJECT_NAME}/edge_sampler.cpp
   src/${PROJECT_NAME}/kinematic_interface.cpp
   src/${PROJECT_NAME}/position_sampler.cpp
+  src/${PROJECT_NAME}/external_axis_sampler.cpp
   src/${PROJECT_NAME}/rail_position_sampler.cpp
   src/${PROJECT_NAME}/ladder_graph_dag_search.cpp
 )
