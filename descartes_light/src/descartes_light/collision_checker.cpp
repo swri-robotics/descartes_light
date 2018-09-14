@@ -39,7 +39,7 @@ bool descartes_light::TesseractCollision::validate(const double* pos, std::size_
   // 4. Analyze results
   const bool no_contacts = results.empty();
 
-#define DEBUG_PRINT
+//#define DEBUG_PRINT
 #ifdef DEBUG_PRINT
   for (const auto& contact : results)
   {

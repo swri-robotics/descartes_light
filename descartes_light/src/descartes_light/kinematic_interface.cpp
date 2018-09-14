@@ -13,7 +13,7 @@ descartes_light::KinematicsInterface::KinematicsInterface(const opw_kinematics::
 
 bool descartes_light::KinematicsInterface::ik(const Eigen::Isometry3d& p, std::vector<double>& solution_set) const
 {
-  Eigen::Isometry3d tool_pose = world_to_base_.inverse() * p * tool0_to_tip_;
+  Eigen::Isometry3d tool_pose = world_to_base_.inverse() * p * tool0_to_tip_.inverse();
 
   std::array<double, 6*8> sols;
   opw_kinematics::inverse(params_, tool_pose, sols.data());

@@ -52,6 +52,7 @@
   <depend>trajopt</depend>
   <depend>tesseract_ros</depend>
   <depend>octomap_ros</depend>
+  <depend>descartes_light</depend>
 
 
   <buildtool_depend>catkin</buildtool_depend>
