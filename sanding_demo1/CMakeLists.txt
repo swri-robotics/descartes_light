@@ -162,6 +162,14 @@ target_link_libraries(${PROJECT_NAME}_node2
   ${catkin_LIBRARIES}
 )
 
+add_executable(${PROJECT_NAME}_node2_descartes src/demo2_descartes.cpp)
+
+add_dependencies(${PROJECT_NAME}_node2_descartes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+target_link_libraries(${PROJECT_NAME}_node2_descartes
+  ${catkin_LIBRARIES}
+)
+
 #############
 ## Install ##
 #############

@@ -40,6 +40,7 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
   std::vector<std::size_t> failed_edge_samplers;
 
   // Build Vertices
+  #pragma omp parallel for
   for (std::size_t i = 0; i < trajectory.size(); ++i)
   {
     std::vector<double> vertex_data;
@@ -53,6 +54,7 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
   }
 
   // Build Edges
+  #pragma omp parallel for
   for (std::size_t i = 1; i < trajectory.size(); ++i)
   {
     const auto& from = graph_.getRung(i - 1);

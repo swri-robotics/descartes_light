@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 2.8.3)
 project(descartes_light)
 
-add_compile_options(-std=c++11 -Wall -Wextra -fno-omit-frame-pointer)
+add_compile_options(-std=c++11 -Wall -Wextra -fopenmp)
 
 find_package(catkin REQUIRED COMPONENTS
   opw_kinematics
@@ -37,12 +37,13 @@ add_library(${PROJECT_NAME}
   src/${PROJECT_NAME}/edge_sampler.cpp
   src/${PROJECT_NAME}/kinematic_interface.cpp
   src/${PROJECT_NAME}/position_sampler.cpp
+  src/${PROJECT_NAME}/rail_position_sampler.cpp
   src/${PROJECT_NAME}/ladder_graph_dag_search.cpp
 )
 
 add_dependencies(${PROJECT_NAME} ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
-target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${catkin_LIBRARIES} gomp)
 
 # Demonstration
 
