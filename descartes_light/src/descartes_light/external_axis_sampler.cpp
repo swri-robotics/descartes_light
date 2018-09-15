@@ -1,8 +1,6 @@
 #include "descartes_light/external_axis_sampler.h"
 #include <iostream>
 
-const static std::size_t opw_dof = 7;
-
 descartes_light::ExternalAxisSampler::ExternalAxisSampler(const Eigen::Isometry3d& tool_in_positioner,
                                                           const KinematicsInterface& robot_kin,
                                                           const CollisionInterfacePtr collision)
@@ -26,19 +24,22 @@ bool descartes_light::ExternalAxisSampler::sample(std::vector<double>& solution_
   };
 
   // So we just loop
-  const static double discretization = M_PI / 12.;
+  const static double discretization = M_PI / 36.;
   for (double angle = -M_PI; angle <= M_PI; angle += discretization)
   {
     std::vector<double> buffer;
     kin_.ik(to_robot_frame(tool_pose_, angle), buffer);
 
     // Now test the solutions
-    const auto n_sols = buffer.size() / opw_dof;
+    const auto n_sols = buffer.size() / 6;
     for (std::size_t i = 0; i < n_sols; ++i)
     {
-      const auto* sol_data = buffer.data() + i * opw_dof;
+      const auto* sol_data = buffer.data() + i * 6;
       if (isCollisionFree(sol_data))
-        solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
+      {
+        solution_set.insert(end(solution_set), sol_data, sol_data + 6);
+        solution_set.insert(end(solution_set), angle);
+      }
     }
   }
 
@@ -47,5 +48,5 @@ bool descartes_light::ExternalAxisSampler::sample(std::vector<double>& solution_
 
 bool descartes_light::ExternalAxisSampler::isCollisionFree(const double* vertex)
 {
-  return collision_->validate(vertex, opw_dof);
+  return collision_->validate(vertex, 7);
 }
