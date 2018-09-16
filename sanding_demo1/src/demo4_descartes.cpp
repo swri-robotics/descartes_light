@@ -9,6 +9,7 @@
 
 #include <tesseract_msgs/TesseractState.h>
 #include <tesseract_ros/ros_tesseract_utils.h>
+#include <trajopt/problem_description.hpp>
 
 #include <geometry_msgs/PoseArray.h>
 
@@ -168,6 +169,95 @@ static std::vector<descartes_light::PositionSamplerPtr> makeSamplers(const Eigen
   return result;
 }
 
+static trajopt::TrajOptProbPtr makeProblem(tesseract::BasicEnvConstPtr env,
+                                           const EigenSTL::vector_Isometry3d& geometric_path,
+                                           const trajectory_msgs::JointTrajectory& seed)
+{
+  trajopt::ProblemConstructionInfo pci (env);
+
+  // Populate Basic Info
+  pci.basic_info.n_steps = geometric_path.size();
+  pci.basic_info.manip = "manipulator_positioner";
+  pci.basic_info.start_fixed = false;
+
+  // Create Kinematic Object
+  pci.kin = pci.env->getManipulator(pci.basic_info.manip);
+
+  const auto dof = pci.kin->numJoints();
+
+  // Populate Init Info
+  Eigen::VectorXd start_pos = pci.env->getCurrentJointValues(pci.kin->getName());
+
+  pci.init_info.type = trajopt::InitInfo::GIVEN_TRAJ;
+  pci.init_info.data = start_pos.transpose().replicate(pci.basic_info.n_steps, 1);
+  for (std::size_t i = 0; i < seed.points.size(); ++i)
+  {
+    for (std::size_t j = 0; j < dof; ++j)
+    {
+      pci.init_info.data(i, j) = seed.points[i].positions[j];
+    }
+  }
+  ROS_ERROR_STREAM("DOF: " << dof);
+
+  // Populate Cost Info
+  std::shared_ptr<trajopt::JointVelCostInfo> jv = std::shared_ptr<trajopt::JointVelCostInfo>(new trajopt::JointVelCostInfo);
+  jv->coeffs = std::vector<double>(dof, 5.0);
+  jv->coeffs.back() = 0.0;
+  jv->name = "joint_vel";
+  jv->term_type = trajopt::TT_COST;
+  pci.cost_infos.push_back(jv);
+
+  auto cv = std::shared_ptr<trajopt::CartVelCntInfo>(new trajopt::CartVelCntInfo);
+  cv->first_step = 0;
+  cv->last_step = pci.basic_info.n_steps - 1;
+  cv->link = "welder_tcp";
+  cv->name = "keep still";
+  cv->term_type = trajopt::TermType::TT_CNT ;
+  cv->max_displacement = 0.02;
+
+  pci.cnt_infos.push_back(cv);
+
+  std::shared_ptr<trajopt::JointAccCostInfo> ja = std::shared_ptr<trajopt::JointAccCostInfo>(new trajopt::JointAccCostInfo);
+  ja->coeffs = std::vector<double>(dof, 10.0);
+  ja->name = "joint_acc";
+  ja->term_type = trajopt::TT_COST;
+  pci.cost_infos.push_back(ja);
+
+  std::shared_ptr<trajopt::CollisionCostInfo> collision = std::shared_ptr<trajopt::CollisionCostInfo>(new trajopt::CollisionCostInfo);
+  collision->name = "collision";
+  collision->term_type = trajopt::TT_COST;
+  collision->continuous = false;
+  collision->first_step = 0;
+  collision->last_step = pci.basic_info.n_steps - 1;
+  collision->gap = 1;
+  collision->info = trajopt::createSafetyMarginDataVector(pci.basic_info.n_steps, 0.015, 10);
+
+  // Apply a special cost between the sander_disks and the part
+  for (auto& c : collision->info)
+  {
+    c->SetPairSafetyMarginData("welder_tip", "positioner", 0.005, 10.0);
+  }
+
+  pci.cost_infos.push_back(collision);
+
+  // Populate Constraints
+  for (std::size_t i = 0; i < geometric_path.size(); ++i)
+  {
+    std::shared_ptr<trajopt::PoseCostInfo> pose = std::shared_ptr<trajopt::PoseCostInfo>(new trajopt::PoseCostInfo);
+    pose->term_type = trajopt::TT_CNT;
+    pose->name = "waypoint_cart_" + std::to_string(i);
+    pose->link = "positioner";
+    pose->target = "welder_tcp";
+    pose->timestep = i;
+    pose->tcp = geometric_path[i];
+    pose->pos_coeffs = Eigen::Vector3d(1, 1, 1);
+    pose->rot_coeffs = Eigen::Vector3d(1, 1, 1);
+    pci.cnt_infos.push_back(pose);
+  }
+
+  return trajopt::ConstructProblem(pci);
+}
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "demo1");
@@ -236,12 +326,47 @@ int main(int argc, char** argv)
     trajectory.points.push_back(pt);
   }
 
+  // TRAJOPT
+  auto opt_problem = makeProblem(env, path, trajectory);
+
+  trajopt::BasicTrustRegionSQP optimizer (opt_problem);
+  optimizer.initialize(trajopt::trajToDblVec(opt_problem->GetInitTraj()));
+  auto params = optimizer.getParameters();
+  params.max_iter = 100;
+  params.max_merit_coeff_increases = 10;
+  optimizer.setParameters(params);
+
+  const auto opt_status = optimizer.optimize();
+  if (opt_status != trajopt::OptStatus::OPT_CONVERGED) ROS_WARN("Did not converge");
+
+  auto result = trajopt::getTraj(optimizer.x(), opt_problem->GetVars());
+
+  // To & From Vector of parameters
+  trajectory_msgs::JointTrajectory out;
+  out.joint_names = env->getManipulator("manipulator_positioner")->getJointNames();
+  for (const auto& joint : out.joint_names)
+  {
+    std::cout << "Joint: " << joint << "\n";
+  }
+
+  for (int i = 0; i < result.rows(); ++i)
+  {
+    trajectory_msgs::JointTrajectoryPoint jtp;
+    for (int j = 0; j < result.cols(); ++j)
+    {
+      jtp.positions.push_back(result(i, j));
+    }
+    jtp.time_from_start = ros::Duration(1.0 * i);
+    out.points.push_back(jtp);
+  }
+
   ros::Timer pub_timer = nh.createTimer(ros::Duration(0.1), [&pub, &poses_msg] (const ros::TimerEvent&) {
     poses_msg.header.stamp = ros::Time::now();
     pub.publish(poses_msg);
   }, false, true);
 
-  executeTrajectory(trajectory);
+//  executeTrajectory(trajectory);
+  executeTrajectory(out);
 
   ros::waitForShutdown();
   return 0;
