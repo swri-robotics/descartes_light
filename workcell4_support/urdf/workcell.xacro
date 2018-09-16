@@ -1,0 +1,56 @@
+<?xml version="1.0" ?>
+<robot name="irb4600_workspace" xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Includes -->
+  <xacro:include filename="$(find abb_irb4600_support)/urdf/irb4600_60_205_macro.xacro"/> <!-- Robot Arm -->
+  <xacro:include filename="$(find workcell4_support)/urdf/welder.xacro"/> <!-- Sanding Tool -->
+
+  <!-- Constants  -->
+
+  <!-- Components -->
+  <xacro:abb_irb4600_60_205 prefix=""/>
+  <xacro:welder prefix="welder_"/>
+
+  <!-- Links -->
+  <link name="world_frame"/>
+  <link name="positioner_base"/>
+  <link name="positioner">
+    <visual>
+      <geometry>
+        <cylinder radius="0.25" length="0.75"/>
+      </geometry>
+    </visual>
+    <collision>
+      <geometry>
+        <cylinder radius="0.5" length="0.5"/>
+      </geometry>
+    </collision>
+  </link>
+
+  <!-- Joints -->
+  <joint name="world_to_base_link" type="fixed"> <!-- Connects world & robot -->
+    <parent link="world_frame"/>
+    <child link="base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="robot_to_sander" type="fixed"> <!-- Connects robot & tool -->
+    <parent link="tool0"/>
+    <child link="welder_base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="world_to_positioner" type="fixed">
+    <parent link="world_frame"/>
+    <child link="positioner_base"/>
+    <origin xyz="1.25 0 0.5" rpy="${pi / 2.0} 0 0"/>
+  </joint>
+
+  <joint name="positioner" type="revolute">
+    <parent link="positioner_base"/>
+    <child link="positioner"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+    <axis xyz="0 0 1"/>
+    <limit lower="-3.14159" upper="3.14159" effort="0" velocity="1.0"/>
+  </joint>
+
+</robot>
