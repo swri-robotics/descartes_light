@@ -1,0 +1,111 @@
+<?xml version="1.0" ?>
+<robot name="irb4600_workspace" xmlns:xacro="http://ros.org/wiki/xacro">
+  <!-- Includes -->
+  <xacro:include filename="$(find abb_irb4600_support)/urdf/irb4600_60_205_macro.xacro"/> <!-- Robot Arm -->
+  <xacro:include filename="$(find plug_support)/urdf/welder.xacro"/> <!-- Sanding Tool -->
+
+  <!-- Macros -->
+  <xacro:macro name="linear_track" params="prefix">
+    <link name="${prefix}base_link"/>
+    <link name="${prefix}carriage"/>
+    <joint name="${prefix}rail" type="prismatic">
+      <parent link="${prefix}base_link"/>
+      <child link="${prefix}carriage"/>
+      <axis xyz="0 1 0"/>
+      <limit lower="0.0" upper="2.0" effort="0" velocity="1.0"/>
+    </joint>
+  </xacro:macro>>
+
+  <!-- Constants  -->
+
+  <!-- Components -->
+  <xacro:abb_irb4600_60_205 prefix="mr_"/> <!-- Material handling robot arm -->
+  <xacro:linear_track prefix="mr_track_"/>
+
+  <xacro:abb_irb4600_60_205 prefix="wr_"/> <!-- The welding / torch cutting arm -->
+  <xacro:linear_track prefix="wr_track_"/>
+  
+  <xacro:welder prefix="welder_"/> <!-- Welding / Torch Tool -->
+
+  <!-- Links -->
+  <link name="world_frame"/>
+  
+  <!-- =========================Joints========================= -->
+
+  <joint name="world_to_mr_track_base_link" type="fixed"> <!-- Connects world & robot -->
+    <parent link="world_frame"/>
+    <child link="mr_track_base_link"/>
+    <origin xyz="0 0 -0.75" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="world_to_base_link" type="fixed"> <!-- Connects world & robot -->
+    <parent link="world_frame"/>
+    <child link="wr_track_base_link"/>
+    <origin xyz="0.5 0 2.75" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="mr_track_to_robot" type="fixed">
+    <parent link="mr_track_carriage"/>
+    <child link="mr_base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <joint name="wr_track_to_robot" type="fixed">
+    <parent link="wr_track_carriage"/>
+    <child link="wr_base_link"/>
+    <origin xyz="0 0 0" rpy="${pi} 0 0"/>
+  </joint>
+
+  <joint name="robot_to_torch" type="fixed"> <!-- Connects robot & tool -->
+    <parent link="wr_tool0"/>
+    <child link="welder_base_link"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint>
+
+  <!-- Parts -->
+  <link name="surface">
+<!--    <visual>
+      <geometry>
+        <box size="0.025 2.0 2.0"/>
+      </geometry>
+      <origin xyz="0.025 0 1.0"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="0.025 2.0 2.0"/>
+      </geometry>
+      <origin xyz="0.025 0 1.0"/>
+    </collision>-->
+  </link>
+
+  <!-- <link name="plug">
+    <visual>
+      <geometry>
+        <box size="1.0 0.5 0.1"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </visual>
+    <collision>
+      <geometry>
+        <box size="1.0 0.5 0.1"/>
+      </geometry>
+      <origin xyz="0 0 0.05"/>
+    </collision>
+  </link>
+ -->
+  <joint name="world_to_surface" type="fixed">
+    <parent link="world_frame"/>
+    <child link="surface"/>
+    <origin xyz="1.75 1.0 0" rpy="0 0 0"/>
+  </joint>
+<!-- 
+  <joint name="mr_robot_to_part" type="fixed">
+    <parent link="mr_tool0"/>
+    <child link="plug"/>
+    <origin xyz="0 0 0" rpy="0 0 0"/>
+  </joint> -->
+
+  
+
+
+</robot>

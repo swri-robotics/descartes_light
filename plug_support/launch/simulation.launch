@@ -1,0 +1,14 @@
+<launch>
+  <rosparam param="controller_joint_names">
+   ['wr_joint_1', 'wr_joint_2', 'wr_joint_3', 'wr_joint_4', 'wr_joint_5', 'wr_joint_6', 'wr_track_rail','mr_track_rail', 'mr_joint_1', 'mr_joint_2', 'mr_joint_3', 'mr_joint_4', 'mr_joint_5', 'mr_joint_6']
+  </rosparam>
+
+   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+   <include file="$(find industrial_robot_simulator)/launch/robot_interface_simulator.launch" />
+
+   <include file="$(find plug_moveit_config)/launch/planning_context.launch" >
+    <arg name="load_robot_description" value="true" />
+  </include>
+
+</launch>
