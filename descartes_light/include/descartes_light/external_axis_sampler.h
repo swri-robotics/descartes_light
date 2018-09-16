@@ -23,7 +23,22 @@ private:
   CollisionInterfacePtr collision_;
 };
 
+class SpoolSampler : public descartes_light::PositionSampler
+{
+public:
+  SpoolSampler(const Eigen::Isometry3d& tool_in_positioner,
+                      const KinematicsInterface& robot_kin,
+                      const CollisionInterfacePtr collision);
 
+  bool sample(std::vector<double>& solution_set) override;
+
+private:
+  bool isCollisionFree(const double* vertex);
+
+  Eigen::Isometry3d tool_pose_;
+  KinematicsInterface kin_;
+  CollisionInterfacePtr collision_;
+};
 }
 
 #endif

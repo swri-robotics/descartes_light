@@ -39,9 +39,9 @@
     <disable_collisions link1="link_3" link2="welder_tip" reason="Never" />
     <disable_collisions link1="link_4" link2="link_5" reason="Adjacent" />
     <disable_collisions link1="link_4" link2="link_6" reason="Default" />
-    <disable_collisions link1="link_4" link2="welder_shaft" reason="Never" />
-    <disable_collisions link1="link_4" link2="welder_tip" reason="Never" />
-    <disable_collisions link1="link_4" link2="welder_base_link" reason="Never" />
+<!--    <disable_collisions link1="link_4" link2="welder_shaft" reason="Never" />-->
+<!--    <disable_collisions link1="link_4" link2="welder_tip" reason="Never" />-->
+<!--    <disable_collisions link1="link_4" link2="welder_base_link" reason="Never" />-->
     <disable_collisions link1="link_5" link2="link_6" reason="Adjacent" />
     <disable_collisions link1="link_5" link2="welder_base_link" reason="Never" />
     <disable_collisions link1="link_5" link2="welder_shaft" reason="Never" />
