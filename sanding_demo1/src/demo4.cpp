@@ -75,20 +75,17 @@ static bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory
 static EigenSTL::vector_Isometry3d makePath()
 {
   // Define a path in the frame of the positioner
-  // The positioner structure is a cube with 0.5 meter sides
-  // The frame is located at the bottom center
+  // The positioner structure is a cylinder of radius 0.25 meters
   EigenSTL::vector_Isometry3d path;
-  const Eigen::Isometry3d to_top_surface = Eigen::Isometry3d::Identity() * Eigen::Translation3d(0, 0, 0.5);
 
   // put a circle on the top plane
-  const double a= 0.25, b =0.5;
-  for (double r = 0; r < 2 * M_PI; r += M_PI / 12)
+  double s = -0.25;
+  for (double r = 0.0; r < 4 * M_PI; r += M_PI / 12)
   {
-    const double radius = a * b / (std::sqrt(a * a * std::sin(r) * std::sin(r) + b * b * std::cos(r) * std::cos(r)));
-//    const double radius = 0.1;
-    Eigen::Isometry3d point = to_top_surface * Eigen::Translation3d(radius * std::cos(r),
-                                                                    radius * std::sin(r),
-                                                                    0.0) * Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY());
+    Eigen::Isometry3d point = Eigen::Isometry3d::Identity() * Eigen::AngleAxisd(r, Eigen::Vector3d::UnitZ()) *
+                              Eigen::Translation3d(0, 0.255, s) * Eigen::AngleAxisd(M_PI / 2., Eigen::Vector3d::UnitX()) *
+                              Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitZ());
+    s += 0.005;
     path.push_back(point);
   }
 
@@ -119,13 +116,13 @@ static trajopt::TrajOptProbPtr makeProblem(tesseract::BasicEnvConstPtr env,
 
   // Populate Cost Info
   std::shared_ptr<trajopt::JointVelCostInfo> jv = std::shared_ptr<trajopt::JointVelCostInfo>(new trajopt::JointVelCostInfo);
-  jv->coeffs = std::vector<double>(dof, 2.5);
+  jv->coeffs = std::vector<double>(dof, 1.0);
   jv->name = "joint_vel";
   jv->term_type = trajopt::TT_COST;
   pci.cost_infos.push_back(jv);
 
   std::shared_ptr<trajopt::JointAccCostInfo> ja = std::shared_ptr<trajopt::JointAccCostInfo>(new trajopt::JointAccCostInfo);
-  ja->coeffs = std::vector<double>(dof, 2.5);
+  ja->coeffs = std::vector<double>(dof, 1.0);
   ja->name = "joint_acc";
   ja->term_type = trajopt::TT_COST;
   pci.cost_infos.push_back(ja);
@@ -137,12 +134,12 @@ static trajopt::TrajOptProbPtr makeProblem(tesseract::BasicEnvConstPtr env,
   collision->first_step = 0;
   collision->last_step = pci.basic_info.n_steps - 1;
   collision->gap = 1;
-  collision->info = trajopt::createSafetyMarginDataVector(pci.basic_info.n_steps, 0.025, 10);
+  collision->info = trajopt::createSafetyMarginDataVector(pci.basic_info.n_steps, 0.015, 10);
 
   // Apply a special cost between the sander_disks and the part
   for (auto& c : collision->info)
   {
-    c->SetPairSafetyMarginData("welder_tip", "positioner", 0.005, 20.0);
+    c->SetPairSafetyMarginData("welder_tip", "positioner", 0.005, 10.0);
   }
 
   pci.cost_infos.push_back(collision);
@@ -157,7 +154,7 @@ static trajopt::TrajOptProbPtr makeProblem(tesseract::BasicEnvConstPtr env,
     pose->target = "welder_tcp";
     pose->timestep = i;
     pose->tcp = geometric_path[i];
-    pose->pos_coeffs = Eigen::Vector3d(10, 10, 10);
+    pose->pos_coeffs = Eigen::Vector3d(20, 20, 20);
     pose->rot_coeffs = Eigen::Vector3d(10, 10, 0);
     pci.cnt_infos.push_back(pose);
   }
@@ -202,6 +199,10 @@ int main(int argc, char** argv)
 
   trajopt::BasicTrustRegionSQP optimizer (opt_problem);
   optimizer.initialize(trajopt::trajToDblVec(opt_problem->GetInitTraj()));
+  auto params = optimizer.getParameters();
+  params.max_iter = 100;
+  params.max_merit_coeff_increases = 10;
+  optimizer.setParameters(params);
 
   const auto opt_status = optimizer.optimize();
   if (opt_status != trajopt::OptStatus::OPT_CONVERGED) ROS_WARN("Did not converge");
@@ -239,6 +240,14 @@ int main(int argc, char** argv)
     poses_msg.header.stamp = ros::Time::now();
     pub.publish(poses_msg);
   }, false, true);
+
+  tesseract::ContactResultMap map;
+  env->getDiscreteContactManager()->contactTest(map);
+  for (auto& p : map)
+  {
+    std::cout << p.first.first << " - " << p.first.second << "\n";
+    std::cout << "Is coll allowed? : "<< env->getAllowedCollisionMatrix()->isCollisionAllowed(p.first.first, p.first.second) << "\n";
+  }
 
   executeTrajectory(out);
 
