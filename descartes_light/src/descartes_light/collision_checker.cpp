@@ -1,6 +1,6 @@
 #include "descartes_light/collision_checker.h"
 
-descartes_light::TesseractCollision::TesseractCollision(tesseract::BasicEnvPtr collision_env,
+descartes_light::TesseractCollision::TesseractCollision(tesseract::BasicEnvConstPtr collision_env,
                                                         const std::string& group_name)
   : collision_env_(std::move(collision_env))
   , contact_manager_(collision_env_->getDiscreteContactManager())

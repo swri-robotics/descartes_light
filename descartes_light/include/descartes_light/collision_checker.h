@@ -21,19 +21,19 @@ public:
 class TesseractCollision : public CollisionInterface
 {
 public:
-  TesseractCollision(tesseract::BasicEnvPtr collision_env, const std::string& group_name);
+  TesseractCollision(tesseract::BasicEnvConstPtr collision_env, const std::string& group_name);
 
   bool validate(const double* pos, std::size_t size) override;
 
   TesseractCollision* clone() const override;
 
-  tesseract::BasicEnvPtr& environment() { return collision_env_; }
-  const tesseract::BasicEnvPtr& environment() const { return collision_env_; }
+  tesseract::BasicEnvConstPtr& environment() { return collision_env_; }
+  const tesseract::BasicEnvConstPtr& environment() const { return collision_env_; }
 
 private:
   bool isContactAllowed(const std::string& a, const std::string& b) const;
 
-  tesseract::BasicEnvPtr collision_env_;
+  tesseract::BasicEnvConstPtr collision_env_;
   tesseract::BasicKinConstPtr kin_group_;
   tesseract::DiscreteContactManagerBasePtr contact_manager_;
 };
