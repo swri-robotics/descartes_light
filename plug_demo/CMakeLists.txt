@@ -1,20 +1,18 @@
 cmake_minimum_required(VERSION 2.8.3)
-project(sanding_demo1)
+project(plug_demo)
 
 ## Compile as C++11, supported in ROS Kinetic and newer
-add_compile_options(-std=c++11 -Wall -Wextra)
+ add_compile_options(-std=c++11 -Wall -Wextra)
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
-  trajopt_examples
-  roscpp
-  trajopt
-  tesseract_ros
-  octomap_ros
   descartes_light
-
+  trajopt
+  trajopt_examples
+  actionlib
+  control_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -108,8 +106,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES sanding_demo1
-#  CATKIN_DEPENDS trajopt_examples
+#  LIBRARIES plug_demo
+#  CATKIN_DEPENDS descartes_light trajopt trajopt_examples
 #  DEPENDS system_lib
 )
 
@@ -120,13 +118,13 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 include_directories(
- include
+# include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a C++ library
 # add_library(${PROJECT_NAME}
-#   src/${PROJECT_NAME}/sanding_demo1.cpp
+#   src/${PROJECT_NAME}/plug_demo.cpp
 # )
 
 ## Add cmake target dependencies of the library
@@ -137,7 +135,24 @@ include_directories(
 ## Declare a C++ executable
 ## With catkin_make all packages are built within a single CMake context
 ## The recommended prefix ensures that target names across packages don't collide
-add_executable(${PROJECT_NAME}_node src/demo1.cpp)
+# add_executable(${PROJECT_NAME}_node src/plug_demo_node.cpp)
+
+## Rename C++ executable without prefix
+## The above recommended prefix causes long target names, the following renames the
+## target back to the shorter version for ease of user use
+## e.g. "rosrun someones_pkg node" instead of "rosrun someones_pkg someones_pkg_node"
+# set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME node PREFIX "")
+
+## Add cmake target dependencies of the executable
+## same as for the library above
+# add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
+## Specify libraries to link a library or executable target against
+# target_link_libraries(${PROJECT_NAME}_node
+#   ${catkin_LIBRARIES}
+# )
+
+add_executable(${PROJECT_NAME}_node src/demo_main.cpp)
 
 add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
 
@@ -145,62 +160,6 @@ target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
 )
 
-#
-add_executable(${PROJECT_NAME}_node_descartes src/demo1_descartes.cpp)
-
-add_dependencies(${PROJECT_NAME}_node_descartes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_node_descartes
-  ${catkin_LIBRARIES}
-)
-
-add_executable(${PROJECT_NAME}_node2 src/demo2.cpp)
-
-add_dependencies(${PROJECT_NAME}_node2 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_node2
-  ${catkin_LIBRARIES}
-)
-
-add_executable(${PROJECT_NAME}_node2_descartes src/demo2_descartes.cpp)
-
-add_dependencies(${PROJECT_NAME}_node2_descartes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_node2_descartes
-  ${catkin_LIBRARIES}
-)
-
-add_executable(${PROJECT_NAME}_node3 src/demo3.cpp)
-
-add_dependencies(${PROJECT_NAME}_node3 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_node3
-  ${catkin_LIBRARIES}
-)
-
-add_executable(${PROJECT_NAME}_node3_descartes src/demo3_descartes.cpp)
-
-add_dependencies(${PROJECT_NAME}_node3_descartes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_node3_descartes
-  ${catkin_LIBRARIES}
-)
-
-add_executable(${PROJECT_NAME}_node4 src/demo4.cpp)
-
-add_dependencies(${PROJECT_NAME}_node4 ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_node4
-  ${catkin_LIBRARIES}
-)
-
-add_executable(${PROJECT_NAME}_node4_descartes src/demo4_descartes.cpp)
-
-add_dependencies(${PROJECT_NAME}_node4_descartes ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_node4_descartes
-  ${catkin_LIBRARIES}
-)
 #############
 ## Install ##
 #############
@@ -241,7 +200,7 @@ target_link_libraries(${PROJECT_NAME}_node4_descartes
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_sanding_demo1.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_plug_demo.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()

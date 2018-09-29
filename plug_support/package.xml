@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>sanding_demo1</name>
+  <name>plug_support</name>
   <version>0.0.0</version>
-  <description>The sanding_demo1 package</description>
+  <description>The plug_support package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/sanding_demo1</url> -->
+  <!-- <url type="website">http://wiki.ros.org/plug_support</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->
@@ -48,17 +48,7 @@
   <!--   <test_depend>gtest</test_depend> -->
   <!-- Use doc_depend for packages you need only for building documentation: -->
   <!--   <doc_depend>doxygen</doc_depend> -->
-  <depend>roscpp</depend>
-  <depend>trajopt</depend>
-  <depend>tesseract_ros</depend>
-  <depend>octomap_ros</depend>
-  <depend>descartes_light</depend>
-
-
   <buildtool_depend>catkin</buildtool_depend>
-  <build_depend>trajopt_examples</build_depend>
-  <build_export_depend>trajopt_examples</build_export_depend>
-  <exec_depend>trajopt_examples</exec_depend>
 
 
   <!-- The export tag contains other, unspecified, tags -->

@@ -1,0 +1,14 @@
+<launch>
+  <rosparam param="controller_joint_names">
+   ['joint_1', 'joint_2', 'joint_3', 'joint_4', 'joint_5', 'joint_6', 'positioner']
+  </rosparam>
+
+   <node name="robot_state_publisher" pkg="robot_state_publisher" type="robot_state_publisher"/>
+
+   <include file="$(find industrial_robot_simulator)/launch/robot_interface_simulator.launch" />
+
+   <include file="$(find workcell3_moveit_config)/launch/planning_context.launch" >
+    <arg name="load_robot_description" value="true" />
+  </include>
+
+</launch>
