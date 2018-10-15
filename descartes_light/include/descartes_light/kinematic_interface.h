@@ -2,6 +2,7 @@
 #define DESCARTES_LIGHT_KINEMATICS_H
 
 #include <Eigen/Geometry>
+#include <vector>
 #include <opw_kinematics/opw_kinematics.h>
 
 namespace descartes_light

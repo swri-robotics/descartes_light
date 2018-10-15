@@ -1,4 +1,5 @@
 #include "descartes_light/edge_sampler.h"
+#include <cmath>
 
 descartes_light::DistanceEdgeEvaluator::DistanceEdgeEvaluator(const std::vector<double>& velocity_limits)
   : velocity_limits_(velocity_limits)
