@@ -21,9 +21,9 @@ ToolPath makePath(bool tilt = true)
 
   // Reference Pose
   auto origin = Eigen::Isometry3d::Identity();
-  origin.translation() = Eigen::Vector3d(0.5, 0, 0.5);
+  origin.translation() = Eigen::Vector3d(0.5, 0, 0.55);
 
-  const int n_passes = 10;
+  const int n_passes = 5;
 
   // For each pass
   for (int r = 0; r < n_passes; ++r)
@@ -134,12 +134,12 @@ trajopt::TrajOptProbPtr makeProblem(const hybrid_planning_common::EnvironmentDef
   collision->gap = 1;
   collision->info = trajopt::createSafetyMarginDataVector(pci.basic_info.n_steps, 0.025, 20);
 
-  // Apply a special cost between the sander_disks and the part
-//  for (auto& c : collision->info)
-//  {
-//    c->SetPairSafetyMarginData("sander_disk", "part", -0.01, 20.0);
-//    c->SetPairSafetyMarginData("sander_shaft", "part", 0.0, 20.0);
-//  }
+  //  Apply a special cost between the sander_disks and the part
+  for (auto& c : collision->info)
+  {
+    c->SetPairSafetyMarginData("sander_disk", "part", -0.01, 20.0);
+    c->SetPairSafetyMarginData("sander_shaft", "part", 0.0, 20.0);
+  }
 
   pci.cost_infos.push_back(collision);
 
@@ -171,6 +171,33 @@ trajopt::TrajOptProbPtr makeProblem(const hybrid_planning_common::EnvironmentDef
   return trajopt::ConstructProblem(pci);
 }
 
+static bool addObject(tesseract::tesseract_ros::KDLEnv& env)
+{
+  auto obj = std::make_shared<tesseract::AttachableObject>();
+
+  auto box = std::make_shared<shapes::Box>(1.0, 1.0, 1.0);
+
+  obj->name = "part";
+  obj->visual.shapes.push_back(box);
+  obj->visual.shape_poses.push_back(Eigen::Isometry3d::Identity());
+  obj->collision.shapes.push_back(box);
+  obj->collision.shape_poses.push_back(Eigen::Isometry3d::Identity());
+  obj->collision.collision_object_types.push_back(tesseract::CollisionObjectType::UseShapeType);
+
+  // This call adds the object to the scene's "database" but does not actuall connect it
+  env.addAttachableObject(obj);
+
+  // To include the object in collision checks, you have to attach it
+  tesseract::AttachedBodyInfo attached_body;
+  attached_body.object_name = "part";
+  attached_body.parent_link_name = "world_frame";
+  attached_body.transform.setIdentity();
+  attached_body.transform.translate(Eigen::Vector3d(1.0, 0, 0));
+
+  env.attachBody(attached_body);
+  return true;
+}
+
 int main(int argc, char** argv)
 {
   ros::init(argc, argv, "workcell1_demo");
@@ -182,6 +209,8 @@ int main(int argc, char** argv)
   {
     return 1;
   }
+
+  addObject(*env);
 
   const std::string group_name = "manipulator_tool";
 
