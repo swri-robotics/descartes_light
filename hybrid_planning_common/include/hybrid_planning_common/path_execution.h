@@ -1,7 +1,7 @@
 #ifndef HYBRID_PLANNING_PATH_EXECUTION_H
 #define HYBRID_PLANNING_PATH_EXECUTION_H
 
-#include <trajectory_msgs/JointTrajectory.h>
+#include "hybrid_planning_common/path_types.h"
 
 namespace hybrid_planning_common
 {
@@ -11,6 +11,8 @@ namespace hybrid_planning_common
  * 'control_msgs::FollowJointTrajectoryAction'. Blocks until the trajectory goal terminates.
  */
 bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory);
+
+bool executeTrajectory(const hybrid_planning_common::JointPath& trajectory);
 
 }
 

@@ -20,7 +20,7 @@ struct EnvironmentDefinition
 
 struct PathDefinition
 {
-  Path path;
+  ToolPath path;
   double speed;
 };
 
@@ -32,7 +32,12 @@ struct SamplerConfiguration
 
 struct OptimizationConfiguration
 {
-//  std::vector<trajop`t::TrajOptProbPtr> problems;
+
+  using TrajoptProblemCreator =
+    std::function<trajopt::TrajOptProbPtr(const hybrid_planning_common::EnvironmentDefinition&,
+                                          const hybrid_planning_common::ToolPass&,
+                                          const JointPass&)>;
+  TrajoptProblemCreator problem_creator;
 };
 
 struct ProblemDefinition
@@ -47,9 +52,9 @@ struct ProblemDefinition
 // Result
 struct ProblemResult
 {
-  bool succeeded;
-  boost::optional<trajectory_msgs::JointTrajectory> sampled_traj;
-  boost::optional<trajectory_msgs::JointTrajectory> optimized_traj;
+  bool succeeded = false;
+  boost::optional<JointPath> sampled_traj;
+  boost::optional<JointPath> optimized_traj;
 };
 
 ProblemResult simpleHybridPlanner(const ProblemDefinition& def);

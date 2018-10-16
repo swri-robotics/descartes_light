@@ -18,3 +18,12 @@ bool hybrid_planning_common::executeTrajectory(const trajectory_msgs::JointTraje
 
   return ac.sendGoalAndWait(goal) == actionlib::SimpleClientGoalState::SUCCEEDED;
 }
+
+bool hybrid_planning_common::executeTrajectory(const hybrid_planning_common::JointPath& trajectory)
+{
+  for (const auto& path : trajectory)
+  {
+    if (!executeTrajectory(path)) return false;
+  }
+  return true;
+}

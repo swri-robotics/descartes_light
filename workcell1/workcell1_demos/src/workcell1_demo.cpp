@@ -11,13 +11,13 @@
 
 #include <ros/ros.h>
 
-using hybrid_planning_common::Path;
-using hybrid_planning_common::Pass;
+using hybrid_planning_common::ToolPath;
+using hybrid_planning_common::ToolPass;
 using hybrid_planning_common::makeIrb4600_205_60;
 
-Path makePath(bool tilt = true)
+ToolPath makePath(bool tilt = true)
 {
-  Path path;
+  ToolPath path;
 
   // Reference Pose
   auto origin = Eigen::Isometry3d::Identity();
@@ -28,7 +28,7 @@ Path makePath(bool tilt = true)
   // For each pass
   for (int r = 0; r < n_passes; ++r)
   {
-     Pass this_pass;
+     ToolPass this_pass;
 
      // For each pose in the pass
     for (int i = -10; i <= 10; ++i)
@@ -62,7 +62,7 @@ Path makePath(bool tilt = true)
 }
 
 std::vector<std::vector<descartes_light::PositionSamplerPtr>>
-makeSamplers(const Path& path, descartes_light::CollisionInterfacePtr coll_env)
+makeSamplers(const ToolPath& path, descartes_light::CollisionInterfacePtr coll_env)
 {
   // The current setup requires that our cartesian sampler is aware of the robot
   // kinematics
@@ -94,9 +94,9 @@ makeSamplers(const Path& path, descartes_light::CollisionInterfacePtr coll_env)
   return samplers;
 }
 
-static trajopt::TrajOptProbPtr makeProblem(const hybrid_planning_common::EnvironmentDefinition& env,
-                                           const hybrid_planning_common::Pass& pass,
-                                           const trajectory_msgs::JointTrajectory& seed)
+trajopt::TrajOptProbPtr makeProblem(const hybrid_planning_common::EnvironmentDefinition& env,
+                                    const hybrid_planning_common::ToolPass& pass,
+                                    const hybrid_planning_common::JointPass& seed)
 {
   trajopt::ProblemConstructionInfo pci (env.environment);
 
@@ -183,7 +183,7 @@ int main(int argc, char** argv)
     return 1;
   }
 
-  const std::string group_name = "manipulator";
+  const std::string group_name = "manipulator_tool";
 
   hybrid_planning_common::EnvironmentDefinition env_def;
   env_def.environment = env;
@@ -199,12 +199,17 @@ int main(int argc, char** argv)
       std::make_shared<descartes_light::TesseractCollision>(env_def.environment, env_def.group_name);
   sampler_config.samplers = makeSamplers(path_def.path, collision_iface);
 
-  // Stage 3: Apply the solvers
+  hybrid_planning_common::OptimizationConfiguration optimizer_config;
+  optimizer_config.problem_creator = makeProblem;
+
+      // Stage 3: Apply the solvers
   hybrid_planning_common::ProblemDefinition problem;
   problem.env = env_def;
   problem.path = path_def;
   problem.sampler_config = sampler_config;
+  problem.optimizer_config = optimizer_config;
   hybrid_planning_common::ProblemResult result = hybrid_planning_common::simpleHybridPlanner(problem);
+
 
   // Stage 4: Visualize the results
   if (result.succeeded)
