@@ -1,5 +1,5 @@
-#ifndef HYBRID_PLANNING_LOAD_ENV_H
-#define HYBRID_PLANNING_LOAD_ENV_H
+#ifndef HYBRID_PLANNING_PATH_EXECUTION_H
+#define HYBRID_PLANNING_PATH_EXECUTION_H
 
 #include <trajectory_msgs/JointTrajectory.h>
 

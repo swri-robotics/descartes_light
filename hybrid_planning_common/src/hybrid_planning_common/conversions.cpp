@@ -1,9 +1,9 @@
 #include "hybrid_planning_common/conversions.h"
 
 trajectory_msgs::JointTrajectory
-hybrid_planning_common::descartes::toJointTrajectory(const std::vector<double>& flat_solution,
-                                                     const std::vector<std::string>& joint_names,
-                                                     const ros::Duration& time_per_pt)
+hybrid_planning_common::descartesToJointTrajectory(const std::vector<double>& flat_solution,
+                                                   const std::vector<std::string>& joint_names,
+                                                   const ros::Duration& time_per_pt)
 {
   trajectory_msgs::JointTrajectory trajectory;
   trajectory.joint_names = joint_names;
@@ -22,9 +22,9 @@ hybrid_planning_common::descartes::toJointTrajectory(const std::vector<double>& 
 
 
 trajectory_msgs::JointTrajectory
-hybrid_planning_common::trajopt::toJointTrajectory(const tesseract::TrajArray& traj_array,
-                                                   const std::vector<std::string>& joint_names,
-                                                   const ros::Duration& time_per_pt)
+hybrid_planning_common::trajoptToJointTrajectory(const trajopt::TrajArray& traj_array,
+                                                 const std::vector<std::string>& joint_names,
+                                                 const ros::Duration& time_per_pt)
 {
   trajectory_msgs::JointTrajectory out;
   out.joint_names = joint_names;
@@ -40,4 +40,21 @@ hybrid_planning_common::trajopt::toJointTrajectory(const tesseract::TrajArray& t
   }
 
   return out;
+}
+
+trajopt::TrajArray hybrid_planning_common::jointTrajectoryToTrajopt(const trajectory_msgs::JointTrajectory& traj)
+{
+  const auto dof = traj.joint_names.size();
+  const auto n_points = traj.points.size();
+  trajopt::TrajArray array (n_points, dof);
+
+  for (long i = 0; i < long(n_points); ++i)
+  {
+    for (long j = 0; j < long(dof); ++j)
+    {
+      array(i, j) = traj.points[i].positions[j];
+    }
+  }
+
+  return array;
 }
