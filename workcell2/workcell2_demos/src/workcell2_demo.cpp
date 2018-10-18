@@ -8,12 +8,14 @@
 
 // Descartes
 #include <descartes_light/position_sampler.h>
+#include <descartes_light/rail_position_sampler.h>
 
 #include <ros/ros.h>
 
 using hybrid_planning_common::ToolPath;
 using hybrid_planning_common::ToolPass;
 using hybrid_planning_common::makeIrb4600_205_60;
+
 
 ToolPath makePath(bool tilt = true)
 {
@@ -33,8 +35,10 @@ ToolPath makePath(bool tilt = true)
      // For each pose in the pass
     for (int i = -10; i <= 10; ++i)
     {
+      const double percent_along_pass = (10 + i) / 20.0;
+      const double arc_height = std::sin(M_PI * percent_along_pass) * 0.5;
       // The last operation flips the pose around so +Z is into the part
-      auto p = origin * Eigen::Translation3d(r * 0.1, i * 0.05, 0) * Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY());
+      auto p = origin * Eigen::Translation3d(r * 0.1, i * 0.05, arc_height) * Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitY());
       this_pass.push_back(p);
     }
 
@@ -68,30 +72,26 @@ makeSamplers(const ToolPath& path, descartes_light::CollisionInterfacePtr coll_e
   // kinematics
   opw_kinematics::Parameters<double> kin_params = makeIrb4600_205_60<double>();
   auto tip_to_tool = hybrid_planning_common::sanderTool0ToTCP();
-  descartes_light::KinematicsInterface kin_interface (kin_params,
-                                                      Eigen::Isometry3d::Identity(), tip_to_tool);
+  auto world_to_base = Eigen::Isometry3d::Identity() * Eigen::Translation3d(0.0, 0.0, 2.75) *
+                       Eigen::AngleAxisd(M_PI, Eigen::Vector3d::UnitX());
 
+  descartes_light::RailedKinematicsInterface kin_interface (kin_params, world_to_base, tip_to_tool);
 
-  std::vector<std::vector<descartes_light::PositionSamplerPtr>> samplers (path.size());
+  std::vector<std::vector<descartes_light::PositionSamplerPtr>> result (path.size());
 
-  // Loop over each pass & each pose and create a sampler specifically for this pose
   for (std::size_t i = 0; i < path.size(); ++i)
   {
-    for (const auto& pose : path[i])
+    const auto& pass = path[i];
+    for (const auto& pose : pass)
     {
-      // The tesseract collision interface is not thread safe and we want to run these checks
-      // in parallel, so I need to create a seperate checker for each point.
       auto collision_clone = descartes_light::CollisionInterfacePtr(coll_env->clone());
-
-      // Create a sampler that samples around the Z axis of the TCP
-      auto sampler = std::make_shared<descartes_light::AxialSymmetricSampler>
-          (pose, kin_interface, M_PI/12.0, collision_clone);
-
-      samplers[i].push_back(std::move(sampler));
+      auto sampler = std::make_shared<descartes_light::RailedAxialSymmetricSampler>(pose, kin_interface, M_PI / 4.0,
+                                                                                    collision_clone);
+      result[i].push_back(std::move(sampler));
     }
   }
 
-  return samplers;
+  return result;
 }
 
 trajopt::TrajOptProbPtr makeProblem(const hybrid_planning_common::EnvironmentDefinition& env,
@@ -212,7 +212,7 @@ int main(int argc, char** argv)
 
   addObject(*env);
 
-  const std::string group_name = "manipulator_tool";
+  const std::string group_name = "manipulator_rail_tool";
 
   hybrid_planning_common::EnvironmentDefinition env_def;
   env_def.environment = env;
