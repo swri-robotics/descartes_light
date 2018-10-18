@@ -118,7 +118,7 @@ bool runOptimizer(const hybrid_planning_common::EnvironmentDefinition& env,
     auto opt_problem = optimizer_config.problem_creator(env, path.path[i], seed[i]);
 
     trajopt::BasicTrustRegionSQP optimizer (opt_problem);
-    optimizer.getParameters().max_iter = 50;
+    optimizer.getParameters().max_iter = 1000;
     optimizer.initialize(trajopt::trajToDblVec(opt_problem->GetInitTraj()));
 
     const auto opt_status = optimizer.optimize();
