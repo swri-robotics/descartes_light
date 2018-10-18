@@ -1,4 +1,5 @@
 #include "descartes_light/edge_sampler.h"
+#include <cmath>
 
 descartes_light::DistanceEdgeEvaluator::DistanceEdgeEvaluator(const std::vector<double>& velocity_limits)
   : velocity_limits_(velocity_limits)
@@ -33,8 +34,15 @@ bool descartes_light::DistanceEdgeEvaluator::evaluate(const Rung_<double>& from,
   std::vector<double> delta_thresholds (velocity_limits_.size());
   std::transform(velocity_limits_.begin(), velocity_limits_.end(), delta_thresholds.begin(),
                  [dt] (const double vel_limit) {
-    const static double safety_factor = 0.9;
-    return dt.upper * vel_limit * safety_factor;
+    if (dt.upper != 0.0)
+    {
+      const static double safety_factor = 0.9;
+      return dt.upper * vel_limit * safety_factor;
+    }
+    else
+    {
+      return std::numeric_limits<double>::max();
+    }
   });
 
   // Allocate

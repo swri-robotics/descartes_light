@@ -1,0 +1,14 @@
+- git: {local-name: abb, uri: 'https://github.com/ros-industrial/abb.git', version: kinetic-devel}
+
+- git: {local-name: abb_experimental, uri: 'https://github.com/ros-industrial/abb_experimental.git', version: kinetic-devel}
+
+- git: {local-name: industrial_core, uri: 'https://github.com/ros-industrial/industrial_core.git', version: kinetic-devel}
+
+- git: {local-name: opw_kinematics, uri: 'https://github.com/Jmeyer1292/opw_kinematics.git', version: master}
+
+- git: {local-name: tesseract, uri: 'https://github.com/Jmeyer1292/tesseract-1.git', version: melodic-fixes}
+
+- git: {local-name: trajopt_ros, uri: 'https://github.com/Jmeyer1292/trajopt_ros-1.git', version: melodic-fixes}
+
+# Needed by trajopt I think
+- git: {local-name: octomap_ros, uri: 'https://github.com/OctoMap/octomap_ros.git', version: melodic-devel}

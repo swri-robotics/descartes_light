@@ -50,7 +50,12 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
       graph_.getRung(i).timing = times[i];
     }
     else
-      failed_vertex_samplers.push_back(i);
+    {
+      #pragma omp critical
+      {
+        failed_vertex_samplers.push_back(i);
+      }
+    }
   }
 
   // Build Edges
@@ -61,7 +66,12 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
     const auto& to = graph_.getRung(i);
 
     if (!edge_eval->evaluate(from, to, graph_.getEdges(i - 1)))
-      failed_edge_samplers.push_back(i-1);
+    {
+      #pragma omp critical
+      {
+        failed_edge_samplers.push_back(i-1);
+      }
+    }
   }
 
   reportFailedVertices(failed_vertex_samplers);

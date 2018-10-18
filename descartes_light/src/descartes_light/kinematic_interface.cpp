@@ -58,7 +58,7 @@ bool descartes_light::RailedKinematicsInterface::ik(const Eigen::Isometry3d &p, 
 
   const Eigen::Vector2d origin (p.translation().x(), p.translation().y());
 
-  const double res = 0.2;
+  const double res = 0.4;
   const double start_x = origin.x() - 2.0;
   const double end_x = origin.x() + 2.0;
   const double start_y = origin.y() - 2.0;
