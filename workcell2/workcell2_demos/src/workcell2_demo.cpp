@@ -202,6 +202,7 @@ int main(int argc, char** argv)
 {
   ros::init(argc, argv, "workcell1_demo");
   ros::NodeHandle pnh;
+  ros::AsyncSpinner spinner (1); spinner.start();
 
   // Stage 1: Load & Prepare Environment
   tesseract::tesseract_ros::KDLEnvPtr env;
@@ -222,6 +223,11 @@ int main(int argc, char** argv)
   hybrid_planning_common::PathDefinition path_def;
   path_def.path = makePath(true);
   path_def.speed = 0.2;
+
+  // Visualize
+  hybrid_planning_common::Republisher<geometry_msgs::PoseArray> pose_pub
+      ("poses", hybrid_planning_common::toPoseArray(hybrid_planning_common::flatten(path_def.path), "world_frame"),
+       ros::Rate(10));
 
   hybrid_planning_common::SamplerConfiguration sampler_config;
   auto collision_iface =
@@ -257,4 +263,6 @@ int main(int argc, char** argv)
       std::cout << "Optimized trajectory done\n";
     }
   }
+
+  ros::waitForShutdown();
 }
