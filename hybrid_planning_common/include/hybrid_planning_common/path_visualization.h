@@ -30,6 +30,7 @@ public:
 
   void publish(const ros::TimerEvent&)
   {
+    msg_.header.stamp = ros::Time::now();
     pub_.publish(msg_);
   }
 
