@@ -12,14 +12,10 @@ descartes_light::TesseractCollision::TesseractCollision(tesseract::BasicEnvConst
     throw std::runtime_error("Group " + group_name + " not found in scene");
   }
 
-  tesseract::ContactRequest cr;
-  cr.link_names = kin_group_->getLinkNames();
-  cr.type = tesseract::ContactRequestTypes::FIRST;
-  cr.isContactAllowed = std::bind(&TesseractCollision::isContactAllowed, this, std::placeholders::_1,
-                                  std::placeholders::_2);
-
-  contact_manager_->setContactRequest(cr);
-}
+  contact_manager_->setActiveCollisionObjects(kin_group_->getLinkNames());
+  contact_manager_->setIsContactAllowedFn(std::bind(&TesseractCollision::isContactAllowed, this, std::placeholders::_1,
+                                                    std::placeholders::_2));
+  }
 
 bool descartes_light::TesseractCollision::validate(const double* pos, std::size_t size)
 {
@@ -34,7 +30,7 @@ bool descartes_light::TesseractCollision::validate(const double* pos, std::size_
 
   // 3. Ask the contact manager to go nuts
   tesseract::ContactResultMap results;
-  contact_manager_->contactTest(results);
+  contact_manager_->contactTest(results, tesseract::ContactTestType::FIRST);
 
   // 4. Analyze results
   const bool no_contacts = results.empty();
