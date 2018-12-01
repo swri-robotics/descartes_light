@@ -5,7 +5,7 @@
 
 The current code is tested on ROS Melodic. First clone this repository and then use the
 `hybrid.rosinstall` file to pull down the required dependencies. There are some extra
-dependencies outside of the catkin packages, such as ros-melodic-catkin-tools.
+dependencies outside of the catkin packages, such as python-catkin-tools and python-wstool.
 
 ```bash
 # Make a ROS WS and cd into the src/ folder
@@ -28,7 +28,7 @@ The packages are organized into "workcells" each with its own geometry. To run t
 roslaunch workcell1_support simulation.launch
 
 # In terminal 2 (and then configure it)
-rosrun rviz rviz
+rosrun rviz rviz -d src/hybrid_planning_experiments/hybrid.rviz
 
 # In terminal 3
 rosrun workcell1_demos workcell1_demo
