@@ -1,22 +1,12 @@
-#ifndef DESCARTES_LIGHT_COLLISION_CHECKER_H
-#define DESCARTES_LIGHT_COLLISION_CHECKER_H
+#ifndef DESCARTES_LIGHT_TESSERACT_COLLISION_CHECKER_H
+#define DESCARTES_LIGHT_TESSERACT_COLLISION_CHECKER_H
 
 #include <memory>
+#include <descartes_light/core/collision_interface.h>
 #include <tesseract_core/basic_env.h>
 
 namespace descartes_light
 {
-
-class CollisionInterface
-{
-public:
-  virtual ~CollisionInterface() {}
-
-  virtual bool validate(const double* pos, std::size_t size) = 0;
-
-  /** You assume ownership of return value */
-  virtual CollisionInterface* clone() const = 0;
-};
 
 class TesseractCollision : public CollisionInterface
 {
@@ -37,8 +27,6 @@ private:
   tesseract::BasicKinConstPtr kin_group_;
   tesseract::DiscreteContactManagerBasePtr contact_manager_;
 };
-
-using CollisionInterfacePtr = std::shared_ptr<CollisionInterface>;
 
 }
 

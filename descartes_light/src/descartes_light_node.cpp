@@ -1,10 +1,15 @@
 #include <iostream>
-#include <descartes_light/descartes_light.h>
+
 #include <opw_kinematics/opw_parameters_examples.h>
 
 #include <control_msgs/FollowJointTrajectoryAction.h>
 #include <actionlib/client/simple_action_client.h>
-#include <descartes_light/collision_checker.h>
+
+#include <descartes_light/core/descartes_light.h>
+#include <descartes_light/collision/tesseract_collision_checker.h>
+#include <descartes_light/samplers/axial_symmetric_sampler.h>
+#include <descartes_light/evaluators/distance_edge_evaluator.h>
+#include <descartes_light/kinematics/opw_kinematics.h>
 
 #include <urdf_parser/urdf_parser.h>
 #include <srdfdom/model.h>
@@ -60,9 +65,7 @@ std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::Colli
   // The current setup requires that our cartesian sampler is aware of the robot
   // kinematics
   opw_kinematics::Parameters<double> kin_params = opw_kinematics::makeIrb2400_10<double>();
-  descartes_light::KinematicsInterface kin_interface (kin_params,
-                                                      Eigen::Isometry3d::Identity(),
-                                                      Eigen::Isometry3d::Identity());
+  descartes_light::KinematicsInterfacePtr kin_interface = std::make_shared<descartes_light::OPWKinematics>(kin_params, Eigen::Isometry3d::Identity(), Eigen::Isometry3d::Identity());
 
   Eigen::Isometry3d reference = Eigen::Isometry3d::Identity() * Eigen::Translation3d(0.8, -1.0, 0.5) *
                                 Eigen::AngleAxisd(M_PI * 0.75, Eigen::Vector3d::UnitY());
