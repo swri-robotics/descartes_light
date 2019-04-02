@@ -48,7 +48,7 @@ target_link_libraries(${PROJECT_NAME}_core ${catkin_LIBRARIES} gomp)
 
 # Collision Interface Implementations
 add_library(${PROJECT_NAME}_collision
-  src/collision/tesseract_collision_checker.cpp
+  src/impl/collision/tesseract_collision_checker.cpp
 )
 
 add_dependencies(${PROJECT_NAME}_collision ${${PROJECT_NAME}_collision_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -56,8 +56,8 @@ add_dependencies(${PROJECT_NAME}_collision ${${PROJECT_NAME}_collision_EXPORTED_
 target_link_libraries(${PROJECT_NAME}_collision ${PROJECT_NAME}_core ${catkin_LIBRARIES})
 
 add_library(${PROJECT_NAME}_kinematics
-  src/kinematics/opw_kinematics.cpp
-  src/kinematics/opw_railed_kinematics.cpp
+  src/impl/kinematics/opw_kinematics.cpp
+  src/impl/kinematics/opw_railed_kinematics.cpp
 )
 
 add_dependencies(${PROJECT_NAME}_kinematics ${${PROJECT_NAME}_kinematics_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -65,7 +65,7 @@ add_dependencies(${PROJECT_NAME}_kinematics ${${PROJECT_NAME}_kinematics_EXPORTE
 target_link_libraries(${PROJECT_NAME}_kinematics ${PROJECT_NAME}_core ${catkin_LIBRARIES})
 
 add_library(${PROJECT_NAME}_evaluators
-  src/evaluators/distance_edge_evaluator.cpp
+  src/impl/evaluators/distance_edge_evaluator.cpp
 )
 
 add_dependencies(${PROJECT_NAME}_evaluators ${${PROJECT_NAME}_evaluators_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -73,11 +73,11 @@ add_dependencies(${PROJECT_NAME}_evaluators ${${PROJECT_NAME}_evaluators_EXPORTE
 target_link_libraries(${PROJECT_NAME}_evaluators ${PROJECT_NAME}_core ${catkin_LIBRARIES})
 
 add_library(${PROJECT_NAME}_samplers
-  src/samplers/axial_symmetric_sampler.cpp
-  src/samplers/cartesian_point_sampler.cpp
-  src/samplers/external_axis_sampler.cpp
-  src/samplers/railed_axial_symmetric_sampler.cpp
-  src/samplers/railed_cartesian_point_sampler.cpp
+  src/impl/samplers/axial_symmetric_sampler.cpp
+  src/impl/samplers/cartesian_point_sampler.cpp
+  src/impl/samplers/external_axis_sampler.cpp
+  src/impl/samplers/railed_axial_symmetric_sampler.cpp
+  src/impl/samplers/railed_cartesian_point_sampler.cpp
 )
 
 add_dependencies(${PROJECT_NAME}_samplers ${${PROJECT_NAME}_samplers_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "descartes_light/evaluators/distance_edge_evaluator.h"
+#include "descartes_light/impl/evaluators/distance_edge_evaluator.h"
 #include <cmath>
 
 descartes_light::DistanceEdgeEvaluator::DistanceEdgeEvaluator(const std::vector<double>& velocity_limits)

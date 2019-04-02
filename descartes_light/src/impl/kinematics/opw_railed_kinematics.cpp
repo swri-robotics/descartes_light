@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "descartes_light/kinematics/opw_railed_kinematics.h"
+#include "descartes_light/impl/kinematics/opw_railed_kinematics.h"
 #include <opw_kinematics/opw_utilities.h>
 #include <iostream>
 

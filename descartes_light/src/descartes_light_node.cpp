@@ -6,10 +6,10 @@
 #include <actionlib/client/simple_action_client.h>
 
 #include <descartes_light/core/descartes_light.h>
-#include <descartes_light/collision/tesseract_collision_checker.h>
-#include <descartes_light/samplers/axial_symmetric_sampler.h>
-#include <descartes_light/evaluators/distance_edge_evaluator.h>
-#include <descartes_light/kinematics/opw_kinematics.h>
+#include <descartes_light/impl/collision/tesseract_collision_checker.h>
+#include <descartes_light/impl/samplers/axial_symmetric_sampler.h>
+#include <descartes_light/impl/evaluators/distance_edge_evaluator.h>
+#include <descartes_light/impl/kinematics/opw_kinematics.h>
 
 #include <urdf_parser/urdf_parser.h>
 #include <srdfdom/model.h>

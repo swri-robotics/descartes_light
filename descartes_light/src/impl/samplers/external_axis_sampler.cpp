@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "descartes_light/samplers/external_axis_sampler.h"
+#include "descartes_light/impl/samplers/external_axis_sampler.h"
 #include <iostream>
 
 descartes_light::ExternalAxisSampler::ExternalAxisSampler(const Eigen::Isometry3d& tool_in_positioner,

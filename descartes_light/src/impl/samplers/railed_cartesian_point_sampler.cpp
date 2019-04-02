@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "descartes_light/samplers/railed_cartesian_point_sampler.h"
+#include "descartes_light/impl/samplers/railed_cartesian_point_sampler.h"
 #include <iostream>
 
 const static std::size_t dof = 8;

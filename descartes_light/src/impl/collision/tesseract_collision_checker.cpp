@@ -16,7 +16,7 @@
  * limitations under the License.
  */
 
-#include "descartes_light/collision/tesseract_collision_checker.h"
+#include "descartes_light/impl/collision/tesseract_collision_checker.h"
 
 descartes_light::TesseractCollision::TesseractCollision(tesseract::BasicEnvConstPtr collision_env,
                                                         const std::string& group_name)
