@@ -18,7 +18,11 @@ catkin_package(
     include
     ${EIGEN3_INCLUDE_DIRS}
   LIBRARIES
-    descartes_light
+    ${PROJECT_NAME}_core
+    ${PROJECT_NAME}_collision
+    ${PROJECT_NAME}_kinematics
+    ${PROJECT_NAME}_evaluators
+    ${PROJECT_NAME}_samplers
   CATKIN_DEPENDS
     opw_kinematics
     tesseract_ros

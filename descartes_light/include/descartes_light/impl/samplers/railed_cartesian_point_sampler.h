@@ -18,7 +18,7 @@
 #ifndef DESCARTES_LIGHT_RAIL_POSITION_SAMPLER_H
 #define DESCARTES_LIGHT_RAIL_POSITION_SAMPLER_H
 
-#include "descartes_light/core/railed_kinematics_interface.h"
+#include "descartes_light/core/kinematics_interface.h"
 #include "descartes_light/core/collision_interface.h"
 #include "descartes_light/core/position_sampler.h"
 #include <memory>
@@ -30,16 +30,21 @@ class RailedCartesianPointSampler : public PositionSampler
 {
 public:
   RailedCartesianPointSampler(const Eigen::Isometry3d& tool_pose,
-                              const RailedKinematicsInterfacePtr robot_kin,
+                              const KinematicsInterfacePtr robot_kin,
                               const CollisionInterfacePtr collision);
 
+  /**
+   * @brief sample
+   * @param solution_set Returns auxiliary axes followed by robot positions
+   * @return True if valid solutions were found, otherwise false.
+   */
   bool sample(std::vector<double>& solution_set) override;
 
 private:
   bool isCollisionFree(const double* vertex);
 
   Eigen::Isometry3d tool_pose_;
-  RailedKinematicsInterfacePtr kin_;
+  KinematicsInterfacePtr kin_;
   CollisionInterfacePtr collision_;
 };
 

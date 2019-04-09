@@ -95,7 +95,10 @@ int main(int argc, char** argv)
 
   const auto group_name = "manipulator";
 
-  auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr, group_name);
+  auto kin_ptr = env_ptr->getManipulator(group_name);
+  if (!kin_ptr) return 1;
+
+  auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr, kin_ptr->getLinkNames(), kin_ptr->getJointNames());
 
   // Define our vertex samplers
   ros::WallTime t1 = ros::WallTime::now();

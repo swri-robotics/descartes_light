@@ -11,11 +11,19 @@ namespace descartes_light
 class TesseractCollision : public CollisionInterface
 {
 public:
-  TesseractCollision(tesseract::BasicEnvConstPtr collision_env, const std::string& group_name);
+  /**
+   * @brief TesseractCollision
+   * @param collision_env The collision Environment
+   * @param active_links The list of active links
+   * @param joint_names The list of joint names in the order that the data will be provided to the validate function.
+   */
+  TesseractCollision(tesseract::BasicEnvConstPtr collision_env,
+                     const std::vector<std::string>& active_links,
+                     const std::vector<std::string>& joint_names);
 
   bool validate(const double* pos, std::size_t size) override;
 
-  TesseractCollision* clone() const override;
+  std::shared_ptr<CollisionInterface> clone() const override;
 
   tesseract::BasicEnvConstPtr& environment() { return collision_env_; }
   const tesseract::BasicEnvConstPtr& environment() const { return collision_env_; }
@@ -24,7 +32,8 @@ private:
   bool isContactAllowed(const std::string& a, const std::string& b) const;
 
   tesseract::BasicEnvConstPtr collision_env_;
-  tesseract::BasicKinConstPtr kin_group_;
+  std::vector<std::string> active_link_names_;
+  std::vector<std::string> joint_names_;
   tesseract::DiscreteContactManagerBasePtr contact_manager_;
 };
 

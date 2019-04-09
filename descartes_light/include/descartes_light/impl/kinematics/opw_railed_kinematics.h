@@ -18,27 +18,37 @@
 #ifndef DESCARTES_LIGHT_RAILED_KINEMATICS_OPW_H
 #define DESCARTES_LIGHT_RAILED_KINEMATICS_OPW_H
 
-#include <descartes_light/core/railed_kinematics_interface.h>
+#include <descartes_light/core/kinematics_interface.h>
 #include <opw_kinematics/opw_kinematics.h>
 
 namespace descartes_light
 {
 
-class OPWRailedKinematics : public RailedKinematicsInterface
+class OPWRailedKinematics : public KinematicsInterface
 {
 public:
   OPWRailedKinematics(const opw_kinematics::Parameters<double>& params,
-                      const Eigen::Isometry3d& world_to_base,
-                      const Eigen::Isometry3d& tool0_to_tip);
+                      const Eigen::Isometry3d &world_to_rail_base,
+                      const Eigen::Isometry3d &rail_base_to_robot_base,
+                      const Eigen::Isometry3d& tool0_to_tip,
+                      const Eigen::Matrix2d& rail_limits,
+                      const Eigen::Vector2d& rail_sample_resolution,
+                      const double robot_reach);
 
   bool ik(const Eigen::Isometry3d& p, std::vector<double>& solution_set) const override;
+  bool fk(const double* pose, Eigen::Isometry3d& solution) const override;
 
-  bool ikAt(const Eigen::Isometry3d& p, const Eigen::Vector2d& rail_pose, std::vector<double>& solution_set) const override;
+  bool ikAt(const Eigen::Isometry3d& p, const Eigen::Vector2d& rail_pose, std::vector<double>& solution_set) const;
+  bool fkAt(const Eigen::Vector2d& rail_pose, const std::vector<double>& pose, Eigen::Isometry3d& solution) const;
 
 private:
   opw_kinematics::Parameters<double> params_;
-  Eigen::Isometry3d world_to_base_;
+  Eigen::Isometry3d world_to_rail_base_;
+  Eigen::Isometry3d rail_base_to_robot_base_;
   Eigen::Isometry3d tool0_to_tip_;
+  Eigen::Matrix2d rail_limits_;
+  Eigen::Vector2d rail_sample_resolution_;
+  double robot_reach_;
 };
 
 }

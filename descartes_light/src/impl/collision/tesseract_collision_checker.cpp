@@ -19,18 +19,14 @@
 #include "descartes_light/impl/collision/tesseract_collision_checker.h"
 
 descartes_light::TesseractCollision::TesseractCollision(tesseract::BasicEnvConstPtr collision_env,
-                                                        const std::string& group_name)
+                                                        const std::vector<std::string>& active_links,
+                                                        const std::vector<std::string>& joint_names)
   : collision_env_(std::move(collision_env))
+  , active_link_names_(active_links)
+  , joint_names_(joint_names)
   , contact_manager_(collision_env_->getDiscreteContactManager())
 {
-  kin_group_ = collision_env_->getManipulator(group_name);
-
-  if (!kin_group_)
-  {
-    throw std::runtime_error("Group " + group_name + " not found in scene");
-  }
-
-  contact_manager_->setActiveCollisionObjects(kin_group_->getLinkNames());
+  contact_manager_->setActiveCollisionObjects(active_links);
   contact_manager_->setIsContactAllowedFn(std::bind(&TesseractCollision::isContactAllowed, this, std::placeholders::_1,
                                                     std::placeholders::_2));
   }
@@ -40,8 +36,7 @@ bool descartes_light::TesseractCollision::validate(const double* pos, std::size_
   // Happens in two phases:
   // 1. Compute the transform of all objects
   Eigen::Map<const Eigen::VectorXd> joint_angles(pos, long(size));
-  const auto& joint_names = kin_group_->getJointNames();
-  tesseract::EnvStatePtr env_state = collision_env_->getState(joint_names, joint_angles);
+  tesseract::EnvStatePtr env_state = collision_env_->getState(joint_names_, joint_angles);
 
   // 2. Update the scene
   contact_manager_->setCollisionObjectsTransform(env_state->transforms);
@@ -64,11 +59,11 @@ bool descartes_light::TesseractCollision::validate(const double* pos, std::size_
   return no_contacts;
 }
 
-descartes_light::TesseractCollision* descartes_light::TesseractCollision::clone() const
+std::shared_ptr<descartes_light::CollisionInterface> descartes_light::TesseractCollision::clone() const
 {
-  auto ptr = new TesseractCollision(*this);
-  ptr->contact_manager_= this->contact_manager_->clone();
-  return ptr;
+  auto sptr = std::make_shared<TesseractCollision>(*this);
+  sptr->contact_manager_= this->contact_manager_->clone();
+  return sptr;
 }
 
 bool descartes_light::TesseractCollision::isContactAllowed(const std::string &a, const std::string &b) const

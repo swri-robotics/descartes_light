@@ -18,7 +18,7 @@
 #ifndef DESCARTES_LIGHT_RAILED_AXIAL_SYMMETRIC_SAMPLER_H
 #define DESCARTES_LIGHT_RAILED_AXIAL_SYMMETRIC_SAMPLER_H
 
-#include "descartes_light/core/railed_kinematics_interface.h"
+#include "descartes_light/core/kinematics_interface.h"
 #include "descartes_light/core/collision_interface.h"
 #include "descartes_light/core/position_sampler.h"
 #include <memory>
@@ -30,7 +30,7 @@ class RailedAxialSymmetricSampler : public PositionSampler
 {
 public:
   RailedAxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
-                              const RailedKinematicsInterfacePtr robot_kin,
+                              const KinematicsInterfacePtr robot_kin,
                               const double radial_sample_resolution,
                               const CollisionInterfacePtr collision);
 
@@ -40,7 +40,7 @@ private:
   bool isCollisionFree(const double* vertex);
 
   Eigen::Isometry3d tool_pose_;
-  RailedKinematicsInterfacePtr kin_;
+  KinematicsInterfacePtr kin_;
   CollisionInterfacePtr collision_;
   double radial_sample_res_;
 };

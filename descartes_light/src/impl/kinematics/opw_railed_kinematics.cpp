@@ -19,49 +19,54 @@
 #include "descartes_light/impl/kinematics/opw_railed_kinematics.h"
 #include <opw_kinematics/opw_utilities.h>
 #include <iostream>
+#include <math.h>
 
 descartes_light::OPWRailedKinematics::OPWRailedKinematics(const opw_kinematics::Parameters<double> &params,
-                                                          const Eigen::Isometry3d &world_to_base,
-                                                          const Eigen::Isometry3d &tool0_to_tip)
+                                                          const Eigen::Isometry3d &world_to_rail_base,
+                                                          const Eigen::Isometry3d &rail_base_to_robot_base,
+                                                          const Eigen::Isometry3d &tool0_to_tip,
+                                                          const Eigen::Matrix2d& rail_limits,
+                                                          const Eigen::Vector2d& rail_sample_resolution,
+                                                          const double robot_reach)
   : params_(params)
-  , world_to_base_(world_to_base)
+  , world_to_rail_base_(world_to_rail_base)
+  , rail_base_to_robot_base_(rail_base_to_robot_base)
   , tool0_to_tip_(tool0_to_tip)
+  , rail_limits_(rail_limits)
+  , rail_sample_resolution_(rail_sample_resolution)
+  , robot_reach_(robot_reach)
 {
 }
 
 bool descartes_light::OPWRailedKinematics::ik(const Eigen::Isometry3d &p, std::vector<double> &solution_set) const
 {
-  const Eigen::Vector2d rail_lower_limit (-2.0, -2.0);
-  const Eigen::Vector2d rail_upper_limit (2.0, 2.0);
+  // Tool pose in rail coordinate system
+  Eigen::Isometry3d tool_pose = world_to_rail_base_.inverse() * p;
 
-  const Eigen::Vector2d origin (p.translation().x(), p.translation().y());
+  const Eigen::Vector2d& rail_lower_limit = rail_limits_.col(0);
+  const Eigen::Vector2d& rail_upper_limit = rail_limits_.col(1);
 
-  const double res = 0.4;
-  const double start_x = origin.x() - 2.0;
-  const double end_x = origin.x() + 2.0;
-  const double start_y = origin.y() - 2.0;
-  const double end_y = origin.y() + 2.0;
+  const Eigen::Vector2d origin (tool_pose.translation().x(), tool_pose.translation().y());
 
-  for (double x = start_x; x < end_x; x += res)
-  {
-    if (x < rail_lower_limit.x() || x > rail_upper_limit.x()) continue;
+  const double start_x = (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
+  const double end_x = (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
+  const double start_y = (origin.y() - robot_reach_ < rail_lower_limit.y()) ? rail_lower_limit.y() : origin.y() - robot_reach_;
+  const double end_y = (origin.y() + robot_reach_ > rail_upper_limit.y()) ? rail_upper_limit.y() : origin.y() + robot_reach_;
+  const double res_x = (end_x - start_x) / std::ceil((end_x - start_x) / rail_sample_resolution_.x());
+  const double res_y = (end_y - start_y) / std::ceil((end_y - start_y) / rail_sample_resolution_.y());
 
-    for (double y = start_y; y < end_y; y += res)
-    {
-      if (y < rail_lower_limit.y() || y > rail_upper_limit.y()) continue;
-      else
-        ikAt(p, Eigen::Vector2d(x, y), solution_set);
-    }
-  }
+  for (double x = start_x; x < end_x; x += res_x)
+    for (double y = start_y; y < end_y; y += res_y)
+      ikAt(p, Eigen::Vector2d(x, y), solution_set);
 
   return !solution_set.empty();
 }
 
-bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d &p, const Eigen::Vector2d &rail_pose,
-                                                      std::vector<double> &solution_set) const
+bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d &p, const Eigen::Vector2d &rail_pose, std::vector<double> &solution_set) const
 {
-  const Eigen::Isometry3d in_robot = Eigen::Translation3d(-rail_pose.x(), rail_pose.y(), 0.0) *
-                                     world_to_base_.inverse() * p * tool0_to_tip_.inverse();
+
+  const Eigen::Isometry3d world_to_robot_base = world_to_rail_base_ * Eigen::Translation3d(rail_pose.x(), rail_pose.y(), 0.0) * rail_base_to_robot_base_;
+  const Eigen::Isometry3d in_robot = world_to_robot_base.inverse() * p * tool0_to_tip_.inverse();
 
   std::array<double, 6*8> sols;
   opw_kinematics::inverse(params_, in_robot, sols.data());
@@ -79,4 +84,23 @@ bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d &p, cons
   }
 
   return !solution_set.empty();
+}
+
+bool descartes_light::OPWRailedKinematics::fk(const double* pose, Eigen::Isometry3d& solution) const
+{
+  Eigen::Vector2d rail_pose;
+  rail_pose(0) = pose[0];
+  rail_pose(1) = pose[1];
+
+  std::vector<double> opw_pose = {pose[2], pose[3], pose[4], pose[5], pose[6], pose[7]};
+
+  return fkAt(rail_pose, opw_pose, solution);
+}
+
+bool descartes_light::OPWRailedKinematics::fkAt(const Eigen::Vector2d& rail_pose, const std::vector<double>& pose, Eigen::Isometry3d& solution) const
+{
+  solution = opw_kinematics::forward<double>(params_, pose.data());
+  Eigen::Isometry3d rail_tf = Eigen::Isometry3d::Identity();
+  rail_tf.translation().head(2) = rail_pose;
+  solution = world_to_rail_base_ * rail_tf * rail_base_to_robot_base_ * solution * tool0_to_tip_;
 }

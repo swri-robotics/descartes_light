@@ -35,6 +35,7 @@ public:
 };
 
 using KinematicsInterfacePtr = std::shared_ptr<KinematicsInterface>;
+using KinematicsInterfaceConstPtr = std::shared_ptr<const KinematicsInterface>;
 
 }
 

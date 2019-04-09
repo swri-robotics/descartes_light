@@ -31,10 +31,11 @@ public:
   virtual bool validate(const double* pos, std::size_t size) = 0;
 
   /** You assume ownership of return value */
-  virtual CollisionInterface* clone() const = 0;
+  virtual std::shared_ptr<CollisionInterface> clone() const = 0;
 };
 
 using CollisionInterfacePtr = std::shared_ptr<CollisionInterface>;
+using CollisionInterfaceConstPtr = std::shared_ptr<const CollisionInterface>;
 
 }
 

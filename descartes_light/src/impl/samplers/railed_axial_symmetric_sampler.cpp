@@ -21,7 +21,7 @@
 const static std::size_t dof = 8;
 
 descartes_light::RailedAxialSymmetricSampler::RailedAxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
-                                                              const RailedKinematicsInterfacePtr robot_kin,
+                                                              const KinematicsInterfacePtr robot_kin,
                                                               const double radial_sample_resolution,
                                                               const CollisionInterfacePtr collision)
   : tool_pose_(tool_pose)

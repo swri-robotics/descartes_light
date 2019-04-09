@@ -21,7 +21,7 @@
 const static std::size_t dof = 8;
 
 descartes_light::RailedCartesianPointSampler::RailedCartesianPointSampler(const Eigen::Isometry3d& tool_pose,
-                                                                          const RailedKinematicsInterfacePtr robot_kin,
+                                                                          const KinematicsInterfacePtr robot_kin,
                                                                           const CollisionInterfacePtr collision)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
