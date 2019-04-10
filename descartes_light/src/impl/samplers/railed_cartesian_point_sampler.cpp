@@ -22,10 +22,12 @@ const static std::size_t dof = 8;
 
 descartes_light::RailedCartesianPointSampler::RailedCartesianPointSampler(const Eigen::Isometry3d& tool_pose,
                                                                           const KinematicsInterfacePtr robot_kin,
-                                                                          const CollisionInterfacePtr collision)
+                                                                          const CollisionInterfacePtr collision,
+                                                                          const IsWithinLimitsFn& fn)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
   , collision_(std::move(collision))
+  , fn_(fn)
 {
 }
 
@@ -43,7 +45,7 @@ bool descartes_light::RailedCartesianPointSampler::sample(std::vector<double>& s
   for (std::size_t i = 0; i < n_sols; ++i)
   {
     const auto* sol_data = buffer.data() + i * dof;
-    if (isCollisionFree(sol_data))
+    if (isCollisionFree(sol_data) && fn_(sol_data))
       solution_set.insert(end(solution_set), sol_data, sol_data + dof);
   }
 

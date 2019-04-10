@@ -1,4 +1,5 @@
 #include <iostream>
+#include <functional>
 
 #include <opw_kinematics/opw_parameters_examples.h>
 
@@ -60,7 +61,16 @@ static bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory
   return ac.sendGoalAndWait(goal) == actionlib::SimpleClientGoalState::SUCCEEDED;
 }
 
-std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::CollisionInterfacePtr coll_env)
+static bool isWithinLimits(const double *vertex, const Eigen::MatrixX2d& limits)
+{
+  for (int i = 0; i < limits.rows(); ++i)
+    if ((vertex[i] < limits(i, 0)) || (vertex[i] > limits(i, 1)))
+      return false;
+
+  return true;
+}
+
+std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::CollisionInterfacePtr coll_env, const descartes_light::IsWithinLimitsFn& fn)
 {
   // The current setup requires that our cartesian sampler is aware of the robot
   // kinematics
@@ -76,7 +86,7 @@ std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::Colli
     result.push_back(
           std::make_shared<descartes_light::AxialSymmetricSampler>(
             reference * Eigen::Translation3d(0, i * 0.01, 0), kin_interface, 0.1,
-            std::shared_ptr<descartes_light::CollisionInterface>(coll_env->clone())));
+            std::shared_ptr<descartes_light::CollisionInterface>(coll_env->clone()), fn));
   }
 
   return result;
@@ -100,9 +110,11 @@ int main(int argc, char** argv)
 
   auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr, kin_ptr->getLinkNames(), kin_ptr->getJointNames());
 
+  descartes_light::IsWithinLimitsFn is_within_limits_fn = std::bind(&isWithinLimits, std::placeholders::_1, kin_ptr->getLimits());
+
   // Define our vertex samplers
   ros::WallTime t1 = ros::WallTime::now();
-  const auto path = makePath(collision_checker);
+  const auto path = makePath(collision_checker, is_within_limits_fn);
   ros::WallTime t2 = ros::WallTime::now();
   ROS_ERROR_STREAM("DELTA T: " << (t2 - t1).toSec());
 

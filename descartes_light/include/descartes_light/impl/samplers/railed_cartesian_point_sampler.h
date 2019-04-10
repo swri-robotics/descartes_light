@@ -21,6 +21,7 @@
 #include "descartes_light/core/kinematics_interface.h"
 #include "descartes_light/core/collision_interface.h"
 #include "descartes_light/core/position_sampler.h"
+#include "descartes_light/impl/samplers/utils.h"
 #include <memory>
 
 namespace descartes_light
@@ -31,7 +32,8 @@ class RailedCartesianPointSampler : public PositionSampler
 public:
   RailedCartesianPointSampler(const Eigen::Isometry3d& tool_pose,
                               const KinematicsInterfacePtr robot_kin,
-                              const CollisionInterfacePtr collision);
+                              const CollisionInterfacePtr collision,
+                              const IsWithinLimitsFn& fn);
 
   /**
    * @brief sample
@@ -46,6 +48,7 @@ private:
   Eigen::Isometry3d tool_pose_;
   KinematicsInterfacePtr kin_;
   CollisionInterfacePtr collision_;
+  IsWithinLimitsFn fn_;
 };
 
 }

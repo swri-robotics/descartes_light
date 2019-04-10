@@ -23,11 +23,13 @@ const static std::size_t opw_dof = 6;
 descartes_light::AxialSymmetricSampler::AxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
                                                               const descartes_light::KinematicsInterfacePtr robot_kin,
                                                               const double radial_sample_resolution,
-                                                              const CollisionInterfacePtr collision)
+                                                              const CollisionInterfacePtr collision,
+                                                              const IsWithinLimitsFn& fn)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
   , collision_(collision)
   , radial_sample_res_(radial_sample_resolution)
+  , fn_(fn)
 {}
 
 bool descartes_light::AxialSymmetricSampler::sample(std::vector<double>& solution_set)
@@ -49,7 +51,7 @@ bool descartes_light::AxialSymmetricSampler::sample(std::vector<double>& solutio
     for (std::size_t i = 0; i < n_sols; ++i)
     {
       const auto* sol_data = buffer.data() + i * opw_dof;
-      if (isCollisionFree(sol_data))
+      if (isCollisionFree(sol_data) && fn_(sol_data))
         solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
     }
     buffer.clear();
