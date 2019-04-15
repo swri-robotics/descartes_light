@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_EDGE_EVALUATOR_H
-#define DESCARTES_LIGHT_EDGE_EVALUATOR_H
+#ifndef DESCARTES_LIGHT_CORE_EDGE_EVALUATOR_H
+#define DESCARTES_LIGHT_CORE_EDGE_EVALUATOR_H
 
 #include <memory>
 #include <vector>
@@ -25,17 +25,19 @@
 namespace descartes_light
 {
 
+template<typename FloatType>
 class EdgeEvaluator
 {
 public:
   virtual ~EdgeEvaluator() {}
 
-  virtual bool evaluate(const Rung_<double>& from, const Rung_<double>& to,
-                        std::vector<LadderGraph<double>::EdgeList>& edges) = 0;
+  virtual bool evaluate(const Rung_<FloatType>& from,
+                        const Rung_<FloatType>& to,
+                        std::vector<typename LadderGraph<FloatType>::EdgeList>& edges) = 0;
+
+  typedef typename std::shared_ptr<EdgeEvaluator<FloatType>> Ptr;
 };
 
-using EdgeEvaluatorPtr = std::shared_ptr<EdgeEvaluator>;
+} // namespace descartes_light
 
-}
-
-#endif // DESCARTES_LIGHT_EDGE_EVALUATOR_H
+#endif // DESCARTES_LIGHT_CORE_EDGE_EVALUATOR_H

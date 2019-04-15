@@ -16,37 +16,37 @@
  * limitations under the License.
  */
 
-#ifndef DESCARTES_LIGHT_LADDER_GRAPH_DAG_SEARCH_H
-#define DESCARTES_LIGHT_LADDER_GRAPH_DAG_SEARCH_H
+#ifndef DESCARTES_LIGHT_CORE_LADDER_GRAPH_DAG_SEARCH_H
+#define DESCARTES_LIGHT_CORE_LADDER_GRAPH_DAG_SEARCH_H
 
 #include "descartes_light/core/ladder_graph.h"
 
 namespace descartes_light
 {
 
-// Directed Acyclic graph search
+template<typename FloatType>
 class DAGSearch
 {
 public:
   using predecessor_t = unsigned;
   using size_type = std::size_t;
 
-  explicit DAGSearch(const LadderGraph<double>& graph);
+  explicit DAGSearch(const LadderGraph<FloatType>& graph);
 
-  double run();
+  FloatType run();
 
   std::vector<predecessor_t> shortestPath() const;
 
 private:
-  const LadderGraph<double>& graph_;
+  const LadderGraph<FloatType>& graph_;
 
   struct SolutionRung
   {
-    std::vector<double> distance;
+    std::vector<FloatType> distance;
     std::vector<predecessor_t> predecessor;
   };
 
-  inline double& distance(size_type rung, size_type index) noexcept
+  inline FloatType& distance(size_type rung, size_type index) noexcept
   {
     return solution_[rung].distance[index];
   }
@@ -63,5 +63,7 @@ private:
 
   std::vector<SolutionRung> solution_;
 };
-} // descartes_planner
-#endif
+
+} // namespace descartes_light
+
+#endif // DESCARTES_LIGHT_CORE_LADDER_GRAPH_DAG_SEARCH_H

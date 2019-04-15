@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_POSITION_SAMPLER_H
-#define DESCARTES_LIGHT_POSITION_SAMPLER_H
+#ifndef DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
+#define DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
 
 #include <memory>
 #include <vector>
@@ -24,16 +24,17 @@
 namespace descartes_light
 {
 
+template<typename FloatType>
 class PositionSampler
 {
 public:
   virtual ~PositionSampler() {}
 
-  virtual bool sample(std::vector<double>& solution_set) = 0;
+  virtual bool sample(std::vector<FloatType>& solution_set) = 0;
+
+  typedef typename std::shared_ptr<PositionSampler<FloatType>> Ptr;
 };
 
-using PositionSamplerPtr = std::shared_ptr<PositionSampler>;
+} // namespace descartes_light
 
-}
-
-#endif // DESCARTES_LIGHT_POSITION_SAMPLER_H
+#endif // DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
