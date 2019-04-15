@@ -25,39 +25,42 @@
 namespace descartes_light
 {
 
-class ExternalAxisSampler : public PositionSampler
+template<typename FloatType>
+class ExternalAxisSampler : public PositionSampler<FloatType>
 {
 public:
-  ExternalAxisSampler(const Eigen::Isometry3d& tool_in_positioner,
-                      const KinematicsInterfacePtr robot_kin,
-                      const CollisionInterfacePtr collision);
+  ExternalAxisSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_in_positioner,
+                      const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+                      const typename CollisionInterface<FloatType>::Ptr collision);
 
-  bool sample(std::vector<double>& solution_set) override;
+  bool sample(std::vector<FloatType>& solution_set) override;
 
 private:
-  bool isCollisionFree(const double* vertex);
+  bool isCollisionFree(const FloatType* vertex);
 
-  Eigen::Isometry3d tool_pose_;
-  KinematicsInterfacePtr kin_;
-  CollisionInterfacePtr collision_;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> tool_pose_;
+  typename KinematicsInterface<FloatType>::Ptr kin_;
+  typename CollisionInterface<FloatType>::Ptr collision_;
 };
 
-class SpoolSampler : public descartes_light::PositionSampler
+template<typename FloatType>
+class SpoolSampler : public descartes_light::PositionSampler<FloatType>
 {
 public:
-  SpoolSampler(const Eigen::Isometry3d& tool_in_positioner,
-                      const KinematicsInterfacePtr robot_kin,
-                      const CollisionInterfacePtr collision);
+  SpoolSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_in_positioner,
+               const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+               const typename CollisionInterface<FloatType>::Ptr collision);
 
-  bool sample(std::vector<double>& solution_set) override;
+  bool sample(std::vector<FloatType>& solution_set) override;
 
 private:
-  bool isCollisionFree(const double* vertex);
+  bool isCollisionFree(const FloatType* vertex);
 
-  Eigen::Isometry3d tool_pose_;
-  KinematicsInterfacePtr kin_;
-  CollisionInterfacePtr collision_;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> tool_pose_;
+  typename KinematicsInterface<FloatType>::Ptr kin_;
+  typename CollisionInterface<FloatType>::Ptr collision_;
 };
-}
+
+} // namespace descartes_light
 
 #endif

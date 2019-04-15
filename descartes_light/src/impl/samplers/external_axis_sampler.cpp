@@ -18,33 +18,44 @@
 #include "descartes_light/impl/samplers/external_axis_sampler.h"
 #include <iostream>
 
-descartes_light::ExternalAxisSampler::ExternalAxisSampler(const Eigen::Isometry3d& tool_in_positioner,
-                                                          const KinematicsInterfacePtr robot_kin,
-                                                          const CollisionInterfacePtr collision)
+namespace descartes_light
+{
+
+template<typename FloatType>
+ExternalAxisSampler<FloatType>::ExternalAxisSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_in_positioner,
+                                                    const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+                                                    const typename CollisionInterface<FloatType>::Ptr collision)
   : tool_pose_(tool_in_positioner)
   , kin_(robot_kin)
   , collision_(std::move(collision))
 {
 }
 
-bool descartes_light::ExternalAxisSampler::sample(std::vector<double>& solution_set)
+template<typename FloatType>
+bool ExternalAxisSampler<FloatType>::isCollisionFree(const FloatType* vertex)
+{
+  return collision_->validate(vertex, 7);
+}
+
+template<typename FloatType>
+bool ExternalAxisSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
 {
   // We need to translate the tool pose to the "robot" frame
   // We need some strategy for moving the positioner around to generate many of these frames
   //    - In the simple case, we can sample the positioner limits evenly but this will often
   //      lead to terrible performance
 
-  auto to_robot_frame = [] (const Eigen::Isometry3d& pose_in_positioner, const double positioner_angle)
+  auto to_robot_frame = [] (const Eigen::Transform<FloatType, 3, Eigen::Isometry>& pose_in_positioner, const FloatType positioner_angle)
   {
-    return Eigen::Translation3d(1.25, 0, 0) * Eigen::AngleAxisd(positioner_angle, Eigen::Vector3d::UnitZ()) *
+    return Eigen::Translation<FloatType, 3>(1.25, 0, 0) * Eigen::AngleAxis<FloatType>(positioner_angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ()) *
            pose_in_positioner;
   };
 
   // So we just loop
-  const static double discretization = M_PI / 36.;
-  for (double angle = -M_PI; angle <= M_PI; angle += discretization)
+  const static FloatType discretization = M_PI / 36.;
+  for (FloatType angle = -M_PI; angle <= M_PI; angle += discretization)
   {
-    std::vector<double> buffer;
+    std::vector<FloatType> buffer;
     kin_->ik(to_robot_frame(tool_pose_, angle), buffer);
 
     // Now test the solutions
@@ -52,7 +63,7 @@ bool descartes_light::ExternalAxisSampler::sample(std::vector<double>& solution_
     for (std::size_t i = 0; i < n_sols; ++i)
     {
       const auto* sol_data = buffer.data() + i * 6;
-      if (isCollisionFree(sol_data))
+      if (ExternalAxisSampler<FloatType>::isCollisionFree(sol_data))
       {
         solution_set.insert(end(solution_set), sol_data, sol_data + 6);
         solution_set.insert(end(solution_set), angle);
@@ -63,38 +74,41 @@ bool descartes_light::ExternalAxisSampler::sample(std::vector<double>& solution_
   return !solution_set.empty();
 }
 
-bool descartes_light::ExternalAxisSampler::isCollisionFree(const double* vertex)
-{
-  return collision_->validate(vertex, 7);
-}
-
-descartes_light::SpoolSampler::SpoolSampler(const Eigen::Isometry3d& tool_in_positioner,
-                                            const KinematicsInterfacePtr robot_kin,
-                                            const CollisionInterfacePtr collision)
+template<typename FloatType>
+SpoolSampler<FloatType>::SpoolSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_in_positioner,
+                                      const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+                                      const typename CollisionInterface<FloatType>::Ptr collision)
   : tool_pose_(tool_in_positioner)
   , kin_(robot_kin)
   , collision_(std::move(collision))
 {
 }
 
-bool descartes_light::SpoolSampler::sample(std::vector<double>& solution_set)
+template<typename FloatType>
+bool SpoolSampler<FloatType>::isCollisionFree(const FloatType* vertex)
+{
+  return collision_->validate(vertex, 7);
+}
+
+template<typename FloatType>
+bool SpoolSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
 {
   // We need to translate the tool pose to the "robot" frame
   // We need some strategy for moving the positioner around to generate many of these frames
   //    - In the simple case, we can sample the positioner limits evenly but this will often
   //      lead to terrible performance
 
-  auto to_robot_frame = [] (const Eigen::Isometry3d& pose_in_positioner, const double positioner_angle)
+  auto to_robot_frame = [] (const Eigen::Transform<FloatType, 3, Eigen::Isometry>& pose_in_positioner, const FloatType positioner_angle)
   {
-    return Eigen::Translation3d(1.25, 0, 0.5) * Eigen::AngleAxisd(M_PI/2., Eigen::Vector3d::UnitX()) *
-           Eigen::AngleAxisd(positioner_angle, Eigen::Vector3d::UnitZ()) * pose_in_positioner;
+    return Eigen::Translation<FloatType, 3>(1.25, 0, 0.5) * Eigen::AngleAxis<FloatType>(M_PI/2., Eigen::Matrix<FloatType, 3, 1>::UnitX()) *
+           Eigen::AngleAxis<FloatType>(positioner_angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ()) * pose_in_positioner;
   };
 
   // So we just loop
-  const static double discretization = M_PI / 36.;
-  for (double angle = -2 * M_PI; angle <= 2 * M_PI; angle += discretization)
+  const static FloatType discretization = M_PI / 36.;
+  for (FloatType angle = -2 * M_PI; angle <= 2 * M_PI; angle += discretization)
   {
-    std::vector<double> buffer;
+    std::vector<FloatType> buffer;
     kin_->ik(to_robot_frame(tool_pose_, angle), buffer);
 
     // Now test the solutions
@@ -102,7 +116,7 @@ bool descartes_light::SpoolSampler::sample(std::vector<double>& solution_set)
     for (std::size_t i = 0; i < n_sols; ++i)
     {
       const auto* sol_data = buffer.data() + i * 6;
-      if (isCollisionFree(sol_data))
+      if (SpoolSampler<FloatType>::isCollisionFree(sol_data))
       {
         solution_set.insert(end(solution_set), sol_data, sol_data + 6);
         solution_set.insert(end(solution_set), angle);
@@ -113,8 +127,12 @@ bool descartes_light::SpoolSampler::sample(std::vector<double>& solution_set)
   return !solution_set.empty();
 }
 
-bool descartes_light::SpoolSampler::isCollisionFree(const double* vertex)
-{
-  return collision_->validate(vertex, 7);
-}
+// Explicit template instantiation
+template class ExternalAxisSampler<float>;
+template class ExternalAxisSampler<double>;
+
+template class SpoolSampler<float>;
+template class SpoolSampler<double>;
+
+} // descartes_light
 

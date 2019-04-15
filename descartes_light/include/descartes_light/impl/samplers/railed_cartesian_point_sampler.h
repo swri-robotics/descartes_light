@@ -27,7 +27,8 @@
 namespace descartes_light
 {
 
-class RailedCartesianPointSampler : public PositionSampler
+template<typename FloatType>
+class RailedCartesianPointSampler : public PositionSampler<FloatType>
 {
 public:
   /**
@@ -37,9 +38,9 @@ public:
    * @param collision The collision interface
    * @param allow_collision If true and no valid solution was found it will return the best of the worst
    */
-  RailedCartesianPointSampler(const Eigen::Isometry3d& tool_pose,
-                              const KinematicsInterfacePtr robot_kin,
-                              const CollisionInterfacePtr collision,
+  RailedCartesianPointSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
+                              const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+                              const typename CollisionInterface<FloatType>::Ptr collision,
                               const bool allow_collision);
 
   /**
@@ -47,18 +48,18 @@ public:
    * @param solution_set Returns auxiliary axes followed by robot positions
    * @return True if valid solutions were found, otherwise false.
    */
-  bool sample(std::vector<double>& solution_set) override;
+  bool sample(std::vector<FloatType>& solution_set) override;
 
 private:
-  bool isCollisionFree(const double* vertex);
-  bool getBestSolution(std::vector<double>& solution_set);
+  bool isCollisionFree(const FloatType* vertex);
+  bool getBestSolution(std::vector<FloatType>& solution_set);
 
-  Eigen::Isometry3d tool_pose_;
-  KinematicsInterfacePtr kin_;
-  CollisionInterfacePtr collision_;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> tool_pose_;
+  typename KinematicsInterface<FloatType>::Ptr kin_;
+  typename CollisionInterface<FloatType>::Ptr collision_;
   bool allow_collision_;
 };
 
-}
+} // namespace descartes_light
 
 #endif

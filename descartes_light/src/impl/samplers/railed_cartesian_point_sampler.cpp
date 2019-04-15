@@ -20,10 +20,14 @@
 
 const static std::size_t dof = 8;
 
-descartes_light::RailedCartesianPointSampler::RailedCartesianPointSampler(const Eigen::Isometry3d& tool_pose,
-                                                                          const KinematicsInterfacePtr robot_kin,
-                                                                          const CollisionInterfacePtr collision,
-                                                                          const bool allow_collision)
+namespace descartes_light
+{
+
+template<typename FloatType>
+RailedCartesianPointSampler<FloatType>::RailedCartesianPointSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
+                                                                    const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+                                                                    const typename CollisionInterface<FloatType>::Ptr collision,
+                                                                    const bool allow_collision)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
   , collision_(std::move(collision))
@@ -31,12 +35,13 @@ descartes_light::RailedCartesianPointSampler::RailedCartesianPointSampler(const 
 {
 }
 
-bool descartes_light::RailedCartesianPointSampler::sample(std::vector<double>& solution_set)
+template<typename FloatType>
+bool RailedCartesianPointSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
 {
-  std::vector<double> buffer;
+  std::vector<FloatType> buffer;
   kin_->ik(tool_pose_, buffer);
 
-  const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
+  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
     return v.size() / dof;
   };
 
@@ -45,7 +50,7 @@ bool descartes_light::RailedCartesianPointSampler::sample(std::vector<double>& s
   for (std::size_t i = 0; i < n_sols; ++i)
   {
     const auto* sol_data = buffer.data() + i * dof;
-    if (isCollisionFree(sol_data))
+    if (RailedCartesianPointSampler<FloatType>::isCollisionFree(sol_data))
       solution_set.insert(end(solution_set), sol_data, sol_data + dof);
   }
 
@@ -55,18 +60,20 @@ bool descartes_light::RailedCartesianPointSampler::sample(std::vector<double>& s
   return !solution_set.empty();
 }
 
-bool descartes_light::RailedCartesianPointSampler::isCollisionFree(const double* vertex)
+template<typename FloatType>
+bool RailedCartesianPointSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
   return collision_->validate(vertex, dof);
 }
 
-bool descartes_light::RailedCartesianPointSampler::getBestSolution(std::vector<double>& solution_set)
+template<typename FloatType>
+bool RailedCartesianPointSampler<FloatType>::getBestSolution(std::vector<FloatType>& solution_set)
 {
-  double distance = -std::numeric_limits<double>::max();
-  std::vector<double> buffer;
+  FloatType distance = -std::numeric_limits<FloatType>::max();
+  std::vector<FloatType> buffer;
   kin_->ik(tool_pose_, buffer);
 
-  const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
+  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
     return v.size() / dof;
   };
 
@@ -75,7 +82,7 @@ bool descartes_light::RailedCartesianPointSampler::getBestSolution(std::vector<d
   for (std::size_t i = 0; i < n_sols; ++i)
   {
     const auto* sol_data = buffer.data() + i * dof;
-    double cur_distance = collision_->distance(sol_data, dof);
+    FloatType cur_distance = collision_->distance(sol_data, dof);
     if (cur_distance > distance)
     {
       distance = cur_distance;
@@ -86,3 +93,9 @@ bool descartes_light::RailedCartesianPointSampler::getBestSolution(std::vector<d
 
   return !solution_set.empty();
 }
+
+// Explicit template instantiation
+template class RailedCartesianPointSampler<float>;
+template class RailedCartesianPointSampler<double>;
+
+} // namespace descartes_light

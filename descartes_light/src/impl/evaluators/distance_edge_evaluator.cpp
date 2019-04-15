@@ -18,18 +18,18 @@
 #include "descartes_light/impl/evaluators/distance_edge_evaluator.h"
 #include <cmath>
 
-descartes_light::DistanceEdgeEvaluator::DistanceEdgeEvaluator(const std::vector<double>& velocity_limits)
-  : velocity_limits_(velocity_limits)
-{}
-
-static void considerEdge(const double* start, const double* end,
-                         const std::vector<double>& delta_thresholds, std::size_t next_idx,
-                         descartes_light::LadderGraph<double>::EdgeList& out)
+namespace
 {
-  double cost = 0.0;
+
+template<typename FloatType>
+static void considerEdge(const FloatType* start, const FloatType* end,
+                         const std::vector<FloatType>& delta_thresholds, std::size_t next_idx,
+                         typename descartes_light::LadderGraph<FloatType>::EdgeList& out)
+{
+  FloatType cost = 0.0;
   for (std::size_t i = 0; i < delta_thresholds.size(); ++i)
   {
-    double step = end[i] - start[i];
+    FloatType step = end[i] - start[i];
     if (std::abs(step) > delta_thresholds[i]) return;
 
     cost += std::pow(step, 2);
@@ -38,8 +38,22 @@ static void considerEdge(const double* start, const double* end,
   out.emplace_back(cost, next_idx);
 }
 
-bool descartes_light::DistanceEdgeEvaluator::evaluate(const Rung_<double>& from, const Rung_<double>& to,
-                                                      std::vector<LadderGraph<double>::EdgeList>& edges)
+} // namespace anonymous
+
+namespace descartes_light
+{
+
+template<typename FloatType>
+DistanceEdgeEvaluator<FloatType>::DistanceEdgeEvaluator(const std::vector<FloatType>& velocity_limits)
+  : velocity_limits_(velocity_limits)
+{
+
+}
+
+template<typename FloatType>
+bool DistanceEdgeEvaluator<FloatType>::evaluate(const Rung_<FloatType>& from,
+                                                const Rung_<FloatType>& to,
+                                                std::vector<typename LadderGraph<FloatType>::EdgeList>& edges)
 {
   const auto dof = velocity_limits_.size();
   const auto n_start = from.data.size() / dof;
@@ -48,17 +62,17 @@ bool descartes_light::DistanceEdgeEvaluator::evaluate(const Rung_<double>& from,
   // Compute thresholds
   const auto dt = to.timing;
 
-  std::vector<double> delta_thresholds (velocity_limits_.size());
+  std::vector<FloatType> delta_thresholds (velocity_limits_.size());
   std::transform(velocity_limits_.begin(), velocity_limits_.end(), delta_thresholds.begin(),
-                 [dt] (const double vel_limit) {
+                 [dt] (const FloatType vel_limit) {
     if (dt.upper != 0.0)
     {
-      const static double safety_factor = 0.9;
+      const static FloatType safety_factor = 0.9;
       return dt.upper * vel_limit * safety_factor;
     }
     else
     {
-      return std::numeric_limits<double>::max();
+      return std::numeric_limits<FloatType>::max();
     }
   });
 
@@ -83,3 +97,9 @@ bool descartes_light::DistanceEdgeEvaluator::evaluate(const Rung_<double>& from,
 
   return false;
 }
+
+// Explicit template instantiation
+template class DistanceEdgeEvaluator<float>;
+template class DistanceEdgeEvaluator<double>;
+
+} // namespace descartes_light

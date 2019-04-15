@@ -20,21 +20,32 @@
 
 const static std::size_t opw_dof = 6;
 
-descartes_light::CartesianPointSampler::CartesianPointSampler(const Eigen::Isometry3d& tool_pose,
-                                                              const KinematicsInterfacePtr robot_kin,
-                                                              const CollisionInterfacePtr collision)
+namespace descartes_light
+{
+
+template<typename FloatType>
+CartesianPointSampler<FloatType>::CartesianPointSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
+                                                        const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+                                                        const typename CollisionInterface<FloatType>::Ptr collision)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
   , collision_(std::move(collision))
 {
 }
 
-bool descartes_light::CartesianPointSampler::sample(std::vector<double>& solution_set)
+template<typename FloatType>
+bool CartesianPointSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
-  std::vector<double> buffer;
+  return collision_->validate(vertex, opw_dof);
+}
+
+template<typename FloatType>
+bool CartesianPointSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
+{
+  std::vector<FloatType> buffer;
   kin_->ik(tool_pose_, buffer);
 
-  const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
+  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
     return v.size() / opw_dof;
   };
 
@@ -43,14 +54,15 @@ bool descartes_light::CartesianPointSampler::sample(std::vector<double>& solutio
   for (std::size_t i = 0; i < n_sols; ++i)
   {
     const auto* sol_data = buffer.data() + i * opw_dof;
-    if (isCollisionFree(sol_data))
+    if (CartesianPointSampler<FloatType>::isCollisionFree(sol_data))
       solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
   }
 
   return !solution_set.empty();
 }
 
-bool descartes_light::CartesianPointSampler::isCollisionFree(const double* vertex)
-{
-  return collision_->validate(vertex, opw_dof);
-}
+// Explicit template instantiation
+template class CartesianPointSampler<float>;
+template class CartesianPointSampler<double>;
+
+} // namespace descartes_light

@@ -21,15 +21,19 @@
 #include <iostream>
 #include <math.h>
 
-descartes_light::OPWRailedKinematics::OPWRailedKinematics(const opw_kinematics::Parameters<double> &params,
-                                                          const Eigen::Isometry3d &world_to_rail_base,
-                                                          const Eigen::Isometry3d &rail_base_to_robot_base,
-                                                          const Eigen::Isometry3d &tool0_to_tip,
-                                                          const Eigen::Matrix2d& rail_limits,
-                                                          const Eigen::Vector2d& rail_sample_resolution,
-                                                          const double robot_reach,
-                                                          const IsValidFn& is_valid_fn,
-                                                          const GetRedundentSolutionsFn& redundent_sol_fn)
+namespace descartes_light
+{
+
+template<typename FloatType>
+OPWRailedKinematics<FloatType>::OPWRailedKinematics(const opw_kinematics::Parameters<FloatType> &params,
+                                                    const Eigen::Transform<FloatType, 3, Eigen::Isometry> &world_to_rail_base,
+                                                    const Eigen::Transform<FloatType, 3, Eigen::Isometry> &rail_base_to_robot_base,
+                                                    const Eigen::Transform<FloatType, 3, Eigen::Isometry> &tool0_to_tip,
+                                                    const Eigen::Matrix<FloatType, 2, 2>& rail_limits,
+                                                    const Eigen::Matrix<FloatType, 2, 1>& rail_sample_resolution,
+                                                    const FloatType robot_reach,
+                                                    const IsValidFn<FloatType>& is_valid_fn,
+                                                    const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn)
   : params_(params)
   , world_to_rail_base_(world_to_rail_base)
   , rail_base_to_robot_base_(rail_base_to_robot_base)
@@ -38,106 +42,113 @@ descartes_light::OPWRailedKinematics::OPWRailedKinematics(const opw_kinematics::
   , rail_sample_resolution_(rail_sample_resolution)
   , robot_reach_(robot_reach)
   , is_valid_fn_(is_valid_fn)
-  , redundent_sol_fn_(redundent_sol_fn)
+  , redundant_sol_fn_(redundant_sol_fn)
 {
 }
 
-bool descartes_light::OPWRailedKinematics::ik(const Eigen::Isometry3d &p, std::vector<double> &solution_set) const
+template<typename FloatType>
+bool OPWRailedKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry> &p,
+                                        std::vector<FloatType> &solution_set) const
 {
-  return ik(p, is_valid_fn_, redundent_sol_fn_, solution_set);
+  return OPWRailedKinematics<FloatType>::ik(p, is_valid_fn_, redundant_sol_fn_, solution_set);
 }
 
-bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d &p, const Eigen::Vector2d &rail_pose, std::vector<double> &solution_set) const
+template<typename FloatType>
+bool OPWRailedKinematics<FloatType>::ikAt(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+                                          const Eigen::Matrix<FloatType, 2, 1>& rail_pose,
+                                          std::vector<FloatType>& solution_set) const
 {
-  return ikAt(p, rail_pose, is_valid_fn_, redundent_sol_fn_, solution_set);
+  return OPWRailedKinematics<FloatType>::ikAt(p, rail_pose, is_valid_fn_, redundant_sol_fn_, solution_set);
 }
 
-bool descartes_light::OPWRailedKinematics::ik(const Eigen::Isometry3d& p,
-                                              const IsValidFn& is_valid_fn,
-                                              const GetRedundentSolutionsFn& redundent_sol_fn,
-                                              std::vector<double>& solution_set) const
+template<typename FloatType>
+bool OPWRailedKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+                                        const IsValidFn<FloatType>& is_valid_fn,
+                                        const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn,
+                                        std::vector<FloatType>& solution_set) const
 {
   // Tool pose in rail coordinate system
-  Eigen::Isometry3d tool_pose = world_to_rail_base_.inverse() * p;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> tool_pose = world_to_rail_base_.inverse() * p;
 
-  const Eigen::Vector2d& rail_lower_limit = rail_limits_.col(0);
-  const Eigen::Vector2d& rail_upper_limit = rail_limits_.col(1);
+  const Eigen::Matrix<FloatType, 2, 1>& rail_lower_limit = rail_limits_.col(0);
+  const Eigen::Matrix<FloatType, 2, 1>& rail_upper_limit = rail_limits_.col(1);
 
-  const Eigen::Vector2d origin (tool_pose.translation().x() - rail_base_to_robot_base_.translation().x(), tool_pose.translation().y() - rail_base_to_robot_base_.translation().y());
+  const Eigen::Matrix<FloatType, 2, 1> origin (tool_pose.translation().x() - rail_base_to_robot_base_.translation().x(), tool_pose.translation().y() - rail_base_to_robot_base_.translation().y());
 
-  const double start_x = (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
-  const double end_x = (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
-  const double start_y = (origin.y() - robot_reach_ < rail_lower_limit.y()) ? rail_lower_limit.y() : origin.y() - robot_reach_;
-  const double end_y = (origin.y() + robot_reach_ > rail_upper_limit.y()) ? rail_upper_limit.y() : origin.y() + robot_reach_;
-  const double res_x = (end_x - start_x) / std::ceil((end_x - start_x) / rail_sample_resolution_.x());
-  const double res_y = (end_y - start_y) / std::ceil((end_y - start_y) / rail_sample_resolution_.y());
+  const FloatType start_x = (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
+  const FloatType end_x = (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
+  const FloatType start_y = (origin.y() - robot_reach_ < rail_lower_limit.y()) ? rail_lower_limit.y() : origin.y() - robot_reach_;
+  const FloatType end_y = (origin.y() + robot_reach_ > rail_upper_limit.y()) ? rail_upper_limit.y() : origin.y() + robot_reach_;
+  const FloatType res_x = (end_x - start_x) / std::ceil((end_x - start_x) / rail_sample_resolution_.x());
+  const FloatType res_y = (end_y - start_y) / std::ceil((end_y - start_y) / rail_sample_resolution_.y());
 
-  for (double x = start_x; x < end_x; x += res_x)
-    for (double y = start_y; y < end_y; y += res_y)
-      ikAt(p, Eigen::Vector2d(x, y), is_valid_fn, redundent_sol_fn, solution_set);
+  for (FloatType x = start_x; x < end_x; x += res_x)
+    for (FloatType y = start_y; y < end_y; y += res_y)
+      ikAt(p, Eigen::Matrix<FloatType, 2, 1>(x, y), is_valid_fn, redundant_sol_fn, solution_set);
 
   return !solution_set.empty();
 }
 
-bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d& p,
-                                                const Eigen::Vector2d& rail_pose,
-                                                const IsValidFn& is_valid_fn,
-                                                const GetRedundentSolutionsFn& redundent_sol_fn,
-                                                std::vector<double>& solution_set) const
+template<typename FloatType>
+bool OPWRailedKinematics<FloatType>::ikAt(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+                                          const Eigen::Matrix<FloatType, 2, 1>& rail_pose,
+                                          const IsValidFn<FloatType>& is_valid_fn,
+                                          const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn,
+                                          std::vector<FloatType>& solution_set) const
 {
-  const Eigen::Isometry3d world_to_robot_base = world_to_rail_base_ * Eigen::Translation3d(rail_pose.x(), rail_pose.y(), 0.0) * rail_base_to_robot_base_;
-  const Eigen::Isometry3d in_robot = world_to_robot_base.inverse() * p * tool0_to_tip_.inverse();
+  const Eigen::Transform<FloatType, 3, Eigen::Isometry> world_to_robot_base = world_to_rail_base_ * Eigen::Translation<FloatType, 3>(rail_pose.x(), rail_pose.y(), 0.0) * rail_base_to_robot_base_;
+  const Eigen::Transform<FloatType, 3, Eigen::Isometry> in_robot = world_to_robot_base.inverse() * p * tool0_to_tip_.inverse();
 
-  std::array<double, 6*8> sols;
+  std::array<FloatType, 6*8> sols;
   opw_kinematics::inverse(params_, in_robot, sols.data());
 
   // Check the output
   for (int i = 0; i < 8; i++)
   {
-    double* sol = sols.data() + 6 * i;
+    FloatType* sol = sols.data() + 6 * i;
     if (opw_kinematics::isValid(sol))
     {
       opw_kinematics::harmonizeTowardZero(sol); // Modifies 'sol' in place
 
-      std::vector<double> full_sol;
+      std::vector<FloatType> full_sol;
       full_sol.insert(end(full_sol), rail_pose.data(), rail_pose.data() + 2); // Insert the X-Y pose of the rail
       full_sol.insert(end(full_sol), sol, sol + 6); // And then insert the robot arm configuration
 
-      if (is_valid_fn && redundent_sol_fn)
+      if (is_valid_fn && redundant_sol_fn)
       {
         if (is_valid_fn(full_sol.data()))
           solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);  // If good then add to solution set
 
-        std::vector<double> redundent_sols = redundent_sol_fn(full_sol.data());
-        if (!redundent_sols.empty())
+        std::vector<FloatType> redundant_sols = redundant_sol_fn(full_sol.data());
+        if (!redundant_sols.empty())
         {
-          int num_sol = redundent_sols.size()/8;
+          int num_sol = redundant_sols.size()/8;
           for (int s = 0; s < num_sol; ++s)
           {
-            double* redundent_sol = redundent_sols.data() + 8 * s;
-            if (is_valid_fn(redundent_sol))
-              solution_set.insert(end(solution_set), redundent_sol, redundent_sol + 8);  // If good then add to solution set
+            FloatType* redundant_sol = redundant_sols.data() + 8 * s;
+            if (is_valid_fn(redundant_sol))
+              solution_set.insert(end(solution_set), redundant_sol, redundant_sol + 8);  // If good then add to solution set
           }
         }
       }
-      else if (is_valid_fn && !redundent_sol_fn)
+      else if (is_valid_fn && !redundant_sol_fn)
       {
         if (is_valid_fn(full_sol.data()))
           solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);  // If good then add to solution set
       }
-      else if (!is_valid_fn && redundent_sol_fn)
+      else if (!is_valid_fn && redundant_sol_fn)
       {
 
         solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);  // If good then add to solution set
 
-        std::vector<double> redundent_sols = redundent_sol_fn(full_sol.data());
-        if (!redundent_sols.empty())
+        std::vector<FloatType> redundant_sols = redundant_sol_fn(full_sol.data());
+        if (!redundant_sols.empty())
         {
-          int num_sol = redundent_sols.size()/8;
+          int num_sol = redundant_sols.size()/8;
           for (int s = 0; s < num_sol; ++s)
           {
-            double* redundent_sol = redundent_sols.data() + 8 * s;
-            solution_set.insert(end(solution_set), redundent_sol, redundent_sol + 8);  // If good then add to solution set
+            FloatType* redundant_sol = redundant_sols.data() + 8 * s;
+            solution_set.insert(end(solution_set), redundant_sol, redundant_sol + 8);  // If good then add to solution set
           }
         }
       }
@@ -151,26 +162,32 @@ bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d& p,
   return !solution_set.empty();
 }
 
-bool descartes_light::OPWRailedKinematics::fk(const double* pose, Eigen::Isometry3d& solution) const
+template<typename FloatType>
+bool OPWRailedKinematics<FloatType>::fkAt(const Eigen::Matrix<FloatType, 2, 1>& rail_pose,
+                                          const std::vector<FloatType>& pose, Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const
 {
-  Eigen::Vector2d rail_pose;
+  solution = opw_kinematics::forward<FloatType>(params_, pose.data());
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> rail_tf = Eigen::Transform<FloatType, 3, Eigen::Isometry>::Identity();
+  rail_tf.translation().head(2) = rail_pose;
+  solution = world_to_rail_base_ * rail_tf * rail_base_to_robot_base_ * solution * tool0_to_tip_;
+  return true;
+}
+
+template<typename FloatType>
+bool OPWRailedKinematics<FloatType>::fk(const FloatType* pose,
+                                        Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const
+{
+  Eigen::Matrix<FloatType, 2, 1> rail_pose;
   rail_pose(0) = pose[0];
   rail_pose(1) = pose[1];
 
-  std::vector<double> opw_pose = {pose[2], pose[3], pose[4], pose[5], pose[6], pose[7]};
+  std::vector<FloatType> opw_pose = {pose[2], pose[3], pose[4], pose[5], pose[6], pose[7]};
 
   return fkAt(rail_pose, opw_pose, solution);
 }
 
-bool descartes_light::OPWRailedKinematics::fkAt(const Eigen::Vector2d& rail_pose, const std::vector<double>& pose, Eigen::Isometry3d& solution) const
-{
-  solution = opw_kinematics::forward<double>(params_, pose.data());
-  Eigen::Isometry3d rail_tf = Eigen::Isometry3d::Identity();
-  rail_tf.translation().head(2) = rail_pose;
-  solution = world_to_rail_base_ * rail_tf * rail_base_to_robot_base_ * solution * tool0_to_tip_;
-}
-
-void descartes_light::OPWRailedKinematics::analyzeIK(const Eigen::Isometry3d &p) const
+template<typename FloatType>
+void OPWRailedKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry> &p) const
 {
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "AnalyzeIK: ", ";");
   std::cout << p.matrix().format(CommaInitFmt) << std::endl;
@@ -180,12 +197,12 @@ void descartes_light::OPWRailedKinematics::analyzeIK(const Eigen::Isometry3d &p)
   else
     std::cout << "\tIs Valid Function: false" << std::endl;
 
-  if (redundent_sol_fn_)
-    std::cout << "\tGet Redundent Solutions Function: true" << std::endl;
+  if (redundant_sol_fn_)
+    std::cout << "\tGet Redundant Solutions Function: true" << std::endl;
   else
-    std::cout << "\tGet Redundent Solutions Function: false" << std::endl;
+    std::cout << "\tGet Redundant Solutions Function: false" << std::endl;
 
-  std::vector<double> solution_set;
+  std::vector<FloatType> solution_set;
   ik(p, nullptr, nullptr, solution_set);
   std::cout << "\tSampling without functions, found solutions: " << solution_set.size() / 8 << std::endl;
 
@@ -194,11 +211,16 @@ void descartes_light::OPWRailedKinematics::analyzeIK(const Eigen::Isometry3d &p)
   std::cout << "\tSampling with only IsValid functions, found solutions: " << solution_set.size() / 8 << std::endl;
 
   solution_set.clear();
-  ik(p, nullptr, redundent_sol_fn_, solution_set);
-  std::cout << "\tSampling with only Redundent Solutions functions, found solutions: " << solution_set.size() / 8 << std::endl;
+  ik(p, nullptr, redundant_sol_fn_, solution_set);
+  std::cout << "\tSampling with only Redundant Solutions functions, found solutions: " << solution_set.size() / 8 << std::endl;
 
   solution_set.clear();
-  ik(p, is_valid_fn_, redundent_sol_fn_, solution_set);
+  ik(p, is_valid_fn_, redundant_sol_fn_, solution_set);
   std::cout << "\tSampling with both functions, found solutions: " << solution_set.size() / 8 << std::endl;
 }
 
+// Explicit template instantiation
+template class OPWRailedKinematics<float>;
+template class OPWRailedKinematics<double>;
+
+} // namespace descartes_light

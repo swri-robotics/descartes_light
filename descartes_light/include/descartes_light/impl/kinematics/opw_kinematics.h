@@ -8,32 +8,36 @@
 namespace descartes_light
 {
 
-class OPWKinematics : public KinematicsInterface
+template<typename FloatType>
+class OPWKinematics : public KinematicsInterface<FloatType>
 {
 public:
-  OPWKinematics(const opw_kinematics::Parameters<double>& params,
-                const Eigen::Isometry3d& world_to_base,
-                const Eigen::Isometry3d& tool0_to_tip,
-                const IsValidFn& is_valid_fn,
-                const GetRedundentSolutionsFn& redundent_sol_fn);
+  OPWKinematics(const opw_kinematics::Parameters<FloatType>& params,
+                const Eigen::Transform<FloatType, 3, Eigen::Isometry>& world_to_base,
+                const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool0_to_tip,
+                const IsValidFn<FloatType>& is_valid_fn,
+                const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn);
 
-  bool ik(const Eigen::Isometry3d& p, std::vector<double>& solution_set) const override;
-  bool fk(const double* pose, Eigen::Isometry3d& solution) const override;
+  bool ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+          std::vector<FloatType>& solution_set) const override;
+  bool fk(const FloatType* pose,
+          Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const override;
 
-  void analyzeIK(const Eigen::Isometry3d &p) const override;
+  void analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const override;
 
 private:
-  opw_kinematics::Parameters<double> params_;
-  Eigen::Isometry3d world_to_base_;
-  Eigen::Isometry3d tool0_to_tip_;
-  IsValidFn is_valid_fn_;
-  GetRedundentSolutionsFn redundent_sol_fn_;
+  opw_kinematics::Parameters<FloatType> params_;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> world_to_base_;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> tool0_to_tip_;
+  IsValidFn<FloatType> is_valid_fn_;
+  GetRedundantSolutionsFn<FloatType> redundant_sol_fn_;
 
-  bool ik(const Eigen::Isometry3d& p,
-          const IsValidFn& is_valid_fn,
-          const GetRedundentSolutionsFn& redundent_sol_fn,
-          std::vector<double>& solution_set) const;
+  bool ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+          const IsValidFn<FloatType>& is_valid_fn,
+          const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn,
+          std::vector<FloatType>& solution_set) const;
 };
 
-}
+} // namespace descartes_light
+
 #endif // DESCARTES_LIGHT_KINEMATICS_OPW_H

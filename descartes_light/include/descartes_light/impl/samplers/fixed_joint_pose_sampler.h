@@ -23,22 +23,18 @@
 namespace descartes_light
 {
 
-class FixedJointPoseSampler : public PositionSampler
+template<typename FloatType>
+class FixedJointPoseSampler : public PositionSampler<FloatType>
 {
 public:
+  FixedJointPoseSampler(const std::vector<FloatType>& fixed_joint_position);
 
-  FixedJointPoseSampler(const std::vector<double>& fixed_joint_position) : fixed_joint_position_(fixed_joint_position) {}
-
-  bool sample(std::vector<double>& solution_set) override
-  {
-    solution_set.insert(solution_set.end(), fixed_joint_position_.begin(), fixed_joint_position_.end());
-    return true;
-  }
+  bool sample(std::vector<FloatType>& solution_set) override;
 
 private:
-  std::vector<double> fixed_joint_position_;
-
+  std::vector<FloatType> fixed_joint_position_;
 };
 
-}
+} // namespace descartes_light
+
 #endif // DESCARTES_LIGHT_FIXED_JOINT_POSE_SAMPLER_H

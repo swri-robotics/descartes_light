@@ -20,31 +20,38 @@
 
 const static std::size_t dof = 8;
 
-descartes_light::RailedAxialSymmetricSampler::RailedAxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
-                                                                          const KinematicsInterfacePtr robot_kin,
-                                                                          const double radial_sample_resolution,
-                                                                          const CollisionInterfacePtr collision,
-                                                                          const bool allow_collision)
+namespace descartes_light
+{
+
+template<typename FloatType>
+RailedAxialSymmetricSampler<FloatType>::RailedAxialSymmetricSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
+                                                                    const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+                                                                    const FloatType radial_sample_resolution,
+                                                                    const typename CollisionInterface<FloatType>::Ptr collision,
+                                                                    const bool allow_collision)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
   , collision_(collision)
   , radial_sample_res_(radial_sample_resolution)
   , allow_collision_(allow_collision)
-{}
-
-bool descartes_light::RailedAxialSymmetricSampler::sample(std::vector<double>& solution_set)
 {
-  std::vector<double> buffer;
 
-  const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
+}
+
+template<typename FloatType>
+bool RailedAxialSymmetricSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
+{
+  std::vector<FloatType> buffer;
+
+  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
     return v.size() / dof;
   };
 
-  double angle = -M_PI;
+  FloatType angle = -M_PI;
 
   while (angle <= M_PI) // loop over each waypoint
   {
-    Eigen::Isometry3d p = tool_pose_ * Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ());
+    Eigen::Transform<FloatType, 3, Eigen::Isometry> p = tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
     kin_->ik(p, buffer);
 
     const auto n_sols = nSamplesInBuffer(buffer);
@@ -65,32 +72,34 @@ bool descartes_light::RailedAxialSymmetricSampler::sample(std::vector<double>& s
   return !solution_set.empty();
 }
 
-bool descartes_light::RailedAxialSymmetricSampler::isCollisionFree(const double* vertex)
+template<typename FloatType>
+bool RailedAxialSymmetricSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
   return collision_->validate(vertex, dof);
 }
 
-bool descartes_light::RailedAxialSymmetricSampler::getBestSolution(std::vector<double>& solution_set)
+template<typename FloatType>
+bool RailedAxialSymmetricSampler<FloatType>::getBestSolution(std::vector<FloatType>& solution_set)
 {
-  double distance = -std::numeric_limits<double>::max();
-  std::vector<double> buffer;
+  FloatType distance = -std::numeric_limits<FloatType>::max();
+  std::vector<FloatType> buffer;
 
-  const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
+  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
     return v.size() / dof;
   };
 
-  double angle = -M_PI;
+  FloatType angle = -M_PI;
 
   while (angle <= M_PI) // loop over each waypoint
   {
-    Eigen::Isometry3d p = tool_pose_ * Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ());
+    Eigen::Transform<FloatType, 3, Eigen::Isometry> p = tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
     kin_->ik(p, buffer);
 
     const auto n_sols = nSamplesInBuffer(buffer);
     for (std::size_t i = 0; i < n_sols; ++i)
     {
       const auto* sol_data = buffer.data() + i * dof;
-      double cur_distance = collision_->distance(sol_data, dof);
+      FloatType cur_distance = collision_->distance(sol_data, dof);
       if (cur_distance > distance)
       {
         distance = cur_distance;
@@ -105,3 +114,9 @@ bool descartes_light::RailedAxialSymmetricSampler::getBestSolution(std::vector<d
 
   return !solution_set.empty();
 }
+
+// Explicit template instantiation
+template class RailedAxialSymmetricSampler<float>;
+template class RailedAxialSymmetricSampler<double>;
+
+} // namespace descartes_light
