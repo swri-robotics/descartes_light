@@ -32,6 +32,7 @@ public:
   bool sample(std::vector<double>& solution_set) override
   {
     solution_set.insert(solution_set.end(), fixed_joint_position_.begin(), fixed_joint_position_.end());
+    return true;
   }
 
 private:
