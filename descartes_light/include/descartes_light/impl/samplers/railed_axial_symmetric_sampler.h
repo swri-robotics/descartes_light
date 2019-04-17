@@ -21,7 +21,7 @@
 #include "descartes_light/core/kinematics_interface.h"
 #include "descartes_light/core/collision_interface.h"
 #include "descartes_light/core/position_sampler.h"
-#include "descartes_light/impl/samplers/utils.h"
+#include "descartes_light/impl/utils.h"
 #include <memory>
 
 namespace descartes_light
@@ -30,22 +30,31 @@ namespace descartes_light
 class RailedAxialSymmetricSampler : public PositionSampler
 {
 public:
+  /**
+   * @brief Is a railed axial symmetric pose sampler
+   * @param tool_pose The tool center point applied to robot kinematics
+   * @param robot_kin The robot kinematics interface
+   * @param radial_sample_resolution The radial sampling resolution
+   * @param collision The collision interface
+   * @param allow_collision If true and no valid solution was found it will return the best of the worst
+   */
   RailedAxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
                               const KinematicsInterfacePtr robot_kin,
                               const double radial_sample_resolution,
                               const CollisionInterfacePtr collision,
-                              const IsWithinLimitsFn& fn);
+                              const bool allow_collision);
 
   bool sample(std::vector<double>& solution_set) override;
 
 private:
   bool isCollisionFree(const double* vertex);
+  bool getBestSolution(std::vector<double>& solution_set);
 
   Eigen::Isometry3d tool_pose_;
   KinematicsInterfacePtr kin_;
   CollisionInterfacePtr collision_;
   double radial_sample_res_;
-  IsWithinLimitsFn fn_;
+  bool allow_collision_;
 };
 
 }

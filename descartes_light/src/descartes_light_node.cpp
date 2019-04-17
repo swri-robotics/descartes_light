@@ -61,21 +61,12 @@ static bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory
   return ac.sendGoalAndWait(goal) == actionlib::SimpleClientGoalState::SUCCEEDED;
 }
 
-static bool isWithinLimits(const double *vertex, const Eigen::MatrixX2d& limits)
-{
-  for (int i = 0; i < limits.rows(); ++i)
-    if ((vertex[i] < limits(i, 0)) || (vertex[i] > limits(i, 1)))
-      return false;
-
-  return true;
-}
-
-std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::CollisionInterfacePtr coll_env, const descartes_light::IsWithinLimitsFn& fn)
+std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::CollisionInterfacePtr coll_env, const descartes_light::IsValidFn& is_valid_fn, const descartes_light::GetRedundentSolutionsFn& get_redundent_sol_fn)
 {
   // The current setup requires that our cartesian sampler is aware of the robot
   // kinematics
   opw_kinematics::Parameters<double> kin_params = opw_kinematics::makeIrb2400_10<double>();
-  descartes_light::KinematicsInterfacePtr kin_interface = std::make_shared<descartes_light::OPWKinematics>(kin_params, Eigen::Isometry3d::Identity(), Eigen::Isometry3d::Identity());
+  descartes_light::KinematicsInterfacePtr kin_interface = std::make_shared<descartes_light::OPWKinematics>(kin_params, Eigen::Isometry3d::Identity(), Eigen::Isometry3d::Identity(), is_valid_fn, get_redundent_sol_fn);
 
   Eigen::Isometry3d reference = Eigen::Isometry3d::Identity() * Eigen::Translation3d(0.8, -1.0, 0.5) *
                                 Eigen::AngleAxisd(M_PI * 0.75, Eigen::Vector3d::UnitY());
@@ -86,7 +77,7 @@ std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::Colli
     result.push_back(
           std::make_shared<descartes_light::AxialSymmetricSampler>(
             reference * Eigen::Translation3d(0, i * 0.01, 0), kin_interface, 0.1,
-            std::shared_ptr<descartes_light::CollisionInterface>(coll_env->clone()), fn));
+            std::shared_ptr<descartes_light::CollisionInterface>(coll_env->clone())));
   }
 
   return result;
@@ -110,11 +101,12 @@ int main(int argc, char** argv)
 
   auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr, kin_ptr->getLinkNames(), kin_ptr->getJointNames());
 
-  descartes_light::IsWithinLimitsFn is_within_limits_fn = std::bind(&isWithinLimits, std::placeholders::_1, kin_ptr->getLimits());
+  descartes_light::IsValidFn is_within_limits_fn = std::bind(&descartes_light::isWithinLimits, std::placeholders::_1, kin_ptr->getLimits());
+  descartes_light::GetRedundentSolutionsFn get_redundent_sol_fn = std::bind(&descartes_light::getOPWRedundentSolutions, std::placeholders::_1, kin_ptr->getLimits());
 
   // Define our vertex samplers
   ros::WallTime t1 = ros::WallTime::now();
-  const auto path = makePath(collision_checker, is_within_limits_fn);
+  const auto path = makePath(collision_checker, is_within_limits_fn, get_redundent_sol_fn);
   ros::WallTime t2 = ros::WallTime::now();
   ROS_ERROR_STREAM("DELTA T: " << (t2 - t1).toSec());
 

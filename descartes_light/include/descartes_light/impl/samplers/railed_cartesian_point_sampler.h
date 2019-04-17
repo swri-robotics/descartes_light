@@ -21,7 +21,7 @@
 #include "descartes_light/core/kinematics_interface.h"
 #include "descartes_light/core/collision_interface.h"
 #include "descartes_light/core/position_sampler.h"
-#include "descartes_light/impl/samplers/utils.h"
+#include "descartes_light/impl/utils.h"
 #include <memory>
 
 namespace descartes_light
@@ -30,10 +30,17 @@ namespace descartes_light
 class RailedCartesianPointSampler : public PositionSampler
 {
 public:
+  /**
+   * @brief Is a railed cartesian pose sampler
+   * @param tool_pose The tool center point applied to robot kinematics
+   * @param robot_kin The robot kinematics interface
+   * @param collision The collision interface
+   * @param allow_collision If true and no valid solution was found it will return the best of the worst
+   */
   RailedCartesianPointSampler(const Eigen::Isometry3d& tool_pose,
                               const KinematicsInterfacePtr robot_kin,
                               const CollisionInterfacePtr collision,
-                              const IsWithinLimitsFn& fn);
+                              const bool allow_collision);
 
   /**
    * @brief sample
@@ -44,11 +51,12 @@ public:
 
 private:
   bool isCollisionFree(const double* vertex);
+  bool getBestSolution(std::vector<double>& solution_set);
 
   Eigen::Isometry3d tool_pose_;
   KinematicsInterfacePtr kin_;
   CollisionInterfacePtr collision_;
-  IsWithinLimitsFn fn_;
+  bool allow_collision_;
 };
 
 }

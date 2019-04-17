@@ -29,7 +29,7 @@ descartes_light::TesseractCollision::TesseractCollision(tesseract::BasicEnvConst
   contact_manager_->setActiveCollisionObjects(active_links);
   contact_manager_->setIsContactAllowedFn(std::bind(&TesseractCollision::isContactAllowed, this, std::placeholders::_1,
                                                     std::placeholders::_2));
-  }
+}
 
 bool descartes_light::TesseractCollision::validate(const double* pos, std::size_t size)
 {
@@ -48,15 +48,42 @@ bool descartes_light::TesseractCollision::validate(const double* pos, std::size_
   // 4. Analyze results
   const bool no_contacts = results.empty();
 
-//#define DEBUG_PRINT
-#ifdef DEBUG_PRINT
+//#ifndef NDEBUG
+//  for (const auto& contact : results)
+//  {
+//    std::cout << "Contact: " << contact.first.first << " - " << contact.first.second << " Distance: " << contact.second[0].distance << "\n";
+//  }
+//#endif
+
+  return no_contacts;
+}
+
+double descartes_light::TesseractCollision::distance(const double* pos, std::size_t size)
+{
+  // Happens in two phases:
+  // 1. Compute the transform of all objects
+  Eigen::Map<const Eigen::VectorXd> joint_angles(pos, long(size));
+  tesseract::EnvStatePtr env_state = collision_env_->getState(joint_names_, joint_angles);
+
+  // 2. Update the scene
+  contact_manager_->setCollisionObjectsTransform(env_state->transforms);
+
+  // 3. Ask the contact manager to go nuts
+  tesseract::ContactResultMap results;
+  contact_manager_->contactTest(results, tesseract::ContactTestType::CLOSEST);
+
+#ifndef NDEBUG
+  std::cout << "Called descartes_light::TesseractCollision::distance\n";
   for (const auto& contact : results)
   {
-    std::cout << "Contact: " << contact.first.first << " - " << contact.first.second << "\n";
+    std::cout << "Contact: " << contact.first.first << " - " << contact.first.second << " Distance: " << contact.second[0].distance << "\n";
   }
 #endif
 
-  return no_contacts;
+  if (results.empty())
+    return contact_manager_->getContactDistanceThreshold();
+  else
+    return results.begin()->second[0].distance;
 }
 
 std::shared_ptr<descartes_light::CollisionInterface> descartes_light::TesseractCollision::clone() const

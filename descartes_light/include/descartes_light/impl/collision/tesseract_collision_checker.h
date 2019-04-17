@@ -23,6 +23,8 @@ public:
 
   bool validate(const double* pos, std::size_t size) override;
 
+  double distance(const double* pos, std::size_t size) override;
+
   std::shared_ptr<CollisionInterface> clone() const override;
 
   tesseract::BasicEnvConstPtr& environment() { return collision_env_; }

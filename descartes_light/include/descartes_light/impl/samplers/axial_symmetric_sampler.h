@@ -21,7 +21,7 @@
 #include "descartes_light/core/kinematics_interface.h"
 #include "descartes_light/core/collision_interface.h"
 #include "descartes_light/core/position_sampler.h"
-#include "descartes_light/impl/samplers/utils.h"
+#include "descartes_light/impl/utils.h"
 
 namespace descartes_light
 {
@@ -32,8 +32,7 @@ public:
   AxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
                         const KinematicsInterfacePtr robot_kin,
                         const double radial_sample_resolution,
-                        const CollisionInterfacePtr collision,
-                        const IsWithinLimitsFn& fn);
+                        const CollisionInterfacePtr collision);
 
   bool sample(std::vector<double>& solution_set) override;
 
@@ -44,7 +43,6 @@ private:
   KinematicsInterfacePtr kin_;
   CollisionInterfacePtr collision_;
   double radial_sample_res_;
-  IsWithinLimitsFn fn_;
 };
 
 }

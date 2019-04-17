@@ -57,6 +57,8 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
   std::vector<std::size_t> failed_edge_samplers;
 
   // Build Vertices
+  long num_waypoints = trajectory.size();
+  long cnt = 0;
   #pragma omp parallel for
   for (std::size_t i = 0; i < trajectory.size(); ++i)
   {
@@ -73,9 +75,17 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
         failed_vertex_samplers.push_back(i);
       }
     }
+#ifndef NDEBUG
+    #pragma omp critical
+    {
+      ++cnt;
+      std::cout << "Descartes Processed: " << cnt << " of " << num_waypoints << " vertices (" << i << ")\n";
+    }
+#endif
   }
 
   // Build Edges
+  cnt = 0;
   #pragma omp parallel for
   for (std::size_t i = 1; i < trajectory.size(); ++i)
   {
@@ -89,6 +99,13 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
         failed_edge_samplers.push_back(i-1);
       }
     }
+#ifndef NDEBUG
+    #pragma omp critical
+    {
+      ++cnt;
+      std::cout << "Descartes Processed: " << cnt << " of " << num_waypoints << " edges (" << i << ")\n";
+    }
+#endif
   }
 
   reportFailedVertices(failed_vertex_samplers);

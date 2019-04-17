@@ -21,10 +21,14 @@
 
 descartes_light::OPWKinematics::OPWKinematics(const opw_kinematics::Parameters<double>& params,
                                               const Eigen::Isometry3d& world_to_base,
-                                              const Eigen::Isometry3d& tool0_to_tip)
+                                              const Eigen::Isometry3d& tool0_to_tip,
+                                              const IsValidFn& is_valid_fn,
+                                              const GetRedundentSolutionsFn& redundent_sol_fn)
   : params_(params)
   , world_to_base_(world_to_base)
   , tool0_to_tip_(tool0_to_tip)
+  , is_valid_fn_(is_valid_fn)
+  , redundent_sol_fn_(redundent_sol_fn)
 {
 }
 
@@ -43,9 +47,48 @@ bool descartes_light::OPWKinematics::ik(const Eigen::Isometry3d& p, std::vector<
     {
       opw_kinematics::harmonizeTowardZero(sol); // Modifies 'sol' in place
 
-      // TODO: Joint limits?
-      // If good then add to solution set
-      solution_set.insert(end(solution_set), sol, sol + 6);
+      if (is_valid_fn_ && redundent_sol_fn_)
+      {
+        if (is_valid_fn_(sol))
+          solution_set.insert(end(solution_set), sol, sol + 6);  // If good then add to solution set
+
+        std::vector<double> redundent_sols = redundent_sol_fn_(sol);
+        if (!redundent_sols.empty())
+        {
+          int num_sol = redundent_sols.size()/6;
+          for (int s = 0; s < num_sol; ++s)
+          {
+            double* redundent_sol = redundent_sols.data() + 6 * s;
+            if (is_valid_fn_(redundent_sol))
+              solution_set.insert(end(solution_set), redundent_sol, redundent_sol + 6);  // If good then add to solution set
+          }
+        }
+      }
+      else if (is_valid_fn_ && !redundent_sol_fn_)
+      {
+        if (is_valid_fn_(sol))
+          solution_set.insert(end(solution_set), sol, sol + 6);  // If good then add to solution set
+      }
+      else if (!is_valid_fn_ && redundent_sol_fn_)
+      {
+
+        solution_set.insert(end(solution_set), sol, sol + 6);  // If good then add to solution set
+
+        std::vector<double> redundent_sols = redundent_sol_fn_(sol);
+        if (!redundent_sols.empty())
+        {
+          int num_sol = redundent_sols.size()/6;
+          for (int s = 0; s < num_sol; ++s)
+          {
+            double* redundent_sol = redundent_sols.data() + 6 * s;
+            solution_set.insert(end(solution_set), redundent_sol, redundent_sol + 6);  // If good then add to solution set
+          }
+        }
+      }
+      else
+      {
+        solution_set.insert(end(solution_set), sol, sol + 6);
+      }
     }
   }
 

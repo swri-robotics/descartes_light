@@ -27,7 +27,9 @@ descartes_light::OPWRailedKinematics::OPWRailedKinematics(const opw_kinematics::
                                                           const Eigen::Isometry3d &tool0_to_tip,
                                                           const Eigen::Matrix2d& rail_limits,
                                                           const Eigen::Vector2d& rail_sample_resolution,
-                                                          const double robot_reach)
+                                                          const double robot_reach,
+                                                          const IsValidFn& is_valid_fn,
+                                                          const GetRedundentSolutionsFn& redundent_sol_fn)
   : params_(params)
   , world_to_rail_base_(world_to_rail_base)
   , rail_base_to_robot_base_(rail_base_to_robot_base)
@@ -35,6 +37,8 @@ descartes_light::OPWRailedKinematics::OPWRailedKinematics(const opw_kinematics::
   , rail_limits_(rail_limits)
   , rail_sample_resolution_(rail_sample_resolution)
   , robot_reach_(robot_reach)
+  , is_valid_fn_(is_valid_fn)
+  , redundent_sol_fn_(redundent_sol_fn)
 {
 }
 
@@ -78,8 +82,53 @@ bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d &p, cons
     if (opw_kinematics::isValid(sol))
     {
       opw_kinematics::harmonizeTowardZero(sol); // Modifies 'sol' in place
-      solution_set.insert(end(solution_set), rail_pose.data(), rail_pose.data() + 2); // Insert the X-Y pose of the rail
-      solution_set.insert(end(solution_set), sol, sol + 6); // And then insert the robot arm configuration
+
+      std::vector<double> full_sol;
+      full_sol.insert(end(full_sol), rail_pose.data(), rail_pose.data() + 2); // Insert the X-Y pose of the rail
+      full_sol.insert(end(full_sol), sol, sol + 6); // And then insert the robot arm configuration
+
+      if (is_valid_fn_ && redundent_sol_fn_)
+      {
+        if (is_valid_fn_(full_sol.data()))
+          solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);  // If good then add to solution set
+
+        std::vector<double> redundent_sols = redundent_sol_fn_(full_sol.data());
+        if (!redundent_sols.empty())
+        {
+          int num_sol = redundent_sols.size()/8;
+          for (int s = 0; s < num_sol; ++s)
+          {
+            double* redundent_sol = redundent_sols.data() + 8 * s;
+            if (is_valid_fn_(redundent_sol))
+              solution_set.insert(end(solution_set), redundent_sol, redundent_sol + 8);  // If good then add to solution set
+          }
+        }
+      }
+      else if (is_valid_fn_ && !redundent_sol_fn_)
+      {
+        if (is_valid_fn_(sol))
+          solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);  // If good then add to solution set
+      }
+      else if (!is_valid_fn_ && redundent_sol_fn_)
+      {
+
+        solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);  // If good then add to solution set
+
+        std::vector<double> redundent_sols = redundent_sol_fn_(sol);
+        if (!redundent_sols.empty())
+        {
+          int num_sol = redundent_sols.size()/8;
+          for (int s = 0; s < num_sol; ++s)
+          {
+            double* redundent_sol = redundent_sols.data() + 8 * s;
+            solution_set.insert(end(solution_set), redundent_sol, redundent_sol + 8);  // If good then add to solution set
+          }
+        }
+      }
+      else
+      {
+        solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);
+      }
     }
   }
 

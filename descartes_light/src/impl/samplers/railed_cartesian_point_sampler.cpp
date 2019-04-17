@@ -23,11 +23,11 @@ const static std::size_t dof = 8;
 descartes_light::RailedCartesianPointSampler::RailedCartesianPointSampler(const Eigen::Isometry3d& tool_pose,
                                                                           const KinematicsInterfacePtr robot_kin,
                                                                           const CollisionInterfacePtr collision,
-                                                                          const IsWithinLimitsFn& fn)
+                                                                          const bool allow_collision)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
   , collision_(std::move(collision))
-  , fn_(fn)
+  , allow_collision_(allow_collision)
 {
 }
 
@@ -45,9 +45,12 @@ bool descartes_light::RailedCartesianPointSampler::sample(std::vector<double>& s
   for (std::size_t i = 0; i < n_sols; ++i)
   {
     const auto* sol_data = buffer.data() + i * dof;
-    if (isCollisionFree(sol_data) && fn_(sol_data))
+    if (isCollisionFree(sol_data))
       solution_set.insert(end(solution_set), sol_data, sol_data + dof);
   }
+
+  if (solution_set.empty() && allow_collision_)
+    getBestSolution(solution_set);
 
   return !solution_set.empty();
 }
@@ -55,4 +58,31 @@ bool descartes_light::RailedCartesianPointSampler::sample(std::vector<double>& s
 bool descartes_light::RailedCartesianPointSampler::isCollisionFree(const double* vertex)
 {
   return collision_->validate(vertex, dof);
+}
+
+bool descartes_light::RailedCartesianPointSampler::getBestSolution(std::vector<double>& solution_set)
+{
+  double distance = -std::numeric_limits<double>::max();
+  std::vector<double> buffer;
+  kin_->ik(tool_pose_, buffer);
+
+  const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
+    return v.size() / dof;
+  };
+
+  const auto n_sols = nSamplesInBuffer(buffer);
+
+  for (std::size_t i = 0; i < n_sols; ++i)
+  {
+    const auto* sol_data = buffer.data() + i * dof;
+    double cur_distance = collision_->distance(sol_data, dof);
+    if (cur_distance > distance)
+    {
+      distance = cur_distance;
+      solution_set.clear();
+      solution_set.insert(end(solution_set), sol_data, sol_data + dof);
+    }
+  }
+
+  return !solution_set.empty();
 }

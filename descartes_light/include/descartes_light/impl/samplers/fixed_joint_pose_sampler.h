@@ -15,34 +15,29 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_CARTESIAN_POINT_SAMPLER_H
-#define DESCARTES_LIGHT_CARTESIAN_POINT_SAMPLER_H
+#ifndef DESCARTES_LIGHT_FIXED_JOINT_POSE_SAMPLER_H
+#define DESCARTES_LIGHT_FIXED_JOINT_POSE_SAMPLER_H
 
-#include "descartes_light/core/kinematics_interface.h"
-#include "descartes_light/core/collision_interface.h"
 #include "descartes_light/core/position_sampler.h"
-#include "descartes_light/impl/utils.h"
 
 namespace descartes_light
 {
 
-class CartesianPointSampler : public PositionSampler
+class FixedJointPoseSampler : public PositionSampler
 {
 public:
-  CartesianPointSampler(const Eigen::Isometry3d& tool_pose,
-                        const KinematicsInterfacePtr robot_kin,
-                        const CollisionInterfacePtr collision);
 
-  bool sample(std::vector<double>& solution_set) override;
+  FixedJointPoseSampler(const std::vector<double>& fixed_joint_position) : fixed_joint_position_(fixed_joint_position) {}
+
+  bool sample(std::vector<double>& solution_set) override
+  {
+    solution_set.insert(solution_set.end(), fixed_joint_position_.begin(), fixed_joint_position_.end());
+  }
 
 private:
-  bool isCollisionFree(const double* vertex);
+  std::vector<double> fixed_joint_position_;
 
-  Eigen::Isometry3d tool_pose_;
-  KinematicsInterfacePtr kin_;
-  CollisionInterfacePtr collision_;
 };
 
 }
-
-#endif // DESCARTES_LIGHT_CARTESIAN_POINT_SAMPLER_H
+#endif // DESCARTES_LIGHT_FIXED_JOINT_POSE_SAMPLER_H

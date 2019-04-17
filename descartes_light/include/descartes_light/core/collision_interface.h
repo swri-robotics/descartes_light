@@ -30,6 +30,8 @@ public:
 
   virtual bool validate(const double* pos, std::size_t size) = 0;
 
+  virtual double distance(const double* pos, std::size_t size) = 0;
+
   /** You assume ownership of return value */
   virtual std::shared_ptr<CollisionInterface> clone() const = 0;
 };
