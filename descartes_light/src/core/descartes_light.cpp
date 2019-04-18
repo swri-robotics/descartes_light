@@ -22,10 +22,10 @@
 static void reportFailedEdges(const std::vector<std::size_t>& indices)
 {
   if (indices.empty())
-    std::cout << "No failed edges\n";
+    std::cout << '\r' << "No failed edges\n";
   else
   {
-    std::cout << "Failed edges:\n";
+    std::cout << '\r' << "Failed edges:\n";
     for (const auto& i : indices)
       std::cout << "\t" << i << "\n";
   }
@@ -34,10 +34,10 @@ static void reportFailedEdges(const std::vector<std::size_t>& indices)
 static void reportFailedVertices(const std::vector<std::size_t>& indices)
 {
   if (indices.empty())
-    std::cout << "No failed vertices\n";
+    std::cout << '\r' << "No failed vertices\n";
   else
   {
-    std::cout << "Failed vertices:\n";
+    std::cout << '\r' << "Failed vertices:\n";
     for (const auto& i : indices)
       std::cout << "\t" << i << "\n";
   }
