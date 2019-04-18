@@ -79,7 +79,7 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
     #pragma omp critical
     {
       ++cnt;
-      std::cout << "Descartes Processed: " << cnt << " of " << num_waypoints << " vertices (" << i << ")\n";
+      std::cout << '\r' << "Descartes Processed: " << cnt << " of " << num_waypoints << " vertices" << std::flush;
     }
 #endif
   }
@@ -103,7 +103,7 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
     #pragma omp critical
     {
       ++cnt;
-      std::cout << "Descartes Processed: " << cnt << " of " << num_waypoints << " edges (" << i << ")\n";
+      std::cout << '\r' << "Descartes Processed: " << cnt << " of " << (num_waypoints - 1) << " edges" << std::flush;
     }
 #endif
   }
