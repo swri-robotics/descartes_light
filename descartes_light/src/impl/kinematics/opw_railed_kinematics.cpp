@@ -50,7 +50,7 @@ bool descartes_light::OPWRailedKinematics::ik(const Eigen::Isometry3d &p, std::v
   const Eigen::Vector2d& rail_lower_limit = rail_limits_.col(0);
   const Eigen::Vector2d& rail_upper_limit = rail_limits_.col(1);
 
-  const Eigen::Vector2d origin (tool_pose.translation().x(), tool_pose.translation().y());
+  const Eigen::Vector2d origin (tool_pose.translation().x() - rail_base_to_robot_base_.translation().x(), tool_pose.translation().y() - rail_base_to_robot_base_.translation().y());
 
   const double start_x = (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
   const double end_x = (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
