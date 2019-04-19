@@ -34,6 +34,14 @@ descartes_light::OPWKinematics::OPWKinematics(const opw_kinematics::Parameters<d
 
 bool descartes_light::OPWKinematics::ik(const Eigen::Isometry3d& p, std::vector<double>& solution_set) const
 {
+  return ik(p, is_valid_fn_, redundent_sol_fn_, solution_set);
+}
+
+bool descartes_light::OPWKinematics::ik(const Eigen::Isometry3d& p,
+                                        const IsValidFn& is_valid_fn,
+                                        const GetRedundentSolutionsFn& redundent_sol_fn,
+                                        std::vector<double>& solution_set) const
+{
   Eigen::Isometry3d tool_pose = world_to_base_.inverse() * p * tool0_to_tip_.inverse();
 
   std::array<double, 6*8> sols;
@@ -47,12 +55,12 @@ bool descartes_light::OPWKinematics::ik(const Eigen::Isometry3d& p, std::vector<
     {
       opw_kinematics::harmonizeTowardZero(sol); // Modifies 'sol' in place
 
-      if (is_valid_fn_ && redundent_sol_fn_)
+      if (is_valid_fn && redundent_sol_fn)
       {
         if (is_valid_fn_(sol))
           solution_set.insert(end(solution_set), sol, sol + 6);  // If good then add to solution set
 
-        std::vector<double> redundent_sols = redundent_sol_fn_(sol);
+        std::vector<double> redundent_sols = redundent_sol_fn(sol);
         if (!redundent_sols.empty())
         {
           int num_sol = redundent_sols.size()/6;
@@ -64,17 +72,17 @@ bool descartes_light::OPWKinematics::ik(const Eigen::Isometry3d& p, std::vector<
           }
         }
       }
-      else if (is_valid_fn_ && !redundent_sol_fn_)
+      else if (is_valid_fn && !redundent_sol_fn)
       {
-        if (is_valid_fn_(sol))
+        if (is_valid_fn(sol))
           solution_set.insert(end(solution_set), sol, sol + 6);  // If good then add to solution set
       }
-      else if (!is_valid_fn_ && redundent_sol_fn_)
+      else if (!is_valid_fn && redundent_sol_fn)
       {
 
         solution_set.insert(end(solution_set), sol, sol + 6);  // If good then add to solution set
 
-        std::vector<double> redundent_sols = redundent_sol_fn_(sol);
+        std::vector<double> redundent_sols = redundent_sol_fn(sol);
         if (!redundent_sols.empty())
         {
           int num_sol = redundent_sols.size()/6;
@@ -100,4 +108,36 @@ bool descartes_light::OPWKinematics::fk(const double* pose, Eigen::Isometry3d& s
   solution = opw_kinematics::forward<double>(params_, pose);
   solution = world_to_base_ * solution * tool0_to_tip_.inverse();
   return true;
+}
+
+void descartes_light::OPWKinematics::analyzeIK(const Eigen::Isometry3d &p) const
+{
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "AnalyzeIK: ", ";");
+  std::cout << p.matrix().format(CommaInitFmt) << std::endl;
+
+  if (is_valid_fn_)
+    std::cout << "\tIs Valid Function: true" << std::endl;
+  else
+    std::cout << "\tIs Valid Function: false" << std::endl;
+
+  if (redundent_sol_fn_)
+    std::cout << "\tGet Redundent Solutions Function: true" << std::endl;
+  else
+    std::cout << "\tGet Redundent Solutions Function: false" << std::endl;
+
+  std::vector<double> solution_set;
+  ik(p, nullptr, nullptr, solution_set);
+  std::cout << "\tSampling without functions, found solutions: " << solution_set.size() / 8 << std::endl;
+
+  solution_set.clear();
+  ik(p, is_valid_fn_, nullptr, solution_set);
+  std::cout << "\tSampling with only IsValid functions, found solutions: " << solution_set.size() / 8 << std::endl;
+
+  solution_set.clear();
+  ik(p, nullptr, redundent_sol_fn_, solution_set);
+  std::cout << "\tSampling with only Redundent Solutions functions, found solutions: " << solution_set.size() / 8 << std::endl;
+
+  solution_set.clear();
+  ik(p, is_valid_fn_, redundent_sol_fn_, solution_set);
+  std::cout << "\tSampling with both functions, found solutions: " << solution_set.size() / 8 << std::endl;
 }

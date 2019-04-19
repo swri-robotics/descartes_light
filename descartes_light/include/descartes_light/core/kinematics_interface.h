@@ -32,6 +32,8 @@ public:
 
   virtual bool ik(const Eigen::Isometry3d& p, std::vector<double>& solution_set) const = 0;
   virtual bool fk(const double* pose, Eigen::Isometry3d& solution) const = 0;
+
+  virtual void analyzeIK(const Eigen::Isometry3d &p) const = 0;
 };
 
 using KinematicsInterfacePtr = std::shared_ptr<KinematicsInterface>;

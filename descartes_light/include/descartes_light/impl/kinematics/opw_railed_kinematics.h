@@ -44,6 +44,8 @@ public:
   bool ikAt(const Eigen::Isometry3d& p, const Eigen::Vector2d& rail_pose, std::vector<double>& solution_set) const;
   bool fkAt(const Eigen::Vector2d& rail_pose, const std::vector<double>& pose, Eigen::Isometry3d& solution) const;
 
+  void analyzeIK(const Eigen::Isometry3d &p) const override;
+
 private:
   opw_kinematics::Parameters<double> params_;
   Eigen::Isometry3d world_to_rail_base_;
@@ -54,6 +56,17 @@ private:
   double robot_reach_;
   IsValidFn is_valid_fn_;
   GetRedundentSolutionsFn redundent_sol_fn_;
+
+  bool ik(const Eigen::Isometry3d& p,
+          const IsValidFn& is_valid_fn,
+          const GetRedundentSolutionsFn& redundent_sol_fn,
+          std::vector<double>& solution_set) const;
+
+  bool ikAt(const Eigen::Isometry3d& p,
+            const Eigen::Vector2d& rail_pose,
+            const IsValidFn& is_valid_fn,
+            const GetRedundentSolutionsFn& redundent_sol_fn,
+            std::vector<double>& solution_set) const;
 };
 
 }

@@ -44,6 +44,19 @@ descartes_light::OPWRailedKinematics::OPWRailedKinematics(const opw_kinematics::
 
 bool descartes_light::OPWRailedKinematics::ik(const Eigen::Isometry3d &p, std::vector<double> &solution_set) const
 {
+  return ik(p, is_valid_fn_, redundent_sol_fn_, solution_set);
+}
+
+bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d &p, const Eigen::Vector2d &rail_pose, std::vector<double> &solution_set) const
+{
+  return ikAt(p, rail_pose, is_valid_fn_, redundent_sol_fn_, solution_set);
+}
+
+bool descartes_light::OPWRailedKinematics::ik(const Eigen::Isometry3d& p,
+                                              const IsValidFn& is_valid_fn,
+                                              const GetRedundentSolutionsFn& redundent_sol_fn,
+                                              std::vector<double>& solution_set) const
+{
   // Tool pose in rail coordinate system
   Eigen::Isometry3d tool_pose = world_to_rail_base_.inverse() * p;
 
@@ -61,14 +74,17 @@ bool descartes_light::OPWRailedKinematics::ik(const Eigen::Isometry3d &p, std::v
 
   for (double x = start_x; x < end_x; x += res_x)
     for (double y = start_y; y < end_y; y += res_y)
-      ikAt(p, Eigen::Vector2d(x, y), solution_set);
+      ikAt(p, Eigen::Vector2d(x, y), is_valid_fn, redundent_sol_fn, solution_set);
 
   return !solution_set.empty();
 }
 
-bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d &p, const Eigen::Vector2d &rail_pose, std::vector<double> &solution_set) const
+bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d& p,
+                                                const Eigen::Vector2d& rail_pose,
+                                                const IsValidFn& is_valid_fn,
+                                                const GetRedundentSolutionsFn& redundent_sol_fn,
+                                                std::vector<double>& solution_set) const
 {
-
   const Eigen::Isometry3d world_to_robot_base = world_to_rail_base_ * Eigen::Translation3d(rail_pose.x(), rail_pose.y(), 0.0) * rail_base_to_robot_base_;
   const Eigen::Isometry3d in_robot = world_to_robot_base.inverse() * p * tool0_to_tip_.inverse();
 
@@ -87,34 +103,34 @@ bool descartes_light::OPWRailedKinematics::ikAt(const Eigen::Isometry3d &p, cons
       full_sol.insert(end(full_sol), rail_pose.data(), rail_pose.data() + 2); // Insert the X-Y pose of the rail
       full_sol.insert(end(full_sol), sol, sol + 6); // And then insert the robot arm configuration
 
-      if (is_valid_fn_ && redundent_sol_fn_)
+      if (is_valid_fn && redundent_sol_fn)
       {
-        if (is_valid_fn_(full_sol.data()))
+        if (is_valid_fn(full_sol.data()))
           solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);  // If good then add to solution set
 
-        std::vector<double> redundent_sols = redundent_sol_fn_(full_sol.data());
+        std::vector<double> redundent_sols = redundent_sol_fn(full_sol.data());
         if (!redundent_sols.empty())
         {
           int num_sol = redundent_sols.size()/8;
           for (int s = 0; s < num_sol; ++s)
           {
             double* redundent_sol = redundent_sols.data() + 8 * s;
-            if (is_valid_fn_(redundent_sol))
+            if (is_valid_fn(redundent_sol))
               solution_set.insert(end(solution_set), redundent_sol, redundent_sol + 8);  // If good then add to solution set
           }
         }
       }
-      else if (is_valid_fn_ && !redundent_sol_fn_)
+      else if (is_valid_fn && !redundent_sol_fn)
       {
-        if (is_valid_fn_(sol))
+        if (is_valid_fn(full_sol.data()))
           solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);  // If good then add to solution set
       }
-      else if (!is_valid_fn_ && redundent_sol_fn_)
+      else if (!is_valid_fn && redundent_sol_fn)
       {
 
         solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + 8);  // If good then add to solution set
 
-        std::vector<double> redundent_sols = redundent_sol_fn_(sol);
+        std::vector<double> redundent_sols = redundent_sol_fn(full_sol.data());
         if (!redundent_sols.empty())
         {
           int num_sol = redundent_sols.size()/8;
@@ -153,3 +169,36 @@ bool descartes_light::OPWRailedKinematics::fkAt(const Eigen::Vector2d& rail_pose
   rail_tf.translation().head(2) = rail_pose;
   solution = world_to_rail_base_ * rail_tf * rail_base_to_robot_base_ * solution * tool0_to_tip_;
 }
+
+void descartes_light::OPWRailedKinematics::analyzeIK(const Eigen::Isometry3d &p) const
+{
+  Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "AnalyzeIK: ", ";");
+  std::cout << p.matrix().format(CommaInitFmt) << std::endl;
+
+  if (is_valid_fn_)
+    std::cout << "\tIs Valid Function: true" << std::endl;
+  else
+    std::cout << "\tIs Valid Function: false" << std::endl;
+
+  if (redundent_sol_fn_)
+    std::cout << "\tGet Redundent Solutions Function: true" << std::endl;
+  else
+    std::cout << "\tGet Redundent Solutions Function: false" << std::endl;
+
+  std::vector<double> solution_set;
+  ik(p, nullptr, nullptr, solution_set);
+  std::cout << "\tSampling without functions, found solutions: " << solution_set.size() / 8 << std::endl;
+
+  solution_set.clear();
+  ik(p, is_valid_fn_, nullptr, solution_set);
+  std::cout << "\tSampling with only IsValid functions, found solutions: " << solution_set.size() / 8 << std::endl;
+
+  solution_set.clear();
+  ik(p, nullptr, redundent_sol_fn_, solution_set);
+  std::cout << "\tSampling with only Redundent Solutions functions, found solutions: " << solution_set.size() / 8 << std::endl;
+
+  solution_set.clear();
+  ik(p, is_valid_fn_, redundent_sol_fn_, solution_set);
+  std::cout << "\tSampling with both functions, found solutions: " << solution_set.size() / 8 << std::endl;
+}
+

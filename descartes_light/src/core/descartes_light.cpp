@@ -52,9 +52,8 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
                                     EdgeEvaluatorPtr edge_eval)
 {
   graph_.resize(trajectory.size());
-
-  std::vector<std::size_t> failed_vertex_samplers;
-  std::vector<std::size_t> failed_edge_samplers;
+  failed_vertices_.clear();
+  failed_edges_.clear();
 
   // Build Vertices
   long num_waypoints = trajectory.size();
@@ -72,7 +71,7 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
     {
       #pragma omp critical
       {
-        failed_vertex_samplers.push_back(i);
+        failed_vertices_.push_back(i);
       }
     }
 #ifndef NDEBUG
@@ -96,7 +95,7 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
     {
       #pragma omp critical
       {
-        failed_edge_samplers.push_back(i-1);
+        failed_edges_.push_back(i-1);
       }
     }
 #ifndef NDEBUG
@@ -108,10 +107,10 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
 #endif
   }
 
-  reportFailedVertices(failed_vertex_samplers);
-  reportFailedEdges(failed_edge_samplers);
+  reportFailedVertices(failed_vertices_);
+  reportFailedEdges(failed_edges_);
 
-  return failed_edge_samplers.empty() && failed_vertex_samplers.empty();
+  return failed_edges_.empty() && failed_vertices_.empty();
 }
 
 bool descartes_light::Solver::search(std::vector<double>& solution)

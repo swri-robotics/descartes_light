@@ -34,10 +34,16 @@ public:
              const std::vector<descartes_core::TimingConstraint>& times,
              EdgeEvaluatorPtr edge_eval);
 
+  const std::vector<std::size_t>& getFailedVertices() const { return failed_vertices_; }
+  const std::vector<std::size_t>& getFailedEdges() const { return failed_edges_; }
+
   bool search(std::vector<double>& solution);
 
 private:
   LadderGraph<double> graph_;
+  std::vector<std::size_t> failed_vertices_;
+  std::vector<std::size_t> failed_edges_;
+
 };
 
 }
