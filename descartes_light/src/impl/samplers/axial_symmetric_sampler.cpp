@@ -20,36 +20,49 @@
 
 const static std::size_t opw_dof = 6;
 
-descartes_light::AxialSymmetricSampler::AxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
-                                                              const descartes_light::KinematicsInterfacePtr robot_kin,
-                                                              const double radial_sample_resolution,
-                                                              const CollisionInterfacePtr collision)
+namespace descartes_light
+{
+
+template<typename FloatType>
+AxialSymmetricSampler<FloatType>::AxialSymmetricSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
+                                                        const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+                                                        const FloatType radial_sample_resolution,
+                                                        const typename CollisionInterface<FloatType>::Ptr collision)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
   , collision_(collision)
   , radial_sample_res_(radial_sample_resolution)
-{}
-
-bool descartes_light::AxialSymmetricSampler::sample(std::vector<double>& solution_set)
 {
-  std::vector<double> buffer;
 
-  const auto nSamplesInBuffer = [] (const std::vector<double>& v) -> std::size_t {
+}
+
+template<typename FloatType>
+bool AxialSymmetricSampler<FloatType>::isCollisionFree(const FloatType* vertex)
+{
+  return collision_->validate(vertex, opw_dof);
+}
+
+template<typename FloatType>
+bool AxialSymmetricSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
+{
+  std::vector<FloatType> buffer;
+
+  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
     return v.size() / opw_dof;
   };
 
-  double angle = -M_PI;
+  FloatType angle = -M_PI;
 
   while (angle <= M_PI) // loop over each waypoint
   {
-    Eigen::Isometry3d p = tool_pose_ * Eigen::AngleAxisd(angle, Eigen::Vector3d::UnitZ());
+    Eigen::Transform<FloatType, 3, Eigen::Isometry> p = tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
     kin_->ik(p, buffer);
 
     const auto n_sols = nSamplesInBuffer(buffer);
     for (std::size_t i = 0; i < n_sols; ++i)
     {
       const auto* sol_data = buffer.data() + i * opw_dof;
-      if (isCollisionFree(sol_data))
+      if (AxialSymmetricSampler<FloatType>::isCollisionFree(sol_data))
         solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
     }
     buffer.clear();
@@ -60,7 +73,8 @@ bool descartes_light::AxialSymmetricSampler::sample(std::vector<double>& solutio
   return !solution_set.empty();
 }
 
-bool descartes_light::AxialSymmetricSampler::isCollisionFree(const double* vertex)
-{
-  return collision_->validate(vertex, opw_dof);
-}
+// Explicit template instantiation
+template class AxialSymmetricSampler<float>;
+template class AxialSymmetricSampler<double>;
+
+} // namespace descartes_light

@@ -23,17 +23,21 @@
 namespace descartes_light
 {
 
-class DistanceEdgeEvaluator : public EdgeEvaluator
+template<typename FloatType>
+class DistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
-  DistanceEdgeEvaluator(const std::vector<double>& velocity_limits);
+  DistanceEdgeEvaluator(const std::vector<FloatType>& velocity_limits);
 
-  bool evaluate(const Rung_<double>& from, const Rung_<double>& to,
-                std::vector<LadderGraph<double>::EdgeList>& edges) override;
+  bool evaluate(const Rung_<FloatType>& from, const Rung_<FloatType>& to,
+                std::vector<typename LadderGraph<FloatType>::EdgeList>& edges) override;
 
-  std::vector<double> velocity_limits_;
+  std::vector<FloatType> velocity_limits_;
 };
 
-}
+using DistanceEdgeEvaluatorF = DistanceEdgeEvaluator<float>;
+using DistanceEdgeEvaluatorD = DistanceEdgeEvaluator<double>;
+
+} // namespace descartes_light
 
 #endif

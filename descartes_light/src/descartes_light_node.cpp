@@ -61,23 +61,25 @@ static bool executeTrajectory(const trajectory_msgs::JointTrajectory& trajectory
   return ac.sendGoalAndWait(goal) == actionlib::SimpleClientGoalState::SUCCEEDED;
 }
 
-std::vector<descartes_light::PositionSamplerPtr> makePath(descartes_light::CollisionInterfacePtr coll_env, const descartes_light::IsValidFn& is_valid_fn, const descartes_light::GetRedundentSolutionsFn& get_redundent_sol_fn)
+std::vector<descartes_light::PositionSampler<double>::Ptr> makePath(descartes_light::CollisionInterface<double>::Ptr coll_env,
+                                                                    const descartes_light::IsValidFn<double>& is_valid_fn,
+                                                                    const descartes_light::GetRedundantSolutionsFn<double>& get_redundant_sol_fn)
 {
   // The current setup requires that our cartesian sampler is aware of the robot
   // kinematics
   opw_kinematics::Parameters<double> kin_params = opw_kinematics::makeIrb2400_10<double>();
-  descartes_light::KinematicsInterfacePtr kin_interface = std::make_shared<descartes_light::OPWKinematics>(kin_params, Eigen::Isometry3d::Identity(), Eigen::Isometry3d::Identity(), is_valid_fn, get_redundent_sol_fn);
+  descartes_light::KinematicsInterface<double>::Ptr kin_interface = std::make_shared<descartes_light::OPWKinematics<double>>(kin_params, Eigen::Isometry3d::Identity(), Eigen::Isometry3d::Identity(), is_valid_fn, get_redundant_sol_fn);
 
   Eigen::Isometry3d reference = Eigen::Isometry3d::Identity() * Eigen::Translation3d(0.8, -1.0, 0.5) *
                                 Eigen::AngleAxisd(M_PI * 0.75, Eigen::Vector3d::UnitY());
 
-  std::vector<descartes_light::PositionSamplerPtr> result;
+  std::vector<descartes_light::PositionSampler<double>::Ptr> result;
   for (int i = 0; i < 100 * 2; ++i)
   {
     result.push_back(
-          std::make_shared<descartes_light::AxialSymmetricSampler>(
+          std::make_shared<descartes_light::AxialSymmetricSampler<double>>(
             reference * Eigen::Translation3d(0, i * 0.01, 0), kin_interface, 0.1,
-            std::shared_ptr<descartes_light::CollisionInterface>(coll_env->clone())));
+            descartes_light::CollisionInterface<double>::Ptr(coll_env->clone())));
   }
 
   return result;
@@ -99,24 +101,24 @@ int main(int argc, char** argv)
   auto kin_ptr = env_ptr->getManipulator(group_name);
   if (!kin_ptr) return 1;
 
-  auto collision_checker = std::make_shared<descartes_light::TesseractCollision>(env_ptr, kin_ptr->getLinkNames(), kin_ptr->getJointNames());
+  auto collision_checker = std::make_shared<descartes_light::TesseractCollision<double>>(env_ptr, kin_ptr->getLinkNames(), kin_ptr->getJointNames());
 
-  descartes_light::IsValidFn is_within_limits_fn = std::bind(&descartes_light::isWithinLimits, std::placeholders::_1, kin_ptr->getLimits());
-  descartes_light::GetRedundentSolutionsFn get_redundent_sol_fn = std::bind(&descartes_light::getOPWRedundentSolutions, std::placeholders::_1, kin_ptr->getLimits());
+  descartes_light::IsValidFn<double> is_within_limits_fn = std::bind(&descartes_light::isWithinLimits<double>, std::placeholders::_1, kin_ptr->getLimits());
+  descartes_light::GetRedundantSolutionsFn<double> get_redundant_sol_fn = std::bind(&descartes_light::getOPWRedundantSolutions<double>, std::placeholders::_1, kin_ptr->getLimits());
 
   // Define our vertex samplers
   ros::WallTime t1 = ros::WallTime::now();
-  const auto path = makePath(collision_checker, is_within_limits_fn, get_redundent_sol_fn);
+  const auto path = makePath(collision_checker, is_within_limits_fn, get_redundant_sol_fn);
   ros::WallTime t2 = ros::WallTime::now();
   ROS_ERROR_STREAM("DELTA T: " << (t2 - t1).toSec());
 
   // What logic to connect edges?
-  auto edge_eval = std::make_shared<descartes_light::DistanceEdgeEvaluator>(std::vector<double>(6, 1.1));
+  auto edge_eval = std::make_shared<descartes_light::DistanceEdgeEvaluator<double>>(std::vector<double>(6, 1.1));
 
-  descartes_light::Solver graph_builder (6);
+  descartes_light::Solver<double> graph_builder (6);
   const static double time_per_point = 0.25;
   if (!graph_builder.build(path,
-                           std::vector<descartes_core::TimingConstraint>(path.size(), time_per_point),
+                           std::vector<descartes_core::TimingConstraint<double>>(path.size(), time_per_point),
                            edge_eval))
   {
     std::cerr << "Failed to build graph\n";

@@ -8,7 +8,8 @@
 namespace descartes_light
 {
 
-class TesseractCollision : public CollisionInterface
+template<typename FloatType>
+class TesseractCollision : public CollisionInterface<FloatType>
 {
 public:
   /**
@@ -21,11 +22,11 @@ public:
                      const std::vector<std::string>& active_links,
                      const std::vector<std::string>& joint_names);
 
-  bool validate(const double* pos, std::size_t size) override;
+  bool validate(const FloatType* pos, const std::size_t size) override;
 
-  double distance(const double* pos, std::size_t size) override;
+  FloatType distance(const FloatType* pos, const std::size_t size) override;
 
-  std::shared_ptr<CollisionInterface> clone() const override;
+  typename CollisionInterface<FloatType>::Ptr clone() const override;
 
   tesseract::BasicEnvConstPtr& environment() { return collision_env_; }
   const tesseract::BasicEnvConstPtr& environment() const { return collision_env_; }
@@ -39,6 +40,9 @@ private:
   tesseract::DiscreteContactManagerBasePtr contact_manager_;
 };
 
-}
+using TesseractCollisionF = TesseractCollision<float>;
+using TesseractCollisionD = TesseractCollision<double>;
 
-#endif
+} // namespace descartes_light
+
+#endif // DESCARTES_LIGHT_TESSERACT_COLLISION_CHECKER_H

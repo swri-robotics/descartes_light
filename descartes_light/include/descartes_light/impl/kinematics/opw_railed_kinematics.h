@@ -25,50 +25,60 @@
 namespace descartes_light
 {
 
-class OPWRailedKinematics : public KinematicsInterface
+template<typename FloatType>
+class OPWRailedKinematics : public KinematicsInterface<FloatType>
 {
 public:
-  OPWRailedKinematics(const opw_kinematics::Parameters<double>& params,
-                      const Eigen::Isometry3d &world_to_rail_base,
-                      const Eigen::Isometry3d &rail_base_to_robot_base,
-                      const Eigen::Isometry3d& tool0_to_tip,
-                      const Eigen::Matrix2d& rail_limits,
-                      const Eigen::Vector2d& rail_sample_resolution,
-                      const double robot_reach,
-                      const IsValidFn& is_valid_fn,
-                      const GetRedundentSolutionsFn& redundent_sol_fn);
+  OPWRailedKinematics(const opw_kinematics::Parameters<FloatType>& params,
+                      const Eigen::Transform<FloatType, 3, Eigen::Isometry> &world_to_rail_base,
+                      const Eigen::Transform<FloatType, 3, Eigen::Isometry> &rail_base_to_robot_base,
+                      const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool0_to_tip,
+                      const Eigen::Matrix<FloatType, 2, 2>& rail_limits,
+                      const Eigen::Matrix<FloatType, 2, 1>& rail_sample_resolution,
+                      const FloatType robot_reach,
+                      const IsValidFn<FloatType>& is_valid_fn,
+                      const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn);
 
-  bool ik(const Eigen::Isometry3d& p, std::vector<double>& solution_set) const override;
-  bool fk(const double* pose, Eigen::Isometry3d& solution) const override;
+  bool ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+          std::vector<FloatType>& solution_set) const override;
+  bool fk(const FloatType* pose,
+          Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const override;
 
-  bool ikAt(const Eigen::Isometry3d& p, const Eigen::Vector2d& rail_pose, std::vector<double>& solution_set) const;
-  bool fkAt(const Eigen::Vector2d& rail_pose, const std::vector<double>& pose, Eigen::Isometry3d& solution) const;
+  bool ikAt(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+            const Eigen::Matrix<FloatType, 2, 1>& rail_pose,
+            std::vector<FloatType>& solution_set) const;
+  bool fkAt(const Eigen::Matrix<FloatType, 2, 1>& rail_pose,
+            const std::vector<FloatType>& pose,
+            Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const;
 
-  void analyzeIK(const Eigen::Isometry3d &p) const override;
+  void analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const override;
 
 private:
-  opw_kinematics::Parameters<double> params_;
-  Eigen::Isometry3d world_to_rail_base_;
-  Eigen::Isometry3d rail_base_to_robot_base_;
-  Eigen::Isometry3d tool0_to_tip_;
-  Eigen::Matrix2d rail_limits_;
-  Eigen::Vector2d rail_sample_resolution_;
-  double robot_reach_;
-  IsValidFn is_valid_fn_;
-  GetRedundentSolutionsFn redundent_sol_fn_;
+  opw_kinematics::Parameters<FloatType> params_;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> world_to_rail_base_;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> rail_base_to_robot_base_;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> tool0_to_tip_;
+  Eigen::Matrix<FloatType, 2, 2> rail_limits_;
+  Eigen::Matrix<FloatType, 2, 1> rail_sample_resolution_;
+  FloatType robot_reach_;
+  IsValidFn<FloatType> is_valid_fn_;
+  GetRedundantSolutionsFn<FloatType> redundant_sol_fn_;
 
-  bool ik(const Eigen::Isometry3d& p,
-          const IsValidFn& is_valid_fn,
-          const GetRedundentSolutionsFn& redundent_sol_fn,
-          std::vector<double>& solution_set) const;
+  bool ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+          const IsValidFn<FloatType>& is_valid_fn,
+          const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn,
+          std::vector<FloatType>& solution_set) const;
 
-  bool ikAt(const Eigen::Isometry3d& p,
-            const Eigen::Vector2d& rail_pose,
-            const IsValidFn& is_valid_fn,
-            const GetRedundentSolutionsFn& redundent_sol_fn,
-            std::vector<double>& solution_set) const;
+  bool ikAt(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+            const Eigen::Matrix<FloatType, 2, 1>& rail_pose,
+            const IsValidFn<FloatType>& is_valid_fn,
+            const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn,
+            std::vector<FloatType>& solution_set) const;
 };
 
-}
+using OPWRailedKinematicsF = OPWRailedKinematics<float>;
+using OPWRailedKinematicsD = OPWRailedKinematics<double>;
+
+} // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_RAILED_KINEMATICS_OPW_H

@@ -15,30 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_COLLISION_INTERFACE_H
-#define DESCARTES_LIGHT_COLLISION_INTERFACE_H
+#ifndef DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H
+#define DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H
 
 #include <memory>
 
 namespace descartes_light
 {
 
+template<typename FloatType>
 class CollisionInterface
 {
 public:
   virtual ~CollisionInterface() = default;
 
-  virtual bool validate(const double* pos, std::size_t size) = 0;
+  virtual bool validate(const FloatType* pos, const std::size_t size) = 0;
 
-  virtual double distance(const double* pos, std::size_t size) = 0;
+  virtual FloatType distance(const FloatType* pos, const std::size_t size) = 0;
 
   /** You assume ownership of return value */
   virtual std::shared_ptr<CollisionInterface> clone() const = 0;
+
+  typedef typename std::shared_ptr<CollisionInterface> Ptr;
+  typedef typename std::shared_ptr<const CollisionInterface> ConstPtr;
 };
 
-using CollisionInterfacePtr = std::shared_ptr<CollisionInterface>;
-using CollisionInterfaceConstPtr = std::shared_ptr<const CollisionInterface>;
+using CollisionInterfaceF = CollisionInterface<float>;
+using CollisionInterfaceD = CollisionInterface<double>;
 
-}
+} // descartes_light
 
-#endif // DESCARTES_LIGHT_COLLISION_INTERFACE_H
+#endif // DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H

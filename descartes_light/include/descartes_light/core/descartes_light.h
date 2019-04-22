@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_H
-#define DESCARTES_LIGHT_H
+#ifndef DESCARTES_LIGHT_CORE_DESCARTES_LIGHT_H
+#define DESCARTES_LIGHT_CORE_DESCARTES_LIGHT_H
 
 #include "descartes_light/core/ladder_graph.h"
 #include "descartes_light/core/position_sampler.h"
@@ -25,27 +25,30 @@
 namespace descartes_light
 {
 
+template<typename FloatType>
 class Solver
 {
 public:
-  Solver(std::size_t dof);
+  Solver(const std::size_t dof);
 
-  bool build(const std::vector<PositionSamplerPtr>& trajectory,
-             const std::vector<descartes_core::TimingConstraint>& times,
-             EdgeEvaluatorPtr edge_eval);
+  bool build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
+             const std::vector<descartes_core::TimingConstraint<FloatType>>& times,
+             typename EdgeEvaluator<FloatType>::Ptr edge_eval);
 
   const std::vector<std::size_t>& getFailedVertices() const { return failed_vertices_; }
   const std::vector<std::size_t>& getFailedEdges() const { return failed_edges_; }
 
-  bool search(std::vector<double>& solution);
+  bool search(std::vector<FloatType>& solution);
 
 private:
-  LadderGraph<double> graph_;
+  LadderGraph<FloatType> graph_;
   std::vector<std::size_t> failed_vertices_;
   std::vector<std::size_t> failed_edges_;
-
 };
 
-}
+using SolverF = Solver<float>;
+using SolverD = Solver<double>;
 
-#endif
+} // namespace descartes_light
+
+#endif // DESCARTES_LIGHT_CORE_DESCARTES_LIGHT_H

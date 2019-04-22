@@ -42,8 +42,9 @@ include_directories(
 
 # Core Library
 add_library(${PROJECT_NAME}_core
-  src/core/descartes_light.cpp
+  src/core/ladder_graph.cpp
   src/core/ladder_graph_dag_search.cpp
+  src/core/descartes_light.cpp
 )
 
 add_dependencies(${PROJECT_NAME}_core ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
@@ -80,6 +81,7 @@ add_library(${PROJECT_NAME}_samplers
   src/impl/samplers/axial_symmetric_sampler.cpp
   src/impl/samplers/cartesian_point_sampler.cpp
   src/impl/samplers/external_axis_sampler.cpp
+  src/impl/samplers/fixed_joint_pose_sampler.cpp
   src/impl/samplers/railed_axial_symmetric_sampler.cpp
   src/impl/samplers/railed_cartesian_point_sampler.cpp
 )

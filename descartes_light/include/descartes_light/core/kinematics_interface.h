@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_KINEMATIC_INTERFACE_H
-#define DESCARTES_LIGHT_KINEMATIC_INTERFACE_H
+#ifndef DESCARTES_LIGHT_CORE_KINEMATIC_INTERFACE_H
+#define DESCARTES_LIGHT_CORE_KINEMATIC_INTERFACE_H
 
 #include <Eigen/Geometry>
 #include <vector>
@@ -25,20 +25,25 @@
 namespace descartes_light
 {
 
+template<typename FloatType>
 class KinematicsInterface
 {
 public:
   virtual ~KinematicsInterface() = default;
 
-  virtual bool ik(const Eigen::Isometry3d& p, std::vector<double>& solution_set) const = 0;
-  virtual bool fk(const double* pose, Eigen::Isometry3d& solution) const = 0;
+  virtual bool ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+                  std::vector<FloatType>& solution_set) const = 0;
+  virtual bool fk(const FloatType* pose,
+                  Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const = 0;
+  virtual void analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const = 0;
 
-  virtual void analyzeIK(const Eigen::Isometry3d &p) const = 0;
+  typedef typename std::shared_ptr<KinematicsInterface> Ptr;
+  typedef typename std::shared_ptr<const KinematicsInterface> ConstPtr;
 };
 
-using KinematicsInterfacePtr = std::shared_ptr<KinematicsInterface>;
-using KinematicsInterfaceConstPtr = std::shared_ptr<const KinematicsInterface>;
+using KinematicsInterfaceF = KinematicsInterface<float>;
+using KinematicsInterfaceD = KinematicsInterface<double>;
 
-}
+} // namespace descartes_light
 
-#endif
+#endif // DESCARTES_LIGHT_CORE_KINEMATIC_INTERFACE_H

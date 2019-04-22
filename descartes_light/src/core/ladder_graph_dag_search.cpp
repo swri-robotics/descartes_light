@@ -20,7 +20,8 @@
 namespace descartes_light
 {
 
-DAGSearch::DAGSearch(const LadderGraph<double> &graph)
+template<typename FloatType>
+DAGSearch<FloatType>::DAGSearch(const LadderGraph<FloatType>& graph)
   : graph_(graph)
 {
   // On creating an object, let's allocate everything we need
@@ -34,14 +35,16 @@ DAGSearch::DAGSearch(const LadderGraph<double> &graph)
   }
 }
 
-double DAGSearch::run()
+template<typename FloatType>
+FloatType DAGSearch<FloatType>::run()
 {
   // Cost to the first rung should be set to zero
   std::fill(solution_.front().distance.begin(), solution_.front().distance.end(), 0.0);
+
   // Other rows initialize to zero
   for (size_type i = 1; i < solution_.size(); ++i)
   {
-    std::fill(solution_[i].distance.begin(), solution_[i].distance.end(), std::numeric_limits<double>::max());
+    std::fill(solution_[i].distance.begin(), solution_[i].distance.end(), std::numeric_limits<FloatType>::max());
   }
 
   // Now we iterate over the graph in 'topological' order
@@ -70,7 +73,8 @@ double DAGSearch::run()
   return *std::min_element(solution_.back().distance.begin(), solution_.back().distance.end());
 }
 
-std::vector<DAGSearch::predecessor_t> DAGSearch::shortestPath() const
+template<typename FloatType>
+std::vector<typename DAGSearch<FloatType>::predecessor_t> DAGSearch<FloatType>::shortestPath() const
 {
   auto min_it = std::min_element(solution_.back().distance.begin(), solution_.back().distance.end());
   auto min_idx = std::distance(solution_.back().distance.begin(), min_it);
@@ -93,4 +97,8 @@ std::vector<DAGSearch::predecessor_t> DAGSearch::shortestPath() const
   return path;
 }
 
-}
+// Explicit template instantiation
+template class DAGSearch<float>;
+template class DAGSearch<double>;
+
+} // namespace descartes_light

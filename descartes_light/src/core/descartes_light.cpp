@@ -43,13 +43,18 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
   }
 }
 
-descartes_light::Solver::Solver(std::size_t dof)
+namespace descartes_light
+{
+
+template<typename FloatType>
+Solver<FloatType>::Solver(const std::size_t dof)
   : graph_{dof}
 {}
 
-bool descartes_light::Solver::build(const std::vector<descartes_light::PositionSamplerPtr>& trajectory,
-                                    const std::vector<descartes_core::TimingConstraint>& times,
-                                    EdgeEvaluatorPtr edge_eval)
+template<typename FloatType>
+bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
+                              const std::vector<typename descartes_core::TimingConstraint<FloatType>>& times,
+                              typename EdgeEvaluator<FloatType>::Ptr edge_eval)
 {
   graph_.resize(trajectory.size());
   failed_vertices_.clear();
@@ -61,7 +66,7 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
   #pragma omp parallel for
   for (std::size_t i = 0; i < trajectory.size(); ++i)
   {
-    std::vector<double> vertex_data;
+    std::vector<FloatType> vertex_data;
     if (trajectory[i]->sample(vertex_data))
     {
       graph_.getRung(i).data = std::move(vertex_data);
@@ -113,12 +118,13 @@ bool descartes_light::Solver::build(const std::vector<descartes_light::PositionS
   return failed_edges_.empty() && failed_vertices_.empty();
 }
 
-bool descartes_light::Solver::search(std::vector<double>& solution)
+template<typename FloatType>
+bool Solver<FloatType>::search(std::vector<FloatType>& solution)
 {
-  DAGSearch s (graph_);
+  DAGSearch<FloatType> s (graph_);
   const auto cost = s.run();
 
-  if (cost == std::numeric_limits<double>::max())
+  if (cost == std::numeric_limits<FloatType>::max())
     return false;
 
   const auto indices = s.shortestPath();
@@ -133,3 +139,9 @@ bool descartes_light::Solver::search(std::vector<double>& solution)
 
   return true;
 }
+
+// Explicit template instantiation
+template class Solver<float>;
+template class Solver<double>;
+
+} // namespace descartes_light

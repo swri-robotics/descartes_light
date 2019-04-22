@@ -26,25 +26,29 @@
 namespace descartes_light
 {
 
-class AxialSymmetricSampler : public PositionSampler
+template<typename FloatType>
+class AxialSymmetricSampler : public PositionSampler<FloatType>
 {
 public:
-  AxialSymmetricSampler(const Eigen::Isometry3d& tool_pose,
-                        const KinematicsInterfacePtr robot_kin,
-                        const double radial_sample_resolution,
-                        const CollisionInterfacePtr collision);
+  AxialSymmetricSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
+                        const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+                        const FloatType radial_sample_resolution,
+                        const typename CollisionInterface<FloatType>::Ptr collision);
 
-  bool sample(std::vector<double>& solution_set) override;
+  bool sample(std::vector<FloatType>& solution_set) override;
 
 private:
-  bool isCollisionFree(const double* vertex);
+  bool isCollisionFree(const FloatType* vertex);
 
-  Eigen::Isometry3d tool_pose_;
-  KinematicsInterfacePtr kin_;
-  CollisionInterfacePtr collision_;
-  double radial_sample_res_;
+  Eigen::Transform<FloatType, 3, Eigen::Isometry> tool_pose_;
+  typename KinematicsInterface<FloatType>::Ptr kin_;
+  typename CollisionInterface<FloatType>::Ptr collision_;
+  FloatType radial_sample_res_;
 };
 
-}
+using AxialSymmetricSamplerF = AxialSymmetricSampler<float>;
+using AxialSymmetricSamplerD = AxialSymmetricSampler<double>;
+
+} // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_AXIAL_SYMMETRIC_SAMPLER_H
