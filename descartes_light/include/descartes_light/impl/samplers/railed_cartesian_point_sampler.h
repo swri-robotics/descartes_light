@@ -60,6 +60,9 @@ private:
   bool allow_collision_;
 };
 
+using RailedCartesianPointSamplerF = RailedCartesianPointSampler<float>;
+using RailedCartesianPointSamplerD = RailedCartesianPointSampler<double>;
+
 } // namespace descartes_light
 
 #endif

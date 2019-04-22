@@ -46,6 +46,9 @@ private:
   std::vector<std::size_t> failed_edges_;
 };
 
+using SolverF = Solver<float>;
+using SolverD = Solver<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_CORE_DESCARTES_LIGHT_H

@@ -44,6 +44,9 @@ private:
   typename CollisionInterface<FloatType>::Ptr collision_;
 };
 
+using CartesianPointSamplerF = CartesianPointSampler<float>;
+using CartesianPointSamplerD = CartesianPointSampler<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_CARTESIAN_POINT_SAMPLER_H

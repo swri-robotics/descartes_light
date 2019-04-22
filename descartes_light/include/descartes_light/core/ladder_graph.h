@@ -35,6 +35,9 @@ struct TimingConstraint
   FloatType upper;
 };
 
+using TimingConstraintF = TimingConstraint<float>;
+using TimingConstraintD = TimingConstraint<double>;
+
 } // namespace descartes_core
 
 namespace descartes_light
@@ -170,6 +173,9 @@ private:
   const std::size_t dof_;
   std::vector<Rung> rungs_;
 };
+
+using LadderGraphF = LadderGraph<float>;
+using LadderGraphD = LadderGraph<double>;
 
 } // namespace descartes_light
 

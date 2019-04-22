@@ -40,6 +40,9 @@ private:
   tesseract::DiscreteContactManagerBasePtr contact_manager_;
 };
 
+using TesseractCollisionF = TesseractCollision<float>;
+using TesseractCollisionD = TesseractCollision<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_TESSERACT_COLLISION_CHECKER_H

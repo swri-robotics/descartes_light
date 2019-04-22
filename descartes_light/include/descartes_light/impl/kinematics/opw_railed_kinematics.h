@@ -76,6 +76,9 @@ private:
             std::vector<FloatType>& solution_set) const;
 };
 
+using OPWRailedKinematicsF = OPWRailedKinematics<float>;
+using OPWRailedKinematicsD = OPWRailedKinematics<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_RAILED_KINEMATICS_OPW_H

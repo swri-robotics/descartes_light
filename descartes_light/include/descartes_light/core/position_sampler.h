@@ -35,6 +35,9 @@ public:
   typedef typename std::shared_ptr<PositionSampler<FloatType>> Ptr;
 };
 
+using PositionSamplerF = PositionSampler<float>;
+using PositionSamplerD = PositionSampler<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H

@@ -41,6 +41,9 @@ public:
   typedef typename std::shared_ptr<const KinematicsInterface> ConstPtr;
 };
 
+using KinematicsInterfaceF = KinematicsInterface<float>;
+using KinematicsInterfaceD = KinematicsInterface<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_CORE_KINEMATIC_INTERFACE_H

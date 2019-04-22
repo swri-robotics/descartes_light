@@ -64,6 +64,9 @@ private:
   std::vector<SolutionRung> solution_;
 };
 
+using DAGSearchF = DAGSearch<float>;
+using DAGSearchD = DAGSearch<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_CORE_LADDER_GRAPH_DAG_SEARCH_H

@@ -43,6 +43,9 @@ private:
   typename CollisionInterface<FloatType>::Ptr collision_;
 };
 
+using ExternalAxisSamplerF = ExternalAxisSampler<float>;
+using ExternalAxisSamplerD = ExternalAxisSampler<double>;
+
 template<typename FloatType>
 class SpoolSampler : public descartes_light::PositionSampler<FloatType>
 {
@@ -60,6 +63,9 @@ private:
   typename KinematicsInterface<FloatType>::Ptr kin_;
   typename CollisionInterface<FloatType>::Ptr collision_;
 };
+
+using SpoolSamplerF = SpoolSampler<float>;
+using SpoolSamplerD = SpoolSampler<double>;
 
 } // namespace descartes_light
 

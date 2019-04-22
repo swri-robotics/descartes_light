@@ -58,6 +58,9 @@ private:
   bool allow_collision_;
 };
 
+using RailedAxialSymmetricSamplerF = RailedAxialSymmetricSampler<float>;
+using RailedAxialSymmetricSamplerD = RailedAxialSymmetricSampler<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_RAILED_AXIAL_SYMMETRIC_SAMPLER_H

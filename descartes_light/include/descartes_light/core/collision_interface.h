@@ -40,6 +40,9 @@ public:
   typedef typename std::shared_ptr<const CollisionInterface> ConstPtr;
 };
 
+using CollisionInterfaceF = CollisionInterface<float>;
+using CollisionInterfaceD = CollisionInterface<double>;
+
 } // descartes_light
 
 #endif // DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H

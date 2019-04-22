@@ -46,6 +46,9 @@ private:
   FloatType radial_sample_res_;
 };
 
+using AxialSymmetricSamplerF = AxialSymmetricSampler<float>;
+using AxialSymmetricSamplerD = AxialSymmetricSampler<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_AXIAL_SYMMETRIC_SAMPLER_H

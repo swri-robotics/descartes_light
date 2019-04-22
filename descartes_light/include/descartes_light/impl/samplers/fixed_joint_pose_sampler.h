@@ -35,6 +35,9 @@ private:
   std::vector<FloatType> fixed_joint_position_;
 };
 
+using FixedJointPoseSamplerF = FixedJointPoseSampler<float>;
+using FixedJointPoseSamplerD = FixedJointPoseSampler<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_FIXED_JOINT_POSE_SAMPLER_H

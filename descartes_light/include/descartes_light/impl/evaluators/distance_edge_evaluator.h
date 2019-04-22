@@ -35,6 +35,9 @@ public:
   std::vector<FloatType> velocity_limits_;
 };
 
+using DistanceEdgeEvaluatorF = DistanceEdgeEvaluator<float>;
+using DistanceEdgeEvaluatorD = DistanceEdgeEvaluator<double>;
+
 } // namespace descartes_light
 
 #endif

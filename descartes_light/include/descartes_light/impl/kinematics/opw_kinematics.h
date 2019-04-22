@@ -38,6 +38,9 @@ private:
           std::vector<FloatType>& solution_set) const;
 };
 
+using OPWKinematicsF = OPWKinematics<float>;
+using OPWKinematicsD = OPWKinematics<double>;
+
 } // namespace descartes_light
 
 #endif // DESCARTES_LIGHT_KINEMATICS_OPW_H
