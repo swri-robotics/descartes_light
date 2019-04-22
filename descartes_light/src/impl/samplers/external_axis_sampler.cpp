@@ -1,8 +1,25 @@
-#include "descartes_light/external_axis_sampler.h"
+/*
+ * Software License Agreement (Apache License)
+ *
+ * Copyright (c) 2016, Southwest Research Institute
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+#include "descartes_light/impl/samplers/external_axis_sampler.h"
 #include <iostream>
 
 descartes_light::ExternalAxisSampler::ExternalAxisSampler(const Eigen::Isometry3d& tool_in_positioner,
-                                                          const KinematicsInterface& robot_kin,
+                                                          const KinematicsInterfacePtr robot_kin,
                                                           const CollisionInterfacePtr collision)
   : tool_pose_(tool_in_positioner)
   , kin_(robot_kin)
@@ -28,7 +45,7 @@ bool descartes_light::ExternalAxisSampler::sample(std::vector<double>& solution_
   for (double angle = -M_PI; angle <= M_PI; angle += discretization)
   {
     std::vector<double> buffer;
-    kin_.ik(to_robot_frame(tool_pose_, angle), buffer);
+    kin_->ik(to_robot_frame(tool_pose_, angle), buffer);
 
     // Now test the solutions
     const auto n_sols = buffer.size() / 6;
@@ -52,8 +69,8 @@ bool descartes_light::ExternalAxisSampler::isCollisionFree(const double* vertex)
 }
 
 descartes_light::SpoolSampler::SpoolSampler(const Eigen::Isometry3d& tool_in_positioner,
-                                                          const KinematicsInterface& robot_kin,
-                                                          const CollisionInterfacePtr collision)
+                                            const KinematicsInterfacePtr robot_kin,
+                                            const CollisionInterfacePtr collision)
   : tool_pose_(tool_in_positioner)
   , kin_(robot_kin)
   , collision_(std::move(collision))
@@ -78,7 +95,7 @@ bool descartes_light::SpoolSampler::sample(std::vector<double>& solution_set)
   for (double angle = -2 * M_PI; angle <= 2 * M_PI; angle += discretization)
   {
     std::vector<double> buffer;
-    kin_.ik(to_robot_frame(tool_pose_, angle), buffer);
+    kin_->ik(to_robot_frame(tool_pose_, angle), buffer);
 
     // Now test the solutions
     const auto n_sols = buffer.size() / 6;

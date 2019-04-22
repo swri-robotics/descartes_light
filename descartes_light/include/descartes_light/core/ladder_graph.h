@@ -16,8 +16,8 @@
  * limitations under the License.
  */
 
-#ifndef DESCARTES_LADDER_GRAPH_H
-#define DESCARTES_LADDER_GRAPH_H
+#ifndef DESCARTES_LIGHT_LADDER_GRAPH_H
+#define DESCARTES_LIGHT_LADDER_GRAPH_H
 
 #include <algorithm>
 #include <cassert>
