@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>descartes_light_demo</name>
+  <version>0.0.0</version>
+  <description>The descartes_light_demo package</description>
+
+  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+  <maintainer email="mripperger@todo.todo">mripperger</maintainer>
+
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>actionlib</depend>
+  <depend>descartes_light</depend>
+  <depend>descartes_opw</depend>
+  <depend>descartes_samplers</depend>
+  <depend>descartes_tesseract</depend>
+  <depend>opw_kinematics</depend>
+  <depend>tesseract_ros</depend>
+</package>
