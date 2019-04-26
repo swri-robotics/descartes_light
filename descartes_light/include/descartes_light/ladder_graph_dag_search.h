@@ -16,10 +16,10 @@
  * limitations under the License.
  */
 
-#ifndef DESCARTES_LIGHT_CORE_LADDER_GRAPH_DAG_SEARCH_H
-#define DESCARTES_LIGHT_CORE_LADDER_GRAPH_DAG_SEARCH_H
+#ifndef DESCARTES_LIGHT_LADDER_GRAPH_DAG_SEARCH_H
+#define DESCARTES_LIGHT_LADDER_GRAPH_DAG_SEARCH_H
 
-#include "descartes_light/core/ladder_graph.h"
+#include "descartes_light/ladder_graph.h"
 
 namespace descartes_light
 {
@@ -69,4 +69,4 @@ using DAGSearchD = DAGSearch<double>;
 
 } // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_CORE_LADDER_GRAPH_DAG_SEARCH_H
+#endif // DESCARTES_LIGHT_LADDER_GRAPH_DAG_SEARCH_H

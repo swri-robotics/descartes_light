@@ -15,9 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-#ifndef DESCARTES_LIGHT_CORE_LADDER_GRAPH_H
-#define DESCARTES_LIGHT_CORE_LADDER_GRAPH_H
+#ifndef DESCARTES_LIGHT_LADDER_GRAPH_H
+#define DESCARTES_LIGHT_LADDER_GRAPH_H
 
 #include <algorithm>
 #include <cassert>
@@ -179,4 +178,4 @@ using LadderGraphD = LadderGraph<double>;
 
 } // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_CORE_LADDER_GRAPH_H
+#endif // DESCARTES_LIGHT_LADDER_GRAPH_H

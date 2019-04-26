@@ -15,12 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_CORE_DESCARTES_LIGHT_H
-#define DESCARTES_LIGHT_CORE_DESCARTES_LIGHT_H
+#ifndef DESCARTES_LIGHT_DESCARTES_LIGHT_H
+#define DESCARTES_LIGHT_DESCARTES_LIGHT_H
 
-#include "descartes_light/core/ladder_graph.h"
-#include "descartes_light/core/position_sampler.h"
-#include "descartes_light/core/edge_evaluator.h"
+#include "descartes_light/ladder_graph.h"
+#include "descartes_light/interface/position_sampler.h"
+#include "descartes_light/interface/edge_evaluator.h"
 
 namespace descartes_light
 {
@@ -51,4 +51,4 @@ using SolverD = Solver<double>;
 
 } // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_CORE_DESCARTES_LIGHT_H
+#endif // DESCARTES_LIGHT_DESCARTES_LIGHT_H
