@@ -1,0 +1,15 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>descartes_samplers</name>
+  <version>0.0.0</version>
+  <description>The descartes_samplers package</description>
+
+  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
+  <maintainer email="mripperger@swri.org">mripperger</maintainer>
+
+  <license>Apache 2.0</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+  <depend>descartes_light</depend>
+
+</package>
