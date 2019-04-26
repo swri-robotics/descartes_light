@@ -3,17 +3,17 @@ project(descartes_light)
 
 add_compile_options(-std=c++11 -Wall -Wextra -fopenmp)
 
+find_package(catkin REQUIRED)
 find_package(Eigen3 REQUIRED)
+find_package(console_bridge)
 
-find_package(tesseract REQUIRED)
-
-find_package(catkin REQUIRED COMPONENTS
-  opw_kinematics
-  control_msgs
-  roscpp # Demo
-  actionlib # Demo
-  tesseract_rosutils
-)
+find_package(OpenMP)
+if(OPENMP_FOUND)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+else(OPENMP_FOUND)
+  message (STATUS "Not found OpenMP")
+endif()
 
 catkin_package(
   INCLUDE_DIRS
@@ -47,13 +47,11 @@ include_directories(
 
 # Core Library
 add_library(${PROJECT_NAME}_core
-  src/core/ladder_graph.cpp
-  src/core/ladder_graph_dag_search.cpp
-  src/core/descartes_light.cpp
+  src/descartes_light.cpp
+  src/ladder_graph.cpp
+  src/ladder_graph_dag_search.cpp
 )
-
 add_dependencies(${PROJECT_NAME}_core ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
 target_link_libraries(${PROJECT_NAME}_core ${catkin_LIBRARIES} gomp)
 
 # Collision Interface Implementations
@@ -122,7 +120,7 @@ target_link_libraries(${PROJECT_NAME}_node
 ## Install ##
 #############
 
-install(TARGETS ${PROJECT_NAME}_core ${PROJECT_NAME}_collision ${PROJECT_NAME}_kinematics ${PROJECT_NAME}_evaluators ${PROJECT_NAME}_samplers ${PROJECT_NAME}_node
+install(TARGETS ${PROJECT_NAME}_core
   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -130,8 +128,6 @@ install(TARGETS ${PROJECT_NAME}_core ${PROJECT_NAME}_collision ${PROJECT_NAME}_k
 
 install(DIRECTORY include/${PROJECT_NAME}/
   DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-  FILES_MATCHING PATTERN "*.h"
-  PATTERN ".svn" EXCLUDE
 )
 
 #############
