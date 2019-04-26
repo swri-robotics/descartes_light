@@ -20,7 +20,7 @@
 
 #include <memory>
 #include <vector>
-#include "descartes_light/core/ladder_graph.h"
+#include "descartes_light/ladder_graph.h"
 
 namespace descartes_light
 {
