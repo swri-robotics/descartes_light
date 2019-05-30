@@ -3,17 +3,16 @@ project(descartes_light)
 
 add_compile_options(-std=c++11 -Wall -Wextra -fopenmp)
 
-find_package(catkin REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(console_bridge)
+find_package(tesseract REQUIRED)
 
-find_package(OpenMP)
-if(OPENMP_FOUND)
-  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
-else(OPENMP_FOUND)
-  message (STATUS "Not found OpenMP")
-endif()
+find_package(catkin REQUIRED COMPONENTS
+  opw_kinematics
+  control_msgs
+  roscpp # Demo
+  actionlib # Demo
+)
 
 catkin_package(
   INCLUDE_DIRS
@@ -30,6 +29,7 @@ catkin_package(
   DEPENDS
     EIGEN3
     tesseract
+    console_bridge
 )
 
 ###########
@@ -41,8 +41,6 @@ include_directories(
   ${catkin_INCLUDE_DIRS}
   SYSTEM
   ${EIGEN3_INCLUDE_DIRS}
-  ${tesseract_INCLUDE_DIRS}
-  ${tesseract_rosutils_INCLUDE_DIRS}
 )
 
 # Core Library
@@ -60,6 +58,7 @@ add_library(${PROJECT_NAME}_collision
 )
 
 add_dependencies(${PROJECT_NAME}_collision ${${PROJECT_NAME}_collision_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+
 
 target_link_libraries(${PROJECT_NAME}_collision ${PROJECT_NAME}_core ${catkin_LIBRARIES} tesseract::tesseract)
 

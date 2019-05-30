@@ -30,7 +30,7 @@ bool TesseractCollision<FloatType>::isContactAllowed(const std::string &a, const
 }
 
 template<typename FloatType>
-TesseractCollision<FloatType>::TesseractCollision(tesseract::BasicEnvConstPtr collision_env,
+TesseractCollision<FloatType>::TesseractCollision(tesseract_environment::EnvironmentConstPtr collision_env,
                                                   const std::vector<std::string>& active_links,
                                                   const std::vector<std::string>& joint_names)
   : collision_env_(std::move(collision_env))
@@ -50,14 +50,14 @@ bool TesseractCollision<FloatType>::validate(const FloatType* pos,
   // Happens in two phases:
   // 1. Compute the transform of all objects
   Eigen::Map<const Eigen::VectorXd> joint_angles(reinterpret_cast<const double*>(pos), long(size));
-  tesseract::EnvStatePtr env_state = collision_env_->getState(joint_names_, joint_angles);
+  tesseract_environment::EnvStatePtr env_state = collision_env_->getState(joint_names_, joint_angles);
 
   // 2. Update the scene
   contact_manager_->setCollisionObjectsTransform(env_state->transforms);
 
   // 3. Ask the contact manager to go nuts
-  tesseract::ContactResultMap results;
-  contact_manager_->contactTest(results, tesseract::ContactTestType::FIRST);
+  tesseract_collision::ContactResultMap results;
+  contact_manager_->contactTest(results, tesseract_collision::ContactTestType::FIRST);
 
   // 4. Analyze results
   const bool no_contacts = results.empty();
@@ -79,14 +79,14 @@ FloatType TesseractCollision<FloatType>::distance(const FloatType* pos,
   // Happens in two phases:
   // 1. Compute the transform of all objects
   Eigen::Map<const Eigen::VectorXd> joint_angles(reinterpret_cast<const double*>(pos), long(size));
-  tesseract::EnvStatePtr env_state = collision_env_->getState(joint_names_, joint_angles);
+  tesseract_environment::EnvStatePtr env_state = collision_env_->getState(joint_names_, joint_angles);
 
   // 2. Update the scene
   contact_manager_->setCollisionObjectsTransform(env_state->transforms);
 
   // 3. Ask the contact manager to go nuts
-  tesseract::ContactResultMap results;
-  contact_manager_->contactTest(results, tesseract::ContactTestType::CLOSEST);
+  tesseract_collision::ContactResultMap results;
+  contact_manager_->contactTest(results, tesseract_collision::ContactTestType::CLOSEST);
 
 #ifndef NDEBUG
   std::cout << "Called descartes_light::TesseractCollision::distance\n";
