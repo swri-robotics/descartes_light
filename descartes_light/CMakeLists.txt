@@ -6,6 +6,8 @@ add_compile_options(-std=c++11 -Wall -Wextra -fopenmp)
 find_package(Eigen3 REQUIRED)
 find_package(console_bridge)
 find_package(tesseract REQUIRED)
+# Needed only for the demo
+find_package(tesseract_rosutils REQUIRED)
 
 find_package(catkin REQUIRED COMPONENTS
   opw_kinematics
@@ -57,7 +59,7 @@ add_library(${PROJECT_NAME}_collision
   src/impl/collision/tesseract_collision_checker.cpp
 )
 
-add_dependencies(${PROJECT_NAME}_collision ${${PROJECT_NAME}_collision_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+add_dependencies(${PROJECT_NAME}_collision ${${PROJECT_NAME}_collision_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS} ${tesseract_EXPORTED_TARGETS})
 
 
 target_link_libraries(${PROJECT_NAME}_collision ${PROJECT_NAME}_core ${catkin_LIBRARIES} tesseract::tesseract)
@@ -104,7 +106,8 @@ add_dependencies(${PROJECT_NAME}_node
     ${${PROJECT_NAME}_kinematics_EXPORTED_TARGETS}
     ${${PROJECT_NAME}_evaluators_EXPORTED_TARGETS}
     ${${PROJECT_NAME}_samplers_EXPORTED_TARGETS}
-    ${catkin_EXPORTED_TARGETS})
+    ${catkin_EXPORTED_TARGETS}
+    ${tesseract_rosutils_EXPORTED_TARGETS})
 
 target_link_libraries(${PROJECT_NAME}_node
   ${catkin_LIBRARIES}
@@ -113,6 +116,7 @@ target_link_libraries(${PROJECT_NAME}_node
   ${PROJECT_NAME}_kinematics
   ${PROJECT_NAME}_evaluators
   ${PROJECT_NAME}_samplers
+  ${tesseract_rosutils_LIBRARIES}
 )
 
 #############

@@ -17,6 +17,7 @@
   <depend>roscpp</depend>
   <depend>actionlib</depend>
   <depend>tesseract</depend>
+  <depend>tesseract_rosutils</depend>
 
   <export>
   </export>

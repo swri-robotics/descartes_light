@@ -2,7 +2,7 @@
 #define DESCARTES_TESSERACT_TESSERACT_COLLISION_CHECKER_H
 
 #include <memory>
-#include <descartes_light/core/collision_interface.h>
+#include <descartes_light/interface/collision_interface.h>
 #include <tesseract_environment/core/environment.h>
 #include <tesseract_collision/core/discrete_contact_manager.h>
 
