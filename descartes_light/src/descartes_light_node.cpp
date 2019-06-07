@@ -96,7 +96,7 @@ int main(int argc, char** argv)
 
   const auto group_name = "manipulator";
 
-  auto kin_ptr = tesseract_ptr->getFwdKinematics(group_name);
+  auto kin_ptr = tesseract_ptr->getFwdKinematicsManager()->getFwdKinematicSolver(group_name);
   if (!kin_ptr)
     return 1;
 
@@ -136,7 +136,7 @@ int main(int argc, char** argv)
 
   // To joint trajectory
   trajectory_msgs::JointTrajectory trajectory;
-  trajectory.joint_names = tesseract_ptr->getFwdKinematics(group_name)->getJointNames();
+  trajectory.joint_names = tesseract_ptr->getFwdKinematicsManager()->getFwdKinematicSolver(group_name)->getJointNames();
   for (std::size_t i = 0; i < solution.size() / 6; ++i)
   {
     trajectory_msgs::JointTrajectoryPoint pt;
