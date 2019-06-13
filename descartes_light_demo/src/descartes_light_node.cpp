@@ -101,8 +101,13 @@ int main(int argc, char** argv)
   if (!kin_ptr)
     return 1;
 
+  tesseract_collision::ContinuousContactManagerPtr manager = tesseract_ptr->getEnvironmentConst()->getContinuousContactManager();
+  tesseract_environment::AdjacencyMapPtr adjacency_map = std::make_shared<tesseract_environment::AdjacencyMap>(tesseract_ptr->getEnvironmentConst()->getSceneGraph(),
+                                                                                        kin_ptr->getLinkNames(),
+                                                                                        tesseract_ptr->getEnvironmentConst()->getCurrentState()->transforms);
+
   auto collision_checker = std::make_shared<descartes_light::TesseractCollision<double>>(
-      tesseract_ptr->getEnvironment(), kin_ptr->getLinkNames(), kin_ptr->getJointNames());
+      tesseract_ptr->getEnvironment(), adjacency_map->getActiveLinkNames(), kin_ptr->getJointNames());
 
   descartes_light::IsValidFn<double> is_within_limits_fn =
       std::bind(&descartes_light::isWithinLimits<double>, std::placeholders::_1, kin_ptr->getLimits());
