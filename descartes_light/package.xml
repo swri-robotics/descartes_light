@@ -14,7 +14,8 @@
   <exec_depend>opw_kinematics</exec_depend>
   <depend>roscpp</depend>
   <depend>actionlib</depend>
-  <depend>tesseract_ros</depend>
+  <depend>tesseract</depend>
+  <depend>tesseract_rosutils</depend>
 
   <export>
 
