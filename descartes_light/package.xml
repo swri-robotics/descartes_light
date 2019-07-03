@@ -3,7 +3,8 @@
   <name>descartes_light</name>
   <version>0.0.0</version>
   <description>The descartes_light package</description>
-  <maintainer email="jmeyer@todo.todo">jmeyer</maintainer>
+
+  <maintainer email="jmeyer1292@github.com">Jon Meyer</maintainer>
   <maintainer email="levi.armstrong@swri.edu">Levi Armstrong</maintainer>
 
   <license>Apache 2.0</license>

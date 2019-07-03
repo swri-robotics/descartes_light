@@ -4,8 +4,9 @@
   <version>0.0.0</version>
   <description>The descartes_tesseract package</description>
 
-  <!-- <author email="jane.doe@example.com">Jane Doe</author> -->
-  <maintainer email="mripperger@todo.todo">mripperger</maintainer>
+  <author email="michael.ripperger@swri.org">Michael Ripperger</author>
+  <author email="levi.armstrong@swri.org">Levi Armstrong</author>
+  <maintainer email="michael.ripperger@swri.org">Michael Ripperger</maintainer>
 
   <license>Apache 2.0</license>
 
