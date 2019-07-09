@@ -19,6 +19,7 @@
 #define DESCARTES_SAMPLERS_EVALUATORS_IMPL_DISTANCE_EDGE_EVALUATOR_HPP
 
 #include "descartes_samplers/evaluators/distance_edge_evaluator.h"
+#include <cmath>
 
 namespace
 {

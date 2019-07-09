@@ -1,140 +1,71 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(descartes_light)
+cmake_minimum_required(VERSION 3.5.0)
+project(descartes_light VERSION 0.1.0 LANGUAGES CXX)
 
-add_compile_options(-std=c++11 -Wall -Wextra -fopenmp)
+find_package(OpenMP REQUIRED)
+
+if(NOT TARGET OpenMP::OpenMP_CXX)
+    find_package(Threads REQUIRED)
+    add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
+    set_property(TARGET OpenMP::OpenMP_CXX
+                 PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
+    # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
+    set_property(TARGET OpenMP::OpenMP_CXX
+                 PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
+
+endif()
 
 find_package(Eigen3 REQUIRED)
 find_package(console_bridge)
-find_package(tesseract REQUIRED)
 
-find_package(catkin REQUIRED COMPONENTS
-  opw_kinematics
-  control_msgs
-  roscpp # Demo
-  actionlib # Demo
-  tesseract_rosutils
-)
-
-catkin_package(
-  INCLUDE_DIRS
-    include
-    ${EIGEN3_INCLUDE_DIRS}
-  LIBRARIES
-    ${PROJECT_NAME}_core
-    ${PROJECT_NAME}_collision
-    ${PROJECT_NAME}_kinematics
-    ${PROJECT_NAME}_evaluators
-    ${PROJECT_NAME}_samplers
-  CATKIN_DEPENDS
-    opw_kinematics
-  DEPENDS
-    EIGEN3
-    tesseract
-    console_bridge
-)
-
-###########
-## Build ##
-###########
-
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-  SYSTEM
-  ${EIGEN3_INCLUDE_DIRS}
-)
+list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_std_11 CXX_FEATURE_FOUND)
 
 # Core Library
-add_library(${PROJECT_NAME}_core
+add_library(${PROJECT_NAME} SHARED
   src/descartes_light.cpp
   src/ladder_graph.cpp
   src/ladder_graph_dag_search.cpp
 )
-add_dependencies(${PROJECT_NAME}_core ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-target_link_libraries(${PROJECT_NAME}_core ${catkin_LIBRARIES} gomp)
+target_link_libraries(${PROJECT_NAME} console_bridge OpenMP::OpenMP_CXX)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wsuggest-override -Wconversion -Wsign-conversion)
+if(CXX_FEATURE_FOUND EQUAL "-1")
+    target_compile_options(${PROJECT_NAME} PUBLIC -std=c++11)
+else()
+    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
+endif()
+target_include_directories(${PROJECT_NAME} PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:include>")
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
+    ${EIGEN3_INCLUDE_DIRS})
 
-# Collision Interface Implementations
-add_library(${PROJECT_NAME}_collision
-  src/impl/collision/tesseract_collision_checker.cpp
-)
+list (APPEND PACKAGE_LIBRARIES ${PROJECT_NAME})
 
-add_dependencies(${PROJECT_NAME}_collision ${${PROJECT_NAME}_collision_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# Mark executables and/or libraries for installation
+install(TARGETS ${PACKAGE_LIBRARIES} EXPORT ${PROJECT_NAME}-targets DESTINATION lib)
+install(EXPORT ${PROJECT_NAME}-targets NAMESPACE descartes:: DESTINATION lib/cmake/${PROJECT_NAME})
 
-target_link_libraries(${PROJECT_NAME}_collision ${PROJECT_NAME}_core ${catkin_LIBRARIES} tesseract::tesseract)
+# Mark cpp header files for installation
+install(DIRECTORY include/${PROJECT_NAME}
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+ )
 
-add_library(${PROJECT_NAME}_kinematics
-  src/impl/kinematics/opw_kinematics.cpp
-  src/impl/kinematics/opw_railed_kinematics.cpp
-)
+install(FILES package.xml DESTINATION share/${PROJECT_NAME})
 
-add_dependencies(${PROJECT_NAME}_kinematics ${${PROJECT_NAME}_kinematics_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
+# Create cmake config files
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/${PROJECT_NAME}-config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+  INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 
-target_link_libraries(${PROJECT_NAME}_kinematics ${PROJECT_NAME}_core ${catkin_LIBRARIES})
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+  VERSION ${PROJECT_VERSION} COMPATIBILITY ExactVersion)
 
-add_library(${PROJECT_NAME}_evaluators
-  src/impl/evaluators/distance_edge_evaluator.cpp
-)
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
+  DESTINATION lib/cmake/${PROJECT_NAME})
 
-add_dependencies(${PROJECT_NAME}_evaluators ${${PROJECT_NAME}_evaluators_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_evaluators ${PROJECT_NAME}_core ${catkin_LIBRARIES})
-
-add_library(${PROJECT_NAME}_samplers
-  src/impl/samplers/axial_symmetric_sampler.cpp
-  src/impl/samplers/cartesian_point_sampler.cpp
-  src/impl/samplers/external_axis_sampler.cpp
-  src/impl/samplers/fixed_joint_pose_sampler.cpp
-  src/impl/samplers/railed_axial_symmetric_sampler.cpp
-  src/impl/samplers/railed_cartesian_point_sampler.cpp
-)
-
-add_dependencies(${PROJECT_NAME}_samplers ${${PROJECT_NAME}_samplers_EXPORTED_TARGETS} ${${PROJECT_NAME}_core_EXPORTED_TARGETS} ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_samplers ${PROJECT_NAME}_core ${catkin_LIBRARIES})
-
-# Demonstration
-
-add_executable(${PROJECT_NAME}_node src/descartes_light_node.cpp)
-
-set_target_properties(${PROJECT_NAME}_node PROPERTIES OUTPUT_NAME demonstration PREFIX "")
-
-add_dependencies(${PROJECT_NAME}_node
-    ${${PROJECT_NAME}_core_EXPORTED_TARGETS}
-    ${${PROJECT_NAME}_collision_EXPORTED_TARGETS}
-    ${${PROJECT_NAME}_kinematics_EXPORTED_TARGETS}
-    ${${PROJECT_NAME}_evaluators_EXPORTED_TARGETS}
-    ${${PROJECT_NAME}_samplers_EXPORTED_TARGETS}
-    ${catkin_EXPORTED_TARGETS})
-
-target_link_libraries(${PROJECT_NAME}_node
-  ${catkin_LIBRARIES}
-  ${PROJECT_NAME}_core
-  ${PROJECT_NAME}_collision
-  ${PROJECT_NAME}_kinematics
-  ${PROJECT_NAME}_evaluators
-  ${PROJECT_NAME}_samplers
-)
-
-#############
-## Install ##
-#############
-
-install(TARGETS ${PROJECT_NAME}_core
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
-
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
-
-#############
-## Testing ##
-#############
-
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_descartes_light.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+export(EXPORT ${PROJECT_NAME}-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)

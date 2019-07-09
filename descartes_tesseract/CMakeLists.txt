@@ -1,67 +1,56 @@
-cmake_minimum_required(VERSION 2.8.3)
-project(descartes_tesseract)
+cmake_minimum_required(VERSION 3.5.0)
+project(descartes_tesseract VERSION 0.1.0 LANGUAGES CXX)
 
-add_compile_options(-std=c++11)
+find_package(descartes_light REQUIRED)
+find_package(tesseract_collision REQUIRED)
+find_package(tesseract_environment REQUIRED)
 
-find_package(catkin REQUIRED COMPONENTS
-  descartes_light
-  tesseract_core
-)
-
-catkin_package(
-  INCLUDE_DIRS
-    include
-  LIBRARIES
-    ${PROJECT_NAME}
-  CATKIN_DEPENDS
-    descartes_light
-    tesseract_core
-)
-
-###########
-## Build ##
-###########
-
-## Specify additional locations of header files
-## Your package locations should be listed before other locations
-include_directories(
-  include
-  ${catkin_INCLUDE_DIRS}
-)
+list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_std_11 CXX_FEATURE_FOUND)
 
 # Declare a C++ library
 add_library(${PROJECT_NAME}
   src/descartes_tesseract_collision_checker.cpp
 )
-target_link_libraries(${PROJECT_NAME}
-  ${catkin_LIBRARIES}
-)
+target_link_libraries(${PROJECT_NAME} SHARED console_bridge tesseract::tesseract_collision_core tesseract::tesseract_environment_core descartes::descartes_light)
+target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wsuggest-override -Wconversion -Wsign-conversion)
+if(CXX_FEATURE_FOUND EQUAL "-1")
+    target_compile_options(${PROJECT_NAME} PUBLIC -std=c++11)
+else()
+    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
+endif()
+target_include_directories(${PROJECT_NAME} PUBLIC
+    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
+    "$<INSTALL_INTERFACE:include>")
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC)
 
-#############
-## Install ##
-#############
+list (APPEND PACKAGE_LIBRARIES ${PROJECT_NAME})
 
 # Mark executables and/or libraries for installation
-install(TARGETS ${PROJECT_NAME}
-  ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
-  RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
-)
+install(TARGETS ${PACKAGE_LIBRARIES} EXPORT ${PROJECT_NAME}-targets DESTINATION lib)
+install(EXPORT ${PROJECT_NAME}-targets NAMESPACE descartes:: DESTINATION lib/cmake/${PROJECT_NAME})
 
 # Mark cpp header files for installation
-install(DIRECTORY include/${PROJECT_NAME}/
-  DESTINATION ${CATKIN_PACKAGE_INCLUDE_DESTINATION}
-)
+install(DIRECTORY include/${PROJECT_NAME}
+  DESTINATION include
+  FILES_MATCHING PATTERN "*.h"
+  PATTERN ".svn" EXCLUDE
+ )
 
-#############
-## Testing ##
-#############
+install(FILES package.xml DESTINATION share/${PROJECT_NAME})
 
-## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_descartes_tesseract.cpp)
-# if(TARGET ${PROJECT_NAME}-test)
-#   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
-# endif()
+# Create cmake config files
+include(CMakePackageConfigHelpers)
+configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/${PROJECT_NAME}-config.cmake.in
+  ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
+  INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
+  NO_CHECK_REQUIRED_COMPONENTS_MACRO)
 
-## Add folders to be run by python nosetests
-# catkin_add_nosetests(test)
+write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
+  VERSION ${PROJECT_VERSION} COMPATIBILITY ExactVersion)
+
+install(FILES
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
+  "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
+  DESTINATION lib/cmake/${PROJECT_NAME})
+
+export(EXPORT ${PROJECT_NAME}-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)

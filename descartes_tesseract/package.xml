@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>descartes_tesseract</name>
-  <version>0.0.0</version>
+  <version>0.1.0</version>
   <description>The descartes_tesseract package</description>
 
   <author email="michael.ripperger@swri.org">Michael Ripperger</author>
@@ -10,7 +10,10 @@
 
   <license>Apache 2.0</license>
 
-  <buildtool_depend>catkin</buildtool_depend>
   <depend>descartes_light</depend>
-  <depend>tesseract_core</depend>
+  <depend>tesseract_collision</depend>
+  <depend>tesseract_environment</depend>
+  <export>
+    <build_type>cmake</build_type>
+  </export>
 </package>
