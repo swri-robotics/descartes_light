@@ -19,7 +19,7 @@ public:
    * @param active_links The list of active links
    * @param joint_names The list of joint names in the order that the data will be provided to the validate function.
    */
-  TesseractCollision(tesseract_environment::EnvironmentConstPtr collision_env,
+  TesseractCollision(tesseract_environment::Environment::ConstPtr collision_env,
                      const std::vector<std::string>& active_links,
                      const std::vector<std::string>& joint_names);
 
@@ -29,16 +29,16 @@ public:
 
   typename CollisionInterface<FloatType>::Ptr clone() const override;
 
-  tesseract_environment::EnvironmentConstPtr& environment() { return collision_env_; }
-  const tesseract_environment::EnvironmentConstPtr& environment() const { return collision_env_; }
+  tesseract_environment::Environment::ConstPtr& environment() { return collision_env_; }
+  const tesseract_environment::Environment::ConstPtr& environment() const { return collision_env_; }
 
 private:
   bool isContactAllowed(const std::string& a, const std::string& b) const;
 
-  tesseract_environment::EnvironmentConstPtr collision_env_;
+  tesseract_environment::Environment::ConstPtr collision_env_;
   std::vector<std::string> active_link_names_;
   std::vector<std::string> joint_names_;
-  tesseract_collision::DiscreteContactManagerPtr contact_manager_;
+  tesseract_collision::DiscreteContactManager::Ptr contact_manager_;
 };
 
 using TesseractCollisionF = TesseractCollision<float>;
