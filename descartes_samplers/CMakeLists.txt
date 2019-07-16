@@ -1,31 +1,21 @@
 cmake_minimum_required(VERSION 3.5.0)
-project(descartes_light VERSION 0.1.0 LANGUAGES CXX)
+project(descartes_samplers VERSION 0.1.0 LANGUAGES CXX)
 
-find_package(OpenMP REQUIRED)
-
-if(NOT TARGET OpenMP::OpenMP_CXX)
-    find_package(Threads REQUIRED)
-    add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
-    set_property(TARGET OpenMP::OpenMP_CXX
-                 PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
-    # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
-    set_property(TARGET OpenMP::OpenMP_CXX
-                 PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
-
-endif()
-
-find_package(Eigen3 REQUIRED)
-find_package(console_bridge)
+find_package(descartes_light REQUIRED)
 
 list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_std_11 CXX_FEATURE_FOUND)
 
-# Core Library
+# Declare a C++ library
 add_library(${PROJECT_NAME} SHARED
-  src/descartes_light.cpp
-  src/ladder_graph.cpp
-  src/ladder_graph_dag_search.cpp
+  src/evaluators/distance_edge_evaluator.cpp
+  src/samplers/axial_symmetric_sampler.cpp
+  src/samplers/cartesian_point_sampler.cpp
+  src/samplers/external_axis_sampler.cpp
+  src/samplers/fixed_joint_pose_sampler.cpp
+  src/samplers/railed_axial_symmetric_sampler.cpp
+  src/samplers/railed_cartesian_point_sampler.cpp
 )
-target_link_libraries(${PROJECT_NAME} console_bridge OpenMP::OpenMP_CXX)
+target_link_libraries(${PROJECT_NAME} descartes::descartes_light)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wsuggest-override -Wconversion -Wsign-conversion)
 if(CXX_FEATURE_FOUND EQUAL "-1")
     target_compile_options(${PROJECT_NAME} PUBLIC -std=c++11)
@@ -35,8 +25,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
-    ${EIGEN3_INCLUDE_DIRS})
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC)
 
 list (APPEND PACKAGE_LIBRARIES ${PROJECT_NAME})
 
