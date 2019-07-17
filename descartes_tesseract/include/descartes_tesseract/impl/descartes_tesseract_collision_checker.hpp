@@ -30,7 +30,7 @@ bool TesseractCollision<FloatType>::isContactAllowed(const std::string &a, const
 }
 
 template<typename FloatType>
-TesseractCollision<FloatType>::TesseractCollision(tesseract_environment::EnvironmentConstPtr collision_env,
+TesseractCollision<FloatType>::TesseractCollision(tesseract_environment::Environment::ConstPtr collision_env,
                                                   const std::vector<std::string>& active_links,
                                                   const std::vector<std::string>& joint_names)
   : collision_env_(std::move(collision_env))
@@ -50,7 +50,7 @@ bool TesseractCollision<FloatType>::validate(const FloatType* pos,
   // Happens in two phases:
   // 1. Compute the transform of all objects
   Eigen::Map<const Eigen::VectorXd> joint_angles(reinterpret_cast<const double*>(pos), long(size));
-  tesseract_environment::EnvStatePtr env_state = collision_env_->getState(joint_names_, joint_angles);
+  tesseract_environment::EnvState::Ptr env_state = collision_env_->getState(joint_names_, joint_angles);
 
   // 2. Update the scene
   contact_manager_->setCollisionObjectsTransform(env_state->transforms);
@@ -79,7 +79,7 @@ FloatType TesseractCollision<FloatType>::distance(const FloatType* pos,
   // Happens in two phases:
   // 1. Compute the transform of all objects
   Eigen::Map<const Eigen::VectorXd> joint_angles(reinterpret_cast<const double*>(pos), long(size));
-  tesseract_environment::EnvStatePtr env_state = collision_env_->getState(joint_names_, joint_angles);
+  tesseract_environment::EnvState::Ptr env_state = collision_env_->getState(joint_names_, joint_angles);
 
   // 2. Update the scene
   contact_manager_->setCollisionObjectsTransform(env_state->transforms);
