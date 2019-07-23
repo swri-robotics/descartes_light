@@ -8,10 +8,10 @@ find_package(tesseract_environment REQUIRED)
 list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_std_11 CXX_FEATURE_FOUND)
 
 # Declare a C++ library
-add_library(${PROJECT_NAME}
+add_library(${PROJECT_NAME} SHARED
   src/descartes_tesseract_collision_checker.cpp
 )
-target_link_libraries(${PROJECT_NAME} SHARED console_bridge tesseract::tesseract_collision_core tesseract::tesseract_environment_core descartes::descartes_light)
+target_link_libraries(${PROJECT_NAME} console_bridge tesseract::tesseract_collision_core tesseract::tesseract_environment_core descartes::descartes_light)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wsuggest-override -Wconversion -Wsign-conversion)
 if(CXX_FEATURE_FOUND EQUAL "-1")
     target_compile_options(${PROJECT_NAME} PUBLIC -std=c++11)
