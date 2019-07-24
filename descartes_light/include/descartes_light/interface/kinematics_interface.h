@@ -35,6 +35,9 @@ public:
                   std::vector<FloatType>& solution_set) const = 0;
   virtual bool fk(const FloatType* pose,
                   Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const = 0;
+
+  virtual int dof() const = 0;
+
   virtual void analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const = 0;
 
   typedef typename std::shared_ptr<KinematicsInterface> Ptr;

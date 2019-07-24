@@ -1,27 +1,27 @@
 cmake_minimum_required(VERSION 3.5.0)
-project(descartes_tesseract VERSION 0.1.0 LANGUAGES CXX)
+project(descartes_ikfast VERSION 0.1.0 LANGUAGES CXX)
 
 find_package(descartes_light REQUIRED)
-find_package(tesseract_collision REQUIRED)
-find_package(tesseract_environment REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(LAPACK REQUIRED)
+find_package(console_bridge REQUIRED)
 
 list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_std_11 CXX_FEATURE_FOUND)
 
-# Declare a C++ library
-add_library(${PROJECT_NAME} SHARED
-  src/descartes_tesseract_collision_checker.cpp
-)
-target_link_libraries(${PROJECT_NAME} console_bridge tesseract::tesseract_collision_core tesseract::tesseract_environment_core descartes::descartes_light)
-target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wsuggest-override -Wconversion -Wsign-conversion)
+add_library(${PROJECT_NAME} INTERFACE)
+target_link_libraries(${PROJECT_NAME} INTERFACE console_bridge descartes::descartes_light_core ${LAPACK_LIBRARIES})
+target_compile_options(${PROJECT_NAME} INTERFACE -Wall -Wextra -Wsuggest-override -Wconversion -Wsign-conversion)
 if(CXX_FEATURE_FOUND EQUAL "-1")
-    target_compile_options(${PROJECT_NAME} PUBLIC -std=c++11)
+    target_compile_options(${PROJECT_NAME} INTERFACE -std=c++11)
 else()
-    target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_11)
+    target_compile_features(${PROJECT_NAME} INTERFACE cxx_std_11)
 endif()
-target_include_directories(${PROJECT_NAME} PUBLIC
+target_include_directories(${PROJECT_NAME} INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC)
+target_include_directories(${PROJECT_NAME} SYSTEM INTERFACE
+    ${LAPACK_INCLUDE_DIRS}
+    ${EIGEN3_INCLUDE_DIRS})
 
 list (APPEND PACKAGE_LIBRARIES ${PROJECT_NAME})
 
@@ -54,3 +54,12 @@ install(FILES
   DESTINATION lib/cmake/${PROJECT_NAME})
 
 export(EXPORT ${PROJECT_NAME}-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)
+
+if (ENABLE_TESTS)
+  enable_testing()
+  add_custom_target(run_tests ALL
+      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+      COMMAND ${CMAKE_CTEST_COMMAND} -C $<CONFIGURATION> -V)
+
+  add_subdirectory(test)
+endif()

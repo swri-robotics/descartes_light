@@ -8,7 +8,6 @@ include(CMakeFindDependencyMacro)
 find_dependency(Eigen3)
 find_dependency(OpenMP)
 find_dependency(console_bridge)
-find_dependency(OpenMP)
 
 if(NOT TARGET OpenMP::OpenMP_CXX)
     find_dependency(Threads)
