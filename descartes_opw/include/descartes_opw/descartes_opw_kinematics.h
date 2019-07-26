@@ -23,6 +23,8 @@ public:
   bool fk(const FloatType* pose,
           Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const override;
 
+  int dof() const override;
+
   void analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const override;
 
 private:

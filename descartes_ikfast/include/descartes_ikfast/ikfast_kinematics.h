@@ -45,7 +45,7 @@ public:
 
   void analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const override;
 
-private:
+protected:
   Eigen::Transform<FloatType, 3, Eigen::Isometry> world_to_robot_base_;
   Eigen::Transform<FloatType, 3, Eigen::Isometry> tool0_to_tip_;
   IsValidFn<FloatType> is_valid_fn_;

@@ -13,7 +13,7 @@ TEST(DescartesIkFastUnit, Instantiation)
   descartes_ikfast_unit::FanucM20ia10lKinematicsD robot(world_to_robot_base, tool0_to_tip, nullptr, nullptr);
 
   Eigen::Isometry3d pose;
-  std::vector<double> all_zeros = {0,0,0,0,0,0};
+  std::vector<double> all_zeros(6, 0.0);
 
   EXPECT_TRUE(robot.fk(all_zeros.data(), pose));
 

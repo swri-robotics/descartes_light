@@ -124,6 +124,12 @@ bool OPWKinematics<FloatType>::fk(const FloatType* pose,
 }
 
 template<typename FloatType>
+int OPWKinematics<FloatType>::dof() const
+{
+  return 6;
+}
+
+template<typename FloatType>
 void OPWKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const
 {
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "AnalyzeIK: ", ";");

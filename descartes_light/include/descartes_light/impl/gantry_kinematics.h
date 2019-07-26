@@ -26,11 +26,30 @@ namespace descartes_light
 {
 /**
  * @brief This takes a kinematics object that represents the robot and adds gantry sampling
+ *
+ * This class is intended to be used for a robots mounted on two-axis gantries, where the
+ * gantry axes are assumed to be orthogonal and along the X and Y axes.
+ *
  */
 template<typename FloatType>
 class GantryKinematics : public KinematicsInterface<FloatType>
 {
 public:
+
+  /**
+   * @brief This takes a kinematics object that represents the robot and adds gantry sampling
+   *
+   * When provided a point in world coordinate system this will find the gantry {X, Y} values
+   * that center the robots base coordinate system directly over the point. It then searches
+   * from {X - Xres, Y - Yres} to {X + Xres, Y + Yres} and provides all solutions.
+   *
+   * @param robot_kinematics The kinematic object atached to a two-axis gantry
+   * @param world_to_rail_base The transformation from the world coordinate system to the origin of the two-axis gantry
+   * @param rail_base_to_robot_base The transformation from the two-axis gantry origin to the robot's base coordinate system
+   * @param rail_limits The rails limit {Xmin, Xmax; Ymin, Ymax}
+   * @param rail_sample_resolution The resolution at which to sample the gantry {Xres, Yres}
+   * @param robot_reach This defines how far to search {X, Y} gantry around a location.
+   */
   GantryKinematics(const typename KinematicsInterface<FloatType>::ConstPtr robot_kinematics,
                    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& world_to_rail_base,
                    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& rail_base_to_robot_base,
@@ -65,6 +84,8 @@ private:
   FloatType robot_reach_;
 };
 
+using GantryKinematicsD = GantryKinematics<double>;
+using GantryKinematicsF = GantryKinematics<float>;
 }
 
 #endif // DESCARTES_LIGHT_GANTRY_KINEMATICS_H
