@@ -26,7 +26,7 @@ namespace descartes_core
 {
 using TrajectoryID = std::size_t;
 
-template<typename FloatType>
+template <typename FloatType>
 struct TimingConstraint
 {
   TimingConstraint() : upper(0.0) {}
@@ -37,29 +37,28 @@ struct TimingConstraint
 using TimingConstraintF = TimingConstraint<float>;
 using TimingConstraintD = TimingConstraint<double>;
 
-} // namespace descartes_core
+}  // namespace descartes_core
 
 namespace descartes_light
 {
-
-template<typename FloatT>
+template <typename FloatT>
 struct Edge_
 {
   Edge_() noexcept = default;
-  Edge_(FloatT cost, unsigned index) noexcept : cost{cost}, idx{index} {}
-  FloatT cost; /** @brief transition cost from vertex who owns this object to 'idx' in next rung */
+  Edge_(FloatT cost, unsigned index) noexcept : cost{ cost }, idx{ index } {}
+  FloatT cost;  /** @brief transition cost from vertex who owns this object to 'idx' in next rung */
   unsigned idx; /** @brief from THIS rung to 'idx' into the NEXT rung */
 };
 
-template<typename FloatType>
+template <typename FloatType>
 struct Rung_
 {
   using Edge = Edge_<FloatType>;
   using EdgeList = std::vector<Edge>;
 
-  descartes_core::TrajectoryID id; // corresponds to user's input ID
-  descartes_core::TimingConstraint<FloatType> timing; // user input timing
-  std::vector<FloatType> data; // joint values stored in one contiguous array
+  descartes_core::TrajectoryID id;                     // corresponds to user's input ID
+  descartes_core::TimingConstraint<FloatType> timing;  // user input timing
+  std::vector<FloatType> data;                         // joint values stored in one contiguous array
   std::vector<EdgeList> edges;
 };
 
@@ -68,7 +67,7 @@ struct Rung_
  *        arranged into "rungs" which have connections only to vertices in the adjacent
  *        rungs. Assumes a fixed DOF.
  */
-template<typename FloatType>
+template <typename FloatType>
 class LadderGraph
 {
 public:
@@ -90,7 +89,7 @@ public:
   Rung& getRung(const std::size_t index) noexcept;
   const Rung& getRung(const std::size_t index) const noexcept;
 
-  std::vector<EdgeList>& getEdges(const std::size_t index) noexcept; // see p.23 Effective C++ (Scott Meyers)
+  std::vector<EdgeList>& getEdges(const std::size_t index) noexcept;  // see p.23 Effective C++ (Scott Meyers)
   const std::vector<EdgeList>& getEdges(const std::size_t index) const noexcept;
 
   std::size_t rungSize(const std::size_t index) const noexcept;
@@ -139,7 +138,7 @@ public:
   /**
    * @brief assign Consumes the given edge list and assigns it to the rung-index given by 'rung'
    */
-  void assignEdges(const std::size_t rung, std::vector<EdgeList>&& edges); // noexcept?
+  void assignEdges(const std::size_t rung, std::vector<EdgeList>&& edges);  // noexcept?
 
   /**
    * @brief assignRung Special helper function to assign a solution set associated with a Descartes point &
@@ -176,6 +175,6 @@ private:
 using LadderGraphF = LadderGraph<float>;
 using LadderGraphD = LadderGraph<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_LADDER_GRAPH_H
+#endif  // DESCARTES_LIGHT_LADDER_GRAPH_H

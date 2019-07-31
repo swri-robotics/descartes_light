@@ -19,9 +19,8 @@
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
 template class GantryEuclideanDistanceEdgeEvaluator<float>;
 template class GantryEuclideanDistanceEdgeEvaluator<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

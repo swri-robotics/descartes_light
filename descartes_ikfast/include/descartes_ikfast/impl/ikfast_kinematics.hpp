@@ -25,15 +25,14 @@
 #include <descartes_light/utils.h>
 #include <console_bridge/console.h>
 
-
 namespace descartes_light
 {
-
-template<typename FloatType>
-IKFastKinematics<FloatType>::IKFastKinematics(const Eigen::Transform<FloatType, 3, Eigen::Isometry> &world_to_robot_base,
-                                              const Eigen::Transform<FloatType, 3, Eigen::Isometry> &tool0_to_tip,
-                                              const IsValidFn<FloatType>& is_valid_fn,
-                                              const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn)
+template <typename FloatType>
+IKFastKinematics<FloatType>::IKFastKinematics(
+    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& world_to_robot_base,
+    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool0_to_tip,
+    const IsValidFn<FloatType>& is_valid_fn,
+    const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn)
   : world_to_robot_base_(world_to_robot_base)
   , tool0_to_tip_(tool0_to_tip)
   , is_valid_fn_(is_valid_fn)
@@ -41,20 +40,21 @@ IKFastKinematics<FloatType>::IKFastKinematics(const Eigen::Transform<FloatType, 
 {
 }
 
-template<typename FloatType>
-bool IKFastKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry> &p,
-                                           std::vector<FloatType> &solution_set) const
+template <typename FloatType>
+bool IKFastKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+                                     std::vector<FloatType>& solution_set) const
 {
   return IKFastKinematics<FloatType>::ik(p, is_valid_fn_, redundant_sol_fn_, solution_set);
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool IKFastKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
                                      const IsValidFn<FloatType>& is_valid_fn,
                                      const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn,
                                      std::vector<FloatType>& solution_set) const
 {
-  const Eigen::Transform<FloatType, 3, Eigen::Isometry> in_robot = world_to_robot_base_.inverse() * p * tool0_to_tip_.inverse();
+  const Eigen::Transform<FloatType, 3, Eigen::Isometry> in_robot =
+      world_to_robot_base_.inverse() * p * tool0_to_tip_.inverse();
 
   // Convert to ikfast data type
   Eigen::Transform<IkReal, 3, Eigen::Isometry> ikfast_tcp = in_robot.template cast<IkReal>();
@@ -95,46 +95,50 @@ bool IKFastKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
     FloatType* sol = sols.data() + ikfast_dof * i;
     if (isValid<FloatType>(sol, ikfast_dof))
     {
-      harmonizeTowardZero<FloatType>(sol, ikfast_dof); // Modifies 'sol' in place
+      harmonizeTowardZero<FloatType>(sol, ikfast_dof);  // Modifies 'sol' in place
 
       std::vector<FloatType> full_sol;
-      full_sol.insert(end(full_sol), sol, sol + ikfast_dof); // And then insert the robot arm configuration
+      full_sol.insert(end(full_sol), sol, sol + ikfast_dof);  // And then insert the robot arm configuration
 
       if (is_valid_fn && redundant_sol_fn)
       {
         if (is_valid_fn(full_sol.data()))
-          solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + ikfast_dof);  // If good then add to solution set
+          solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + ikfast_dof);  // If good then add to
+                                                                                                  // solution set
 
         std::vector<FloatType> redundant_sols = redundant_sol_fn(full_sol.data());
         if (!redundant_sols.empty())
         {
-          int num_sol = redundant_sols.size()/ikfast_dof;
+          int num_sol = redundant_sols.size() / ikfast_dof;
           for (int s = 0; s < num_sol; ++s)
           {
             FloatType* redundant_sol = redundant_sols.data() + ikfast_dof * s;
             if (is_valid_fn(redundant_sol))
-              solution_set.insert(end(solution_set), redundant_sol, redundant_sol + ikfast_dof);  // If good then add to solution set
+              solution_set.insert(end(solution_set), redundant_sol, redundant_sol + ikfast_dof);  // If good then add to
+                                                                                                  // solution set
           }
         }
       }
       else if (is_valid_fn && !redundant_sol_fn)
       {
         if (is_valid_fn(full_sol.data()))
-          solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + ikfast_dof);  // If good then add to solution set
+          solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + ikfast_dof);  // If good then add to
+                                                                                                  // solution set
       }
       else if (!is_valid_fn && redundant_sol_fn)
       {
-
-        solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + ikfast_dof);  // If good then add to solution set
+        solution_set.insert(end(solution_set), full_sol.data(), full_sol.data() + ikfast_dof);  // If good then add to
+                                                                                                // solution set
 
         std::vector<FloatType> redundant_sols = redundant_sol_fn(full_sol.data());
         if (!redundant_sols.empty())
         {
-          int num_sol = redundant_sols.size()/ikfast_dof;
+          int num_sol = redundant_sols.size() / ikfast_dof;
           for (int s = 0; s < num_sol; ++s)
           {
             FloatType* redundant_sol = redundant_sols.data() + ikfast_dof * s;
-            solution_set.insert(end(solution_set), redundant_sol, redundant_sol + ikfast_dof);  // If good then add to solution set
+            solution_set.insert(end(solution_set), redundant_sol, redundant_sol + ikfast_dof);  // If good then add to
+                                                                                                // solution set
           }
         }
       }
@@ -148,15 +152,15 @@ bool IKFastKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
   return !solution_set.empty();
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool IKFastKinematics<FloatType>::fk(const FloatType* pose,
-                                           Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const
+                                     Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const
 {
   Eigen::Matrix<IkReal, 3, 1> translation;
   // Note the row major ordering here
   Eigen::Matrix<IkReal, 3, 3, Eigen::RowMajor> rotation;
 
-  std::vector<IkReal> ikfast_joint_pose(pose, pose + dof()); // TODO: Need to convert joint_pose
+  std::vector<IkReal> ikfast_joint_pose(pose, pose + dof());  // TODO: Need to convert joint_pose
   ComputeFk(ikfast_joint_pose.data(), translation.data(), rotation.data());
 
   Eigen::Transform<FloatType, 3, Eigen::Isometry> output;
@@ -168,14 +172,14 @@ bool IKFastKinematics<FloatType>::fk(const FloatType* pose,
   return true;
 }
 
-template<typename FloatType>
+template <typename FloatType>
 int IKFastKinematics<FloatType>::dof() const
 {
   return GetNumJoints();
 }
 
-template<typename FloatType>
-void IKFastKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry> &p) const
+template <typename FloatType>
+void IKFastKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const
 {
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "AnalyzeIK: ", ";");
   std::stringstream ss;
@@ -212,5 +216,5 @@ void IKFastKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3,
   CONSOLE_BRIDGE_logInform(ss.str().c_str());
 }
 
-} // namespace descartes_light
-#endif // DESCARTES_IKFAST_IKFAST_KINEMATICS_HPP
+}  // namespace descartes_light
+#endif  // DESCARTES_IKFAST_IKFAST_KINEMATICS_HPP

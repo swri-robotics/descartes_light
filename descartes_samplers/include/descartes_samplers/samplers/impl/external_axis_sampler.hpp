@@ -22,24 +22,22 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
-ExternalAxisSampler<FloatType>::ExternalAxisSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_in_positioner,
-                                                    const typename KinematicsInterface<FloatType>::Ptr robot_kin,
-                                                    const typename CollisionInterface<FloatType>::Ptr collision)
-  : tool_pose_(tool_in_positioner)
-  , kin_(robot_kin)
-  , collision_(std::move(collision))
+template <typename FloatType>
+ExternalAxisSampler<FloatType>::ExternalAxisSampler(
+    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_in_positioner,
+    const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+    const typename CollisionInterface<FloatType>::Ptr collision)
+  : tool_pose_(tool_in_positioner), kin_(robot_kin), collision_(std::move(collision))
 {
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool ExternalAxisSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
   return collision_->validate(vertex, 7);
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool ExternalAxisSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
 {
   // We need to translate the tool pose to the "robot" frame
@@ -47,18 +45,19 @@ bool ExternalAxisSampler<FloatType>::sample(std::vector<FloatType>& solution_set
   //    - In the simple case, we can sample the positioner limits evenly but this will often
   //      lead to terrible performance
 
-  auto to_robot_frame = [] (const Eigen::Transform<FloatType, 3, Eigen::Isometry>& pose_in_positioner, const FloatType positioner_angle)
-  {
+  auto to_robot_frame = [](const Eigen::Transform<FloatType, 3, Eigen::Isometry>& pose_in_positioner,
+                           const FloatType positioner_angle) {
     const FloatType x = static_cast<FloatType>(1.25);
     const FloatType y = static_cast<FloatType>(0.0);
     const FloatType z = static_cast<FloatType>(0.0);
-    return Eigen::Translation<FloatType, 3>(x, y, z) * Eigen::AngleAxis<FloatType>(positioner_angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ()) *
-           pose_in_positioner;
+    return Eigen::Translation<FloatType, 3>(x, y, z) *
+           Eigen::AngleAxis<FloatType>(positioner_angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ()) * pose_in_positioner;
   };
 
   // So we just loop
   const static FloatType discretization = static_cast<FloatType>(M_PI / 36.0);
-  for (FloatType angle = static_cast<FloatType>(-1.0 * M_PI); angle <= static_cast<FloatType>(M_PI); angle += discretization)
+  for (FloatType angle = static_cast<FloatType>(-1.0 * M_PI); angle <= static_cast<FloatType>(M_PI);
+       angle += discretization)
   {
     std::vector<FloatType> buffer;
     kin_->ik(to_robot_frame(tool_pose_, angle), buffer);
@@ -79,23 +78,21 @@ bool ExternalAxisSampler<FloatType>::sample(std::vector<FloatType>& solution_set
   return !solution_set.empty();
 }
 
-template<typename FloatType>
+template <typename FloatType>
 SpoolSampler<FloatType>::SpoolSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_in_positioner,
                                       const typename KinematicsInterface<FloatType>::Ptr robot_kin,
                                       const typename CollisionInterface<FloatType>::Ptr collision)
-  : tool_pose_(tool_in_positioner)
-  , kin_(robot_kin)
-  , collision_(std::move(collision))
+  : tool_pose_(tool_in_positioner), kin_(robot_kin), collision_(std::move(collision))
 {
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool SpoolSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
   return collision_->validate(vertex, 7);
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool SpoolSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
 {
   // We need to translate the tool pose to the "robot" frame
@@ -103,18 +100,20 @@ bool SpoolSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
   //    - In the simple case, we can sample the positioner limits evenly but this will often
   //      lead to terrible performance
 
-  auto to_robot_frame = [] (const Eigen::Transform<FloatType, 3, Eigen::Isometry>& pose_in_positioner, const FloatType positioner_angle)
-  {
+  auto to_robot_frame = [](const Eigen::Transform<FloatType, 3, Eigen::Isometry>& pose_in_positioner,
+                           const FloatType positioner_angle) {
     const FloatType x = static_cast<FloatType>(1.25);
     const FloatType y = static_cast<FloatType>(0.0);
     const FloatType z = static_cast<FloatType>(0.0);
-    return Eigen::Translation<FloatType, 3>(x, y, z) * Eigen::AngleAxis<FloatType>(static_cast<FloatType>(M_PI / 2.0), Eigen::Matrix<FloatType, 3, 1>::UnitX()) *
+    return Eigen::Translation<FloatType, 3>(x, y, z) *
+           Eigen::AngleAxis<FloatType>(static_cast<FloatType>(M_PI / 2.0), Eigen::Matrix<FloatType, 3, 1>::UnitX()) *
            Eigen::AngleAxis<FloatType>(positioner_angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ()) * pose_in_positioner;
   };
 
   // So we just loop
   const static FloatType discretization = static_cast<FloatType>(M_PI / 36.0);
-  for (FloatType angle = static_cast<FloatType>(-2.0 * M_PI); angle <= static_cast<FloatType>(2.0 * M_PI); angle += discretization)
+  for (FloatType angle = static_cast<FloatType>(-2.0 * M_PI); angle <= static_cast<FloatType>(2.0 * M_PI);
+       angle += discretization)
   {
     std::vector<FloatType> buffer;
     kin_->ik(to_robot_frame(tool_pose_, angle), buffer);
@@ -135,6 +134,6 @@ bool SpoolSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
   return !solution_set.empty();
 }
 
-} // descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_SAMPLERS_SAMPLERS_IMPL_EXTERNAL_AXIS_SAMPLER_HPP
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_IMPL_EXTERNAL_AXIS_SAMPLER_HPP

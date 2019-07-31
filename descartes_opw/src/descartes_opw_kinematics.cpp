@@ -19,9 +19,8 @@
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
 template class OPWKinematics<float>;
 template class OPWKinematics<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

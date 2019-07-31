@@ -24,7 +24,7 @@ TEST(DescartesIkFastUnit, Instantiation)
   int num_sol = ik_solution.size() / num_dof;
   for (int i = 0; i < num_sol; ++i)
   {
-    double* sol =  ik_solution.data() + i * num_dof;
+    double* sol = ik_solution.data() + i * num_dof;
     Eigen::Isometry3d sol_pose;
     EXPECT_TRUE(robot.fk(sol, sol_pose));
     EXPECT_TRUE(pose.isApprox(sol_pose, 1e-8));

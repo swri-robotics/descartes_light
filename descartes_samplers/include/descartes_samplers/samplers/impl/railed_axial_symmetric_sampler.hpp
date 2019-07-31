@@ -24,36 +24,34 @@ const static std::size_t dof = 8;
 
 namespace descartes_light
 {
-
-template<typename FloatType>
-RailedAxialSymmetricSampler<FloatType>::RailedAxialSymmetricSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
-                                                                    const typename KinematicsInterface<FloatType>::Ptr robot_kin,
-                                                                    const FloatType radial_sample_resolution,
-                                                                    const typename CollisionInterface<FloatType>::Ptr collision,
-                                                                    const bool allow_collision)
+template <typename FloatType>
+RailedAxialSymmetricSampler<FloatType>::RailedAxialSymmetricSampler(
+    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
+    const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+    const FloatType radial_sample_resolution,
+    const typename CollisionInterface<FloatType>::Ptr collision,
+    const bool allow_collision)
   : tool_pose_(tool_pose)
   , kin_(robot_kin)
   , collision_(collision)
   , radial_sample_res_(radial_sample_resolution)
   , allow_collision_(allow_collision)
 {
-
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool RailedAxialSymmetricSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
 {
   std::vector<FloatType> buffer;
 
-  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
-    return v.size() / dof;
-  };
+  const auto nSamplesInBuffer = [](const std::vector<FloatType>& v) -> std::size_t { return v.size() / dof; };
 
   FloatType angle = static_cast<FloatType>(-1.0 * M_PI);
 
-  while (angle <= M_PI) // loop over each waypoint
+  while (angle <= M_PI)  // loop over each waypoint
   {
-    Eigen::Transform<FloatType, 3, Eigen::Isometry> p = tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
+    Eigen::Transform<FloatType, 3, Eigen::Isometry> p =
+        tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
     kin_->ik(p, buffer);
 
     const auto n_sols = nSamplesInBuffer(buffer);
@@ -66,7 +64,7 @@ bool RailedAxialSymmetricSampler<FloatType>::sample(std::vector<FloatType>& solu
     buffer.clear();
 
     angle += radial_sample_res_;
-  } // redundancy resolution loop
+  }  // redundancy resolution loop
 
   if (solution_set.empty() && allow_collision_)
     getBestSolution(solution_set);
@@ -74,27 +72,26 @@ bool RailedAxialSymmetricSampler<FloatType>::sample(std::vector<FloatType>& solu
   return !solution_set.empty();
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool RailedAxialSymmetricSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
   return collision_->validate(vertex, dof);
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool RailedAxialSymmetricSampler<FloatType>::getBestSolution(std::vector<FloatType>& solution_set)
 {
   FloatType distance = -std::numeric_limits<FloatType>::max();
   std::vector<FloatType> buffer;
 
-  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
-    return v.size() / dof;
-  };
+  const auto nSamplesInBuffer = [](const std::vector<FloatType>& v) -> std::size_t { return v.size() / dof; };
 
   FloatType angle = static_cast<FloatType>(-1.0 * M_PI);
 
-  while (angle <= M_PI) // loop over each waypoint
+  while (angle <= M_PI)  // loop over each waypoint
   {
-    Eigen::Transform<FloatType, 3, Eigen::Isometry> p = tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
+    Eigen::Transform<FloatType, 3, Eigen::Isometry> p =
+        tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
     kin_->ik(p, buffer);
 
     const auto n_sols = nSamplesInBuffer(buffer);
@@ -112,11 +109,11 @@ bool RailedAxialSymmetricSampler<FloatType>::getBestSolution(std::vector<FloatTy
     buffer.clear();
 
     angle += radial_sample_res_;
-  } // redundancy resolution loop
+  }  // redundancy resolution loop
 
   return !solution_set.empty();
 }
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_SAMPLERS_SAMPLERS_IMPL_RAILED_AXIAL_SYMMETRIC_SAMPLER_HPP
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_IMPL_RAILED_AXIAL_SYMMETRIC_SAMPLER_HPP

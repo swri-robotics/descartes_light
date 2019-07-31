@@ -24,8 +24,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class Solver
 {
 public:
@@ -49,6 +48,6 @@ private:
 using SolverF = Solver<float>;
 using SolverD = Solver<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_DESCARTES_LIGHT_H
+#endif  // DESCARTES_LIGHT_DESCARTES_LIGHT_H

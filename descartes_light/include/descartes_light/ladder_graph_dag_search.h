@@ -23,8 +23,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class DAGSearch
 {
 public:
@@ -46,10 +45,7 @@ private:
     std::vector<predecessor_t> predecessor;
   };
 
-  inline FloatType& distance(size_type rung, size_type index) noexcept
-  {
-    return solution_[rung].distance[index];
-  }
+  inline FloatType& distance(size_type rung, size_type index) noexcept { return solution_[rung].distance[index]; }
 
   inline predecessor_t& predecessor(size_type rung, size_type index) noexcept
   {
@@ -67,6 +63,6 @@ private:
 using DAGSearchF = DAGSearch<float>;
 using DAGSearchD = DAGSearch<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_LADDER_GRAPH_DAG_SEARCH_H
+#endif  // DESCARTES_LIGHT_LADDER_GRAPH_DAG_SEARCH_H

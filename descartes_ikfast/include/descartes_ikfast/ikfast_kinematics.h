@@ -25,21 +25,21 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class IKFastKinematics : public KinematicsInterface<FloatType>
 {
 public:
-  IKFastKinematics(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& world_to_robot_base = Eigen::Transform<FloatType, 3, Eigen::Isometry>::Identity(),
-                   const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool0_to_tip = Eigen::Transform<FloatType, 3, Eigen::Isometry>::Identity(),
+  IKFastKinematics(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& world_to_robot_base =
+                       Eigen::Transform<FloatType, 3, Eigen::Isometry>::Identity(),
+                   const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool0_to_tip =
+                       Eigen::Transform<FloatType, 3, Eigen::Isometry>::Identity(),
                    const IsValidFn<FloatType>& is_valid_fn = nullptr,
                    const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn = nullptr);
 
   bool ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
           std::vector<FloatType>& solution_set) const override;
 
-  bool fk(const FloatType* pose,
-          Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const override;
+  bool fk(const FloatType* pose, Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const override;
 
   int dof() const override;
 
@@ -60,5 +60,5 @@ protected:
 using IKFastKinematicsD = IKFastKinematics<double>;
 using IKFastKinematicsF = IKFastKinematics<float>;
 
-}
-#endif // DESCARTES_IKFAST_IKFAST_KINEMATICS_H
+}  // namespace descartes_light
+#endif  // DESCARTES_IKFAST_IKFAST_KINEMATICS_H

@@ -31,11 +31,10 @@ namespace descartes_light
  * gantry axes are assumed to be orthogonal and along the X and Y axes.
  *
  */
-template<typename FloatType>
+template <typename FloatType>
 class GantryKinematics : public KinematicsInterface<FloatType>
 {
 public:
-
   /**
    * @brief This takes a kinematics object that represents the robot and adds gantry sampling
    *
@@ -45,7 +44,8 @@ public:
    *
    * @param robot_kinematics The kinematic object atached to a two-axis gantry
    * @param world_to_rail_base The transformation from the world coordinate system to the origin of the two-axis gantry
-   * @param rail_base_to_robot_base The transformation from the two-axis gantry origin to the robot's base coordinate system
+   * @param rail_base_to_robot_base The transformation from the two-axis gantry origin to the robot's base coordinate
+   * system
    * @param rail_limits The rails limit {Xmin, Xmax; Ymin, Ymax}
    * @param rail_sample_resolution The resolution at which to sample the gantry {Xres, Yres}
    * @param robot_reach This defines how far to search {X, Y} gantry around a location.
@@ -60,8 +60,7 @@ public:
   bool ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
           std::vector<FloatType>& solution_set) const override;
 
-  bool fk(const FloatType* pose,
-          Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const override;
+  bool fk(const FloatType* pose, Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const override;
 
   bool ikAt(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
             const Eigen::Matrix<FloatType, 2, 1>& rail_pose,
@@ -86,6 +85,6 @@ private:
 
 using GantryKinematicsD = GantryKinematics<double>;
 using GantryKinematicsF = GantryKinematics<float>;
-}
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_GANTRY_KINEMATICS_H
+#endif  // DESCARTES_LIGHT_GANTRY_KINEMATICS_H

@@ -22,10 +22,8 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
-DAGSearch<FloatType>::DAGSearch(const LadderGraph<FloatType>& graph)
-  : graph_(graph)
+template <typename FloatType>
+DAGSearch<FloatType>::DAGSearch(const LadderGraph<FloatType>& graph) : graph_(graph)
 {
   // On creating an object, let's allocate everything we need
   solution_.resize(graph.size());
@@ -38,7 +36,7 @@ DAGSearch<FloatType>::DAGSearch(const LadderGraph<FloatType>& graph)
   }
 }
 
-template<typename FloatType>
+template <typename FloatType>
 FloatType DAGSearch<FloatType>::run()
 {
   // Cost to the first rung should be set to zero
@@ -63,27 +61,27 @@ FloatType DAGSearch<FloatType>::run()
       // for each out edge
       for (const auto& edge : edges)
       {
-        auto dv = u_cost + edge.cost; // new cost
+        auto dv = u_cost + edge.cost;  // new cost
         if (dv < distance(next_rung, edge.idx))
         {
           distance(next_rung, edge.idx) = dv;
-          predecessor(next_rung, edge.idx) = index; // the predecessor's rung is implied to be the current rung
+          predecessor(next_rung, edge.idx) = index;  // the predecessor's rung is implied to be the current rung
         }
       }
-    } // vertex for loop
-  } // rung for loop
+    }  // vertex for loop
+  }    // rung for loop
 
   return *std::min_element(solution_.back().distance.begin(), solution_.back().distance.end());
 }
 
-template<typename FloatType>
+template <typename FloatType>
 std::vector<typename DAGSearch<FloatType>::predecessor_t> DAGSearch<FloatType>::shortestPath() const
 {
   auto min_it = std::min_element(solution_.back().distance.begin(), solution_.back().distance.end());
   auto min_idx = std::distance(solution_.back().distance.begin(), min_it);
   assert(min_idx >= 0);
 
-  std::vector<predecessor_t> path (solution_.size());
+  std::vector<predecessor_t> path(solution_.size());
 
   size_type current_rung = path.size() - 1;
   size_type current_index = min_idx;
@@ -100,6 +98,6 @@ std::vector<typename DAGSearch<FloatType>::predecessor_t> DAGSearch<FloatType>::
   return path;
 }
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_IMPL_LADDER_GRAPH_DAG_SEARCH_HPP
+#endif  // DESCARTES_LIGHT_IMPL_LADDER_GRAPH_DAG_SEARCH_HPP

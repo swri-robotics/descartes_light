@@ -23,10 +23,11 @@
 
 namespace
 {
-
-template<typename FloatType>
-static void considerEdge(const FloatType* start, const FloatType* end,
-                         const int dof, std::size_t next_idx,
+template <typename FloatType>
+static void considerEdge(const FloatType* start,
+                         const FloatType* end,
+                         const int dof,
+                         std::size_t next_idx,
                          typename descartes_light::LadderGraph<FloatType>::EdgeList& out)
 {
   FloatType cost = 0.0;
@@ -38,18 +39,20 @@ static void considerEdge(const FloatType* start, const FloatType* end,
   out.emplace_back(cost, next_idx);
 }
 
-} // namespace anonymous
+}  // namespace
 
 namespace descartes_light
 {
+template <typename FloatType>
+GantryEuclideanDistanceEdgeEvaluator<FloatType>::GantryEuclideanDistanceEdgeEvaluator()
+{
+}
 
-template<typename FloatType>
-GantryEuclideanDistanceEdgeEvaluator<FloatType>::GantryEuclideanDistanceEdgeEvaluator() {}
-
-template<typename FloatType>
-bool GantryEuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const Rung_<FloatType>& from,
-                                                               const Rung_<FloatType>& to,
-                                                               std::vector<typename LadderGraph<FloatType>::EdgeList>& edges)
+template <typename FloatType>
+bool GantryEuclideanDistanceEdgeEvaluator<FloatType>::evaluate(
+    const Rung_<FloatType>& from,
+    const Rung_<FloatType>& to,
+    std::vector<typename LadderGraph<FloatType>::EdgeList>& edges)
 {
   const auto dof = 8;
   const auto n_start = from.data.size() / dof;
@@ -77,6 +80,6 @@ bool GantryEuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const Rung_<Float
   return false;
 }
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_SAMPLERS_EVALUATORS_GANTRY_EUCLIDEAN_DISTANCE_EDGE_EVALUATOR_HPP
+#endif  // DESCARTES_SAMPLERS_EVALUATORS_GANTRY_EUCLIDEAN_DISTANCE_EDGE_EVALUATOR_HPP

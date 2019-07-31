@@ -70,9 +70,7 @@ template <typename T>
 class IkSolutionBase
 {
 public:
-  virtual ~IkSolutionBase()
-  {
-  }
+  virtual ~IkSolutionBase() {}
   /// \brief gets a concrete solution
   ///
   /// \param[out] solution the result
@@ -100,9 +98,7 @@ template <typename T>
 class IkSolutionListBase
 {
 public:
-  virtual ~IkSolutionListBase()
-  {
-  }
+  virtual ~IkSolutionListBase() {}
 
   /// \brief add one solution and return its index for later retrieval
   ///
@@ -139,9 +135,7 @@ public:
     , _GetKinematicsHash(NULL)
   {
   }
-  virtual ~IkFastFunctions()
-  {
-  }
+  virtual ~IkFastFunctions() {}
   typedef bool (*ComputeIkFn)(const T*, const T*, const T*, IkSolutionListBase<T>&);
   ComputeIkFn _ComputeIk;
   typedef void (*ComputeFkFn)(const T*, T*, T*);
@@ -202,14 +196,8 @@ public:
     GetSolution(&solution.at(0), freevalues.size() > 0 ? &freevalues.at(0) : NULL);
   }
 
-  virtual const std::vector<int>& GetFree() const
-  {
-    return _vfree;
-  }
-  virtual const int GetDOF() const
-  {
-    return static_cast<int>(_vbasesol.size());
-  }
+  virtual const std::vector<int>& GetFree() const { return _vfree; }
+  virtual const int GetDOF() const { return static_cast<int>(_vbasesol.size()); }
 
   virtual void Validate() const
   {
@@ -291,20 +279,14 @@ public:
     return *it;
   }
 
-  virtual size_t GetNumSolutions() const
-  {
-    return _listsolutions.size();
-  }
+  virtual size_t GetNumSolutions() const { return _listsolutions.size(); }
 
-  virtual void Clear()
-  {
-    _listsolutions.clear();
-  }
+  virtual void Clear() { _listsolutions.clear(); }
 
 protected:
   std::list<IkSolution<T> > _listsolutions;
 };
-}
+}  // namespace ikfast
 
 #endif  // OPENRAVE_IKFAST_HEADER
 
@@ -344,7 +326,9 @@ typedef double IkReal;
    - For **TranslationLocalGlobal6D**, the diagonal elements ([0],[4],[8]) are the local translation inside the end
    effector coordinate system.
  */
-IKFAST_API bool ComputeIk(const IkReal* eetrans, const IkReal* eerot, const IkReal* pfree,
+IKFAST_API bool ComputeIk(const IkReal* eetrans,
+                          const IkReal* eerot,
+                          const IkReal* pfree,
                           ikfast::IkSolutionListBase<IkReal>& solutions);
 
 /// \brief Computes the end effector coordinates given the joint values. This function is used to double check ik.

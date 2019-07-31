@@ -24,8 +24,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class ExternalAxisSampler : public PositionSampler<FloatType>
 {
 public:
@@ -46,7 +45,7 @@ private:
 using ExternalAxisSamplerF = ExternalAxisSampler<float>;
 using ExternalAxisSamplerD = ExternalAxisSampler<double>;
 
-template<typename FloatType>
+template <typename FloatType>
 class SpoolSampler : public descartes_light::PositionSampler<FloatType>
 {
 public:
@@ -67,6 +66,6 @@ private:
 using SpoolSamplerF = SpoolSampler<float>;
 using SpoolSamplerD = SpoolSampler<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_SAMPLERS_SAMPLERS_EXTERNAL_AXIS_SAMPLER_H
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_EXTERNAL_AXIS_SAMPLER_H

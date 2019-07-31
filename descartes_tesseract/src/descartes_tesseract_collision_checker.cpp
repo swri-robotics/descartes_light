@@ -19,9 +19,8 @@
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
 template class TesseractCollision<float>;
 template class TesseractCollision<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

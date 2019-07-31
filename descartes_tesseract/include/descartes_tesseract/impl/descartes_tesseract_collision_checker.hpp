@@ -22,14 +22,13 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
-bool TesseractCollision<FloatType>::isContactAllowed(const std::string &a, const std::string &b) const
+template <typename FloatType>
+bool TesseractCollision<FloatType>::isContactAllowed(const std::string& a, const std::string& b) const
 {
-  return collision_env_->getAllowedCollisionMatrix()->isCollisionAllowed(a ,b);
+  return collision_env_->getAllowedCollisionMatrix()->isCollisionAllowed(a, b);
 }
 
-template<typename FloatType>
+template <typename FloatType>
 TesseractCollision<FloatType>::TesseractCollision(tesseract_environment::Environment::ConstPtr collision_env,
                                                   const std::vector<std::string>& active_links,
                                                   const std::vector<std::string>& joint_names)
@@ -39,13 +38,12 @@ TesseractCollision<FloatType>::TesseractCollision(tesseract_environment::Environ
   , contact_manager_(collision_env_->getDiscreteContactManager())
 {
   contact_manager_->setActiveCollisionObjects(active_links);
-  contact_manager_->setIsContactAllowedFn(std::bind(&TesseractCollision<FloatType>::isContactAllowed, this, std::placeholders::_1,
-                                                    std::placeholders::_2));
+  contact_manager_->setIsContactAllowedFn(
+      std::bind(&TesseractCollision<FloatType>::isContactAllowed, this, std::placeholders::_1, std::placeholders::_2));
 }
 
-template<typename FloatType>
-bool TesseractCollision<FloatType>::validate(const FloatType* pos,
-                                             const std::size_t size)
+template <typename FloatType>
+bool TesseractCollision<FloatType>::validate(const FloatType* pos, const std::size_t size)
 {
   // Happens in two phases:
   // 1. Compute the transform of all objects
@@ -62,19 +60,19 @@ bool TesseractCollision<FloatType>::validate(const FloatType* pos,
   // 4. Analyze results
   const bool no_contacts = results.empty();
 
-//#ifndef NDEBUG
-//  for (const auto& contact : results)
-//  {
-//    std::cout << "Contact: " << contact.first.first << " - " << contact.first.second << " Distance: " << contact.second[0].distance << "\n";
-//  }
-//#endif
+  //#ifndef NDEBUG
+  //  for (const auto& contact : results)
+  //  {
+  //    std::cout << "Contact: " << contact.first.first << " - " << contact.first.second << " Distance: " <<
+  //    contact.second[0].distance << "\n";
+  //  }
+  //#endif
 
   return no_contacts;
 }
 
-template<typename FloatType>
-FloatType TesseractCollision<FloatType>::distance(const FloatType* pos,
-                                                  const std::size_t size)
+template <typename FloatType>
+FloatType TesseractCollision<FloatType>::distance(const FloatType* pos, const std::size_t size)
 {
   // Happens in two phases:
   // 1. Compute the transform of all objects
@@ -92,7 +90,8 @@ FloatType TesseractCollision<FloatType>::distance(const FloatType* pos,
   std::cout << "Called descartes_light::TesseractCollision::distance\n";
   for (const auto& contact : results)
   {
-    std::cout << "Contact: " << contact.first.first << " - " << contact.first.second << " Distance: " << contact.second[0].distance << "\n";
+    std::cout << "Contact: " << contact.first.first << " - " << contact.first.second
+              << " Distance: " << contact.second[0].distance << "\n";
   }
 #endif
 
@@ -102,14 +101,14 @@ FloatType TesseractCollision<FloatType>::distance(const FloatType* pos,
     return static_cast<FloatType>(results.begin()->second[0].distance);
 }
 
-template<typename FloatType>
+template <typename FloatType>
 typename CollisionInterface<FloatType>::Ptr TesseractCollision<FloatType>::clone() const
 {
   auto sptr = std::make_shared<TesseractCollision>(*this);
-  sptr->contact_manager_= this->contact_manager_->clone();
+  sptr->contact_manager_ = this->contact_manager_->clone();
   return sptr;
 }
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_TESSERACT_IMPL_DESCARTES_TESSERACT_COLLISION_CHECKER_HPP
+#endif  // DESCARTES_TESSERACT_IMPL_DESCARTES_TESSERACT_COLLISION_CHECKER_HPP

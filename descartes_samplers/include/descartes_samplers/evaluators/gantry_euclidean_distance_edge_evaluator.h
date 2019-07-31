@@ -22,20 +22,20 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class GantryEuclideanDistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
   GantryEuclideanDistanceEdgeEvaluator();
 
-  bool evaluate(const Rung_<FloatType>& from, const Rung_<FloatType>& to,
+  bool evaluate(const Rung_<FloatType>& from,
+                const Rung_<FloatType>& to,
                 std::vector<typename LadderGraph<FloatType>::EdgeList>& edges) override;
 };
 
 using GantryEuclideanDistanceEdgeEvaluatorF = GantryEuclideanDistanceEdgeEvaluator<float>;
 using GantryEuclideanDistanceEdgeEvaluatorD = GantryEuclideanDistanceEdgeEvaluator<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_SAMPLERS_EVALUATORS_GANTRY_EUCLIDEAN_DISTANCE_EDGE_EVALUATOR_H
+#endif  // DESCARTES_SAMPLERS_EVALUATORS_GANTRY_EUCLIDEAN_DISTANCE_EDGE_EVALUATOR_H

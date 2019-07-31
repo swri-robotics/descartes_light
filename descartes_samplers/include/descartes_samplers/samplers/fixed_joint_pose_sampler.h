@@ -22,8 +22,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class FixedJointPoseSampler : public PositionSampler<FloatType>
 {
 public:
@@ -38,6 +37,6 @@ private:
 using FixedJointPoseSamplerF = FixedJointPoseSampler<float>;
 using FixedJointPoseSamplerD = FixedJointPoseSampler<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_POSE_SAMPLER_H
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_POSE_SAMPLER_H

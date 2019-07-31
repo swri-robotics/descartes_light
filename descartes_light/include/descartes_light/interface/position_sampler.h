@@ -23,8 +23,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class PositionSampler
 {
 public:
@@ -38,6 +37,6 @@ public:
 using PositionSamplerF = PositionSampler<float>;
 using PositionSamplerD = PositionSampler<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
+#endif  // DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H

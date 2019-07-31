@@ -24,32 +24,28 @@ const static std::size_t opw_dof = 6;
 
 namespace descartes_light
 {
-
-template<typename FloatType>
-CartesianPointSampler<FloatType>::CartesianPointSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
-                                                        const typename KinematicsInterface<FloatType>::Ptr robot_kin,
-                                                        const typename CollisionInterface<FloatType>::Ptr collision)
-  : tool_pose_(tool_pose)
-  , kin_(robot_kin)
-  , collision_(std::move(collision))
+template <typename FloatType>
+CartesianPointSampler<FloatType>::CartesianPointSampler(
+    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
+    const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+    const typename CollisionInterface<FloatType>::Ptr collision)
+  : tool_pose_(tool_pose), kin_(robot_kin), collision_(std::move(collision))
 {
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool CartesianPointSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
   return collision_->validate(vertex, opw_dof);
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool CartesianPointSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
 {
   std::vector<FloatType> buffer;
   kin_->ik(tool_pose_, buffer);
 
-  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
-    return v.size() / opw_dof;
-  };
+  const auto nSamplesInBuffer = [](const std::vector<FloatType>& v) -> std::size_t { return v.size() / opw_dof; };
 
   const auto n_sols = nSamplesInBuffer(buffer);
 
@@ -63,6 +59,6 @@ bool CartesianPointSampler<FloatType>::sample(std::vector<FloatType>& solution_s
   return !solution_set.empty();
 }
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_SAMPLERS_SAMPLERS_IMPL_CARTESIAN_POINT_SAMPLER_HPP
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_IMPL_CARTESIAN_POINT_SAMPLER_HPP

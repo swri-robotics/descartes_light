@@ -2,9 +2,8 @@
 
 namespace descartes_light
 {
-
 // Explicit template specialization
 template class LadderGraph<float>;
 template class LadderGraph<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

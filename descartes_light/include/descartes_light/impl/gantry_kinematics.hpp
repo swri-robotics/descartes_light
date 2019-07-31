@@ -24,14 +24,14 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
-GantryKinematics<FloatType>::GantryKinematics(const typename KinematicsInterface<FloatType>::ConstPtr robot_kinematics,
-                                              const Eigen::Transform<FloatType, 3, Eigen::Isometry>& world_to_rail_base,
-                                              const Eigen::Transform<FloatType, 3, Eigen::Isometry>& rail_base_to_robot_base,
-                                              const Eigen::Matrix<FloatType, 2, 2>& rail_limits,
-                                              const Eigen::Matrix<FloatType, 2, 1>& rail_sample_resolution,
-                                              const FloatType robot_reach)
+template <typename FloatType>
+GantryKinematics<FloatType>::GantryKinematics(
+    const typename KinematicsInterface<FloatType>::ConstPtr robot_kinematics,
+    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& world_to_rail_base,
+    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& rail_base_to_robot_base,
+    const Eigen::Matrix<FloatType, 2, 2>& rail_limits,
+    const Eigen::Matrix<FloatType, 2, 1>& rail_sample_resolution,
+    const FloatType robot_reach)
   : robot_kinematics_(std::move(robot_kinematics))
   , world_to_rail_base_(world_to_rail_base)
   , rail_base_to_robot_base_(rail_base_to_robot_base)
@@ -41,9 +41,9 @@ GantryKinematics<FloatType>::GantryKinematics(const typename KinematicsInterface
 {
 }
 
-template<typename FloatType>
-bool GantryKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry> &p,
-                                     std::vector<FloatType> &solution_set) const
+template <typename FloatType>
+bool GantryKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
+                                     std::vector<FloatType>& solution_set) const
 {
   // Tool pose in rail coordinate system
   Eigen::Transform<FloatType, 3, Eigen::Isometry> tool_pose = world_to_rail_base_.inverse() * p;
@@ -51,12 +51,17 @@ bool GantryKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
   const Eigen::Matrix<FloatType, 2, 1>& rail_lower_limit = rail_limits_.col(0);
   const Eigen::Matrix<FloatType, 2, 1>& rail_upper_limit = rail_limits_.col(1);
 
-  const Eigen::Matrix<FloatType, 2, 1> origin (tool_pose.translation().x() - rail_base_to_robot_base_.translation().x(), tool_pose.translation().y() - rail_base_to_robot_base_.translation().y());
+  const Eigen::Matrix<FloatType, 2, 1> origin(tool_pose.translation().x() - rail_base_to_robot_base_.translation().x(),
+                                              tool_pose.translation().y() - rail_base_to_robot_base_.translation().y());
 
-  const FloatType start_x = (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
-  const FloatType end_x = (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
-  const FloatType start_y = (origin.y() - robot_reach_ < rail_lower_limit.y()) ? rail_lower_limit.y() : origin.y() - robot_reach_;
-  const FloatType end_y = (origin.y() + robot_reach_ > rail_upper_limit.y()) ? rail_upper_limit.y() : origin.y() + robot_reach_;
+  const FloatType start_x =
+      (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
+  const FloatType end_x =
+      (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
+  const FloatType start_y =
+      (origin.y() - robot_reach_ < rail_lower_limit.y()) ? rail_lower_limit.y() : origin.y() - robot_reach_;
+  const FloatType end_y =
+      (origin.y() + robot_reach_ > rail_upper_limit.y()) ? rail_upper_limit.y() : origin.y() + robot_reach_;
   const FloatType res_x = (end_x - start_x) / std::ceil((end_x - start_x) / rail_sample_resolution_.x());
   const FloatType res_y = (end_y - start_y) / std::ceil((end_y - start_y) / rail_sample_resolution_.y());
 
@@ -67,12 +72,15 @@ bool GantryKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
   return !solution_set.empty();
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool GantryKinematics<FloatType>::ikAt(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
                                        const Eigen::Matrix<FloatType, 2, 1>& rail_pose,
                                        std::vector<FloatType>& solution_set) const
 {
-  const Eigen::Transform<FloatType, 3, Eigen::Isometry> world_to_robot_base = world_to_rail_base_ * Eigen::Translation<FloatType, 3>(rail_pose.x(), rail_pose.y(), static_cast<FloatType>(0.0)) * rail_base_to_robot_base_;
+  const Eigen::Transform<FloatType, 3, Eigen::Isometry> world_to_robot_base =
+      world_to_rail_base_ *
+      Eigen::Translation<FloatType, 3>(rail_pose.x(), rail_pose.y(), static_cast<FloatType>(0.0)) *
+      rail_base_to_robot_base_;
   const Eigen::Transform<FloatType, 3, Eigen::Isometry> in_robot = world_to_robot_base.inverse() * p;
 
   std::vector<FloatType> sols;
@@ -80,21 +88,22 @@ bool GantryKinematics<FloatType>::ikAt(const Eigen::Transform<FloatType, 3, Eige
   if (!robot_kinematics_->ik(in_robot, sols))
     return false;
 
-  int num_sols = sols.size()/robot_dof;
+  int num_sols = sols.size() / robot_dof;
   // Check the output
   for (int i = 0; i < num_sols; i++)
   {
     FloatType* sol = sols.data() + robot_dof * i;
-    solution_set.insert(end(solution_set), rail_pose.data(), rail_pose.data() + 2); // Insert the X-Y pose of the rail
-    solution_set.insert(end(solution_set), sol, sol + robot_dof); // And then insert the robot arm configuration
+    solution_set.insert(end(solution_set), rail_pose.data(), rail_pose.data() + 2);  // Insert the X-Y pose of the rail
+    solution_set.insert(end(solution_set), sol, sol + robot_dof);  // And then insert the robot arm configuration
   }
 
   return !solution_set.empty();
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool GantryKinematics<FloatType>::fkAt(const Eigen::Matrix<FloatType, 2, 1>& rail_pose,
-                                       const std::vector<FloatType>& pose, Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const
+                                       const std::vector<FloatType>& pose,
+                                       Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const
 {
   if (!robot_kinematics_->fk(pose.data(), solution))
     return false;
@@ -105,7 +114,7 @@ bool GantryKinematics<FloatType>::fkAt(const Eigen::Matrix<FloatType, 2, 1>& rai
   return true;
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool GantryKinematics<FloatType>::fk(const FloatType* pose,
                                      Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const
 {
@@ -118,14 +127,14 @@ bool GantryKinematics<FloatType>::fk(const FloatType* pose,
   return fkAt(rail_pose, robot_pose, solution);
 }
 
-template<typename FloatType>
+template <typename FloatType>
 int GantryKinematics<FloatType>::dof() const
 {
   return robot_kinematics_->dof() + 2;
 }
 
-template<typename FloatType>
-void GantryKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry> &p) const
+template <typename FloatType>
+void GantryKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const
 {
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "AnalyzeIK: ", ";");
   std::stringstream ss;
@@ -138,12 +147,17 @@ void GantryKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3,
   const Eigen::Matrix<FloatType, 2, 1>& rail_lower_limit = rail_limits_.col(0);
   const Eigen::Matrix<FloatType, 2, 1>& rail_upper_limit = rail_limits_.col(1);
 
-  const Eigen::Matrix<FloatType, 2, 1> origin (tool_pose.translation().x() - rail_base_to_robot_base_.translation().x(), tool_pose.translation().y() - rail_base_to_robot_base_.translation().y());
+  const Eigen::Matrix<FloatType, 2, 1> origin(tool_pose.translation().x() - rail_base_to_robot_base_.translation().x(),
+                                              tool_pose.translation().y() - rail_base_to_robot_base_.translation().y());
 
-  const FloatType start_x = (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
-  const FloatType end_x = (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
-  const FloatType start_y = (origin.y() - robot_reach_ < rail_lower_limit.y()) ? rail_lower_limit.y() : origin.y() - robot_reach_;
-  const FloatType end_y = (origin.y() + robot_reach_ > rail_upper_limit.y()) ? rail_upper_limit.y() : origin.y() + robot_reach_;
+  const FloatType start_x =
+      (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
+  const FloatType end_x =
+      (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
+  const FloatType start_y =
+      (origin.y() - robot_reach_ < rail_lower_limit.y()) ? rail_lower_limit.y() : origin.y() - robot_reach_;
+  const FloatType end_y =
+      (origin.y() + robot_reach_ > rail_upper_limit.y()) ? rail_upper_limit.y() : origin.y() + robot_reach_;
   const FloatType res_x = (end_x - start_x) / std::ceil((end_x - start_x) / rail_sample_resolution_.x());
   const FloatType res_y = (end_y - start_y) / std::ceil((end_y - start_y) / rail_sample_resolution_.y());
 
@@ -151,7 +165,9 @@ void GantryKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3,
   {
     for (FloatType y = start_y; y < end_y; y += res_y)
     {
-      const Eigen::Transform<FloatType, 3, Eigen::Isometry> world_to_robot_base = world_to_rail_base_ * Eigen::Translation<FloatType, 3>(x, y, static_cast<FloatType>(0.0)) * rail_base_to_robot_base_;
+      const Eigen::Transform<FloatType, 3, Eigen::Isometry> world_to_robot_base =
+          world_to_rail_base_ * Eigen::Translation<FloatType, 3>(x, y, static_cast<FloatType>(0.0)) *
+          rail_base_to_robot_base_;
       const Eigen::Transform<FloatType, 3, Eigen::Isometry> in_robot = world_to_robot_base.inverse() * p;
 
       robot_kinematics_->analyzeIK(in_robot);
@@ -159,6 +175,6 @@ void GantryKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3,
   }
 }
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_GANTRY_KINEMATICS_HPP
+#endif  // DESCARTES_LIGHT_GANTRY_KINEMATICS_HPP

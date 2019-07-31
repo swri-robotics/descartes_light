@@ -19,9 +19,8 @@
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
 template class GantryKinematics<float>;
 template class GantryKinematics<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

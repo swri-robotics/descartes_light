@@ -19,9 +19,8 @@
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
 template class RailedCartesianPointSampler<float>;
 template class RailedCartesianPointSampler<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

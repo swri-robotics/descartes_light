@@ -24,8 +24,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class KinematicsInterface
 {
 public:
@@ -33,8 +32,7 @@ public:
 
   virtual bool ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
                   std::vector<FloatType>& solution_set) const = 0;
-  virtual bool fk(const FloatType* pose,
-                  Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const = 0;
+  virtual bool fk(const FloatType* pose, Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const = 0;
 
   virtual int dof() const = 0;
 
@@ -47,6 +45,6 @@ public:
 using KinematicsInterfaceF = KinematicsInterface<float>;
 using KinematicsInterfaceD = KinematicsInterface<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_CORE_KINEMATIC_INTERFACE_H
+#endif  // DESCARTES_LIGHT_CORE_KINEMATIC_INTERFACE_H
