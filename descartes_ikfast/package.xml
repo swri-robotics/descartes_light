@@ -10,6 +10,9 @@
   <license>Apache 2.0</license>
 
   <depend>descartes_light</depend>
+  <depend>libblas-dev</depend>
+  <depend>liblapack-dev</depend>
+
   <test_depend>gtest</test_depend>
 
   <export>
