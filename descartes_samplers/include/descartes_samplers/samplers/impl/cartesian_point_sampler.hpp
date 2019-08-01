@@ -28,15 +28,10 @@ template <typename FloatType>
 CartesianPointSampler<FloatType>::CartesianPointSampler(
     const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
     const typename KinematicsInterface<FloatType>::Ptr robot_kin,
-    const typename CollisionInterface<FloatType>::Ptr collision)
-  : tool_pose_(tool_pose), kin_(robot_kin), collision_(std::move(collision))
+    const typename CollisionInterface<FloatType>::Ptr collision,
+    const bool allow_collision)
+  : tool_pose_(tool_pose), kin_(robot_kin), collision_(std::move(collision)), allow_collision_(allow_collision)
 {
-}
-
-template <typename FloatType>
-bool CartesianPointSampler<FloatType>::isCollisionFree(const FloatType* vertex)
-{
-  return collision_->validate(vertex, opw_dof);
 }
 
 template <typename FloatType>
@@ -54,6 +49,41 @@ bool CartesianPointSampler<FloatType>::sample(std::vector<FloatType>& solution_s
     const auto* sol_data = buffer.data() + i * opw_dof;
     if (CartesianPointSampler<FloatType>::isCollisionFree(sol_data))
       solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
+  }
+
+  if (solution_set.empty() && allow_collision_)
+    getBestSolution(solution_set);
+
+  return !solution_set.empty();
+}
+
+template <typename FloatType>
+bool CartesianPointSampler<FloatType>::isCollisionFree(const FloatType* vertex)
+{
+  return collision_->validate(vertex, opw_dof);
+}
+
+template <typename FloatType>
+bool CartesianPointSampler<FloatType>::getBestSolution(std::vector<FloatType>& solution_set)
+{
+  FloatType distance = -std::numeric_limits<FloatType>::max();
+  std::vector<FloatType> buffer;
+  kin_->ik(tool_pose_, buffer);
+
+  const auto nSamplesInBuffer = [](const std::vector<FloatType>& v) -> std::size_t { return v.size() / opw_dof; };
+
+  const auto n_sols = nSamplesInBuffer(buffer);
+
+  for (std::size_t i = 0; i < n_sols; ++i)
+  {
+    const auto* sol_data = buffer.data() + i * opw_dof;
+    FloatType cur_distance = collision_->distance(sol_data, opw_dof);
+    if (cur_distance > distance)
+    {
+      distance = cur_distance;
+      solution_set.clear();
+      solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
+    }
   }
 
   return !solution_set.empty();

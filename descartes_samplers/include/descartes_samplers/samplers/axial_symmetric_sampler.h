@@ -32,17 +32,20 @@ public:
   AxialSymmetricSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
                         const typename KinematicsInterface<FloatType>::Ptr robot_kin,
                         const FloatType radial_sample_resolution,
-                        const typename CollisionInterface<FloatType>::Ptr collision);
+                        const typename CollisionInterface<FloatType>::Ptr collision,
+                        const bool allow_collision);
 
   bool sample(std::vector<FloatType>& solution_set) override;
 
 private:
   bool isCollisionFree(const FloatType* vertex);
+  bool getBestSolution(std::vector<FloatType>& solution_set);
 
   Eigen::Transform<FloatType, 3, Eigen::Isometry> tool_pose_;
   typename KinematicsInterface<FloatType>::Ptr kin_;
   typename CollisionInterface<FloatType>::Ptr collision_;
   FloatType radial_sample_res_;
+  bool allow_collision_;
 };
 
 using AxialSymmetricSamplerF = AxialSymmetricSampler<float>;
