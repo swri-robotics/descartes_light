@@ -44,7 +44,7 @@ static void considerEdge(const FloatType* start,
 namespace descartes_light
 {
 template <typename FloatType>
-GantryEuclideanDistanceEdgeEvaluator<FloatType>::GantryEuclideanDistanceEdgeEvaluator()
+GantryEuclideanDistanceEdgeEvaluator<FloatType>::GantryEuclideanDistanceEdgeEvaluator(int dof) : dof_(dof)
 {
 }
 
@@ -54,22 +54,21 @@ bool GantryEuclideanDistanceEdgeEvaluator<FloatType>::evaluate(
     const Rung_<FloatType>& to,
     std::vector<typename LadderGraph<FloatType>::EdgeList>& edges)
 {
-  const auto dof = 8;
-  const auto n_start = from.data.size() / dof;
-  const auto n_end = to.data.size() / dof;
+  const auto n_start = from.data.size() / dof_;
+  const auto n_end = to.data.size() / dof_;
 
   // Allocate
   edges.resize(n_start);
 
   for (std::size_t i = 0; i < n_start; ++i)
   {
-    const auto* start_vertex = from.data.data() + dof * i;
+    const auto* start_vertex = from.data.data() + dof_ * i;
     for (std::size_t j = 0; j < n_end; ++j)
     {
-      const auto* end_vertex = to.data.data() + dof * j;
+      const auto* end_vertex = to.data.data() + dof_ * j;
 
       // Consider the edge:
-      considerEdge(start_vertex, end_vertex, dof, j, edges[i]);
+      considerEdge(start_vertex, end_vertex, dof_, j, edges[i]);
     }
   }
 
