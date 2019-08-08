@@ -60,7 +60,10 @@ bool RailedCartesianPointSampler<FloatType>::sample(std::vector<FloatType>& solu
 template <typename FloatType>
 bool RailedCartesianPointSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
-  return collision_->validate(vertex, dof);
+  if (collision_ == nullptr)
+    return true;
+  else
+    return collision_->validate(vertex, dof);
 }
 
 template <typename FloatType>

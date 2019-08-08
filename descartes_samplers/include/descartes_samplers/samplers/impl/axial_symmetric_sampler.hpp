@@ -71,7 +71,10 @@ bool AxialSymmetricSampler<FloatType>::sample(std::vector<FloatType>& solution_s
 template <typename FloatType>
 bool AxialSymmetricSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
-  return collision_->validate(vertex, opw_dof);
+  if (collision_ == nullptr)
+    return true;
+  else
+    return collision_->validate(vertex, opw_dof);
 }
 
 template <typename FloatType>

@@ -75,7 +75,10 @@ bool RailedAxialSymmetricSampler<FloatType>::sample(std::vector<FloatType>& solu
 template <typename FloatType>
 bool RailedAxialSymmetricSampler<FloatType>::isCollisionFree(const FloatType* vertex)
 {
-  return collision_->validate(vertex, dof);
+  if (collision_ == nullptr)
+    return true;
+  else
+    return collision_->validate(vertex, dof);
 }
 
 template <typename FloatType>
