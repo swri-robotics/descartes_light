@@ -54,19 +54,14 @@ bool GantryKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
   const Eigen::Matrix<FloatType, 2, 1> origin(tool_pose.translation().x() - rail_base_to_robot_base_.translation().x(),
                                               tool_pose.translation().y() - rail_base_to_robot_base_.translation().y());
 
-  const FloatType start_x =
-      (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
-  const FloatType end_x =
-      (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
-  const FloatType start_y =
-      (origin.y() - robot_reach_ < rail_lower_limit.y()) ? rail_lower_limit.y() : origin.y() - robot_reach_;
-  const FloatType end_y =
-      (origin.y() + robot_reach_ > rail_upper_limit.y()) ? rail_upper_limit.y() : origin.y() + robot_reach_;
-  const FloatType res_x = (end_x - start_x) / std::ceil((end_x - start_x) / rail_sample_resolution_.x());
-  const FloatType res_y = (end_y - start_y) / std::ceil((end_y - start_y) / rail_sample_resolution_.y());
+  const Eigen::Matrix<FloatType, 2, 1> x_range = getRange(origin.x(), rail_lower_limit.x(), rail_upper_limit.x());
+  const Eigen::Matrix<FloatType, 2, 1> y_range = getRange(origin.y(), rail_lower_limit.y(), rail_upper_limit.y());
 
-  for (FloatType x = start_x; x < end_x; x += res_x)
-    for (FloatType y = start_y; y < end_y; y += res_y)
+  const FloatType res_x = (x_range[1] - x_range[0]) / std::ceil((x_range[1] - x_range[0]) / rail_sample_resolution_.x());
+  const FloatType res_y = (y_range[1] - y_range[0]) / std::ceil((y_range[1] - y_range[0]) / rail_sample_resolution_.y());
+
+  for (FloatType x = x_range[0]; x < x_range[1]; x += res_x)
+    for (FloatType y = y_range[0]; y < y_range[1]; y += res_y)
       ikAt(p, Eigen::Matrix<FloatType, 2, 1>(x, y), solution_set);
 
   return !solution_set.empty();
@@ -150,20 +145,15 @@ void GantryKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3,
   const Eigen::Matrix<FloatType, 2, 1> origin(tool_pose.translation().x() - rail_base_to_robot_base_.translation().x(),
                                               tool_pose.translation().y() - rail_base_to_robot_base_.translation().y());
 
-  const FloatType start_x =
-      (origin.x() - robot_reach_ < rail_lower_limit.x()) ? rail_lower_limit.x() : origin.x() - robot_reach_;
-  const FloatType end_x =
-      (origin.x() + robot_reach_ > rail_upper_limit.x()) ? rail_upper_limit.x() : origin.x() + robot_reach_;
-  const FloatType start_y =
-      (origin.y() - robot_reach_ < rail_lower_limit.y()) ? rail_lower_limit.y() : origin.y() - robot_reach_;
-  const FloatType end_y =
-      (origin.y() + robot_reach_ > rail_upper_limit.y()) ? rail_upper_limit.y() : origin.y() + robot_reach_;
-  const FloatType res_x = (end_x - start_x) / std::ceil((end_x - start_x) / rail_sample_resolution_.x());
-  const FloatType res_y = (end_y - start_y) / std::ceil((end_y - start_y) / rail_sample_resolution_.y());
+  const Eigen::Matrix<FloatType, 2, 1> x_range = getRange(origin.x(), rail_lower_limit.x(), rail_upper_limit.x());
+  const Eigen::Matrix<FloatType, 2, 1> y_range = getRange(origin.y(), rail_lower_limit.y(), rail_upper_limit.y());
 
-  for (FloatType x = start_x; x < end_x; x += res_x)
+  const FloatType res_x = (x_range[1] - x_range[0]) / std::ceil((x_range[1] - x_range[0]) / rail_sample_resolution_.x());
+  const FloatType res_y = (y_range[1] - y_range[0]) / std::ceil((y_range[1] - y_range[0]) / rail_sample_resolution_.y());
+
+  for (FloatType x = x_range[0]; x < x_range[1]; x += res_x)
   {
-    for (FloatType y = start_y; y < end_y; y += res_y)
+    for (FloatType y = y_range[0]; y < y_range[1]; y += res_y)
     {
       const Eigen::Transform<FloatType, 3, Eigen::Isometry> world_to_robot_base =
           world_to_rail_base_ * Eigen::Translation<FloatType, 3>(x, y, static_cast<FloatType>(0.0)) *
@@ -173,6 +163,29 @@ void GantryKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3,
       robot_kinematics_->analyzeIK(in_robot);
     }
   }
+}
+
+template<typename FloatType>
+Eigen::Matrix<FloatType, 2, 1> GantryKinematics<FloatType>::getRange(const FloatType val,
+                                                                     const FloatType min_val,
+                                                                     const FloatType max_val) const
+{
+  Eigen::Matrix<FloatType, 2, 1> rng;
+  if (val - robot_reach_ < min_val)
+    rng[0] = min_val;
+  else if (val - robot_reach_ > max_val)
+    rng[0] = (max_val - robot_reach_ < min_val) ? min_val : max_val - robot_reach_;
+  else
+    rng[0] = val - robot_reach_;
+
+  if (val + robot_reach_ > max_val)
+    rng[1] = max_val;
+  else if (val + robot_reach_ < min_val)
+    rng[1] = (min_val + robot_reach_ > max_val) ? max_val : min_val + robot_reach_;
+  else
+    rng[1] = val + robot_reach_;
+
+  return rng;
 }
 
 }  // namespace descartes_light
