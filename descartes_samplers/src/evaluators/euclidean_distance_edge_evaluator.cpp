@@ -15,13 +15,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "descartes_opw/impl/descartes_opw_railed_kinematics.hpp"
+#include <descartes_samplers/evaluators/impl/euclidean_distance_edge_evaluator.hpp>
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
-template class OPWRailedKinematics<float>;
-template class OPWRailedKinematics<double>;
+template class EuclideanDistanceEdgeEvaluator<float>;
+template class EuclideanDistanceEdgeEvaluator<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

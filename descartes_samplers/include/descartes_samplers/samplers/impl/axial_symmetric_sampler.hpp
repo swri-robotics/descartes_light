@@ -24,57 +24,95 @@ const static std::size_t opw_dof = 6;
 
 namespace descartes_light
 {
-
-template<typename FloatType>
-AxialSymmetricSampler<FloatType>::AxialSymmetricSampler(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
-                                                        const typename KinematicsInterface<FloatType>::Ptr robot_kin,
-                                                        const FloatType radial_sample_resolution,
-                                                        const typename CollisionInterface<FloatType>::Ptr collision)
-  : tool_pose_(tool_pose)
-  , kin_(robot_kin)
-  , collision_(collision)
-  , radial_sample_res_(radial_sample_resolution)
+template <typename FloatType>
+AxialSymmetricSampler<FloatType>::AxialSymmetricSampler(
+    const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool_pose,
+    const typename KinematicsInterface<FloatType>::Ptr robot_kin,
+    const FloatType radial_sample_resolution,
+    const typename CollisionInterface<FloatType>::Ptr collision,
+    const bool allow_collision)
+  : tool_pose_(tool_pose), kin_(robot_kin), collision_(collision), radial_sample_res_(radial_sample_resolution), allow_collision_(allow_collision)
 {
-
 }
 
-template<typename FloatType>
-bool AxialSymmetricSampler<FloatType>::isCollisionFree(const FloatType* vertex)
-{
-  return collision_->validate(vertex, opw_dof);
-}
-
-template<typename FloatType>
+template <typename FloatType>
 bool AxialSymmetricSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
 {
   std::vector<FloatType> buffer;
 
-  const auto nSamplesInBuffer = [] (const std::vector<FloatType>& v) -> std::size_t {
-    return v.size() / opw_dof;
-  };
+  const auto nSamplesInBuffer = [](const std::vector<FloatType>& v) -> std::size_t { return v.size() / opw_dof; };
 
   FloatType angle = static_cast<FloatType>(-1.0 * M_PI);
 
-  while (angle <= static_cast<FloatType>(M_PI)) // loop over each waypoint
+  while (angle <= static_cast<FloatType>(M_PI))  // loop over each waypoint
   {
-    Eigen::Transform<FloatType, 3, Eigen::Isometry> p = tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
+    Eigen::Transform<FloatType, 3, Eigen::Isometry> p =
+        tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
     kin_->ik(p, buffer);
 
     const auto n_sols = nSamplesInBuffer(buffer);
     for (std::size_t i = 0; i < n_sols; ++i)
     {
       const auto* sol_data = buffer.data() + i * opw_dof;
-      if (AxialSymmetricSampler<FloatType>::isCollisionFree(sol_data))
+      if (isCollisionFree(sol_data))
         solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
     }
     buffer.clear();
 
     angle += radial_sample_res_;
-  } // redundancy resolution loop
+  }  // redundancy resolution loop
+
+  if (solution_set.empty() && allow_collision_)
+    getBestSolution(solution_set);
 
   return !solution_set.empty();
 }
 
-} // namespace descartes_light
+template <typename FloatType>
+bool AxialSymmetricSampler<FloatType>::isCollisionFree(const FloatType* vertex)
+{
+  if (collision_ == nullptr)
+    return true;
+  else
+    return collision_->validate(vertex, opw_dof);
+}
 
-#endif // DESCARTES_SAMPLERS_SAMPLERS_IMPL_AXIAL_SYMMETRIC_SAMPLER_HPP
+template <typename FloatType>
+bool AxialSymmetricSampler<FloatType>::getBestSolution(std::vector<FloatType>& solution_set)
+{
+  FloatType distance = -std::numeric_limits<FloatType>::max();
+  std::vector<FloatType> buffer;
+
+  const auto nSamplesInBuffer = [](const std::vector<FloatType>& v) -> std::size_t { return v.size() / opw_dof; };
+
+  FloatType angle = static_cast<FloatType>(-1.0 * M_PI);
+
+  while (angle <= M_PI)  // loop over each waypoint
+  {
+    Eigen::Transform<FloatType, 3, Eigen::Isometry> p =
+        tool_pose_ * Eigen::AngleAxis<FloatType>(angle, Eigen::Matrix<FloatType, 3, 1>::UnitZ());
+    kin_->ik(p, buffer);
+
+    const auto n_sols = nSamplesInBuffer(buffer);
+    for (std::size_t i = 0; i < n_sols; ++i)
+    {
+      const auto* sol_data = buffer.data() + i * opw_dof;
+      FloatType cur_distance = collision_->distance(sol_data, opw_dof);
+      if (cur_distance > distance)
+      {
+        distance = cur_distance;
+        solution_set.clear();
+        solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
+      }
+    }
+    buffer.clear();
+
+    angle += radial_sample_res_;
+  }  // redundancy resolution loop
+
+  return !solution_set.empty();
+}
+
+}  // namespace descartes_light
+
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_IMPL_AXIAL_SYMMETRIC_SAMPLER_HPP

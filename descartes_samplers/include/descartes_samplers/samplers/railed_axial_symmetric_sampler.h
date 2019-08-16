@@ -26,8 +26,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class RailedAxialSymmetricSampler : public PositionSampler<FloatType>
 {
 public:
@@ -61,6 +60,6 @@ private:
 using RailedAxialSymmetricSamplerF = RailedAxialSymmetricSampler<float>;
 using RailedAxialSymmetricSamplerD = RailedAxialSymmetricSampler<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_SAMPLERS_SAMPLERS_RAILED_AXIAL_SYMMETRIC_SAMPLER_H
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_RAILED_AXIAL_SYMMETRIC_SAMPLER_H

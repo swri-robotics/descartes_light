@@ -19,7 +19,6 @@
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
 template class ExternalAxisSampler<float>;
 template class ExternalAxisSampler<double>;
@@ -27,5 +26,4 @@ template class ExternalAxisSampler<double>;
 template class SpoolSampler<float>;
 template class SpoolSampler<double>;
 
-} // descartes_light
-
+}  // namespace descartes_light

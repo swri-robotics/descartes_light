@@ -10,7 +10,6 @@ list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_std_11 CXX_FEATURE_FOUND)
 # Declare a C++ library
 add_library(${PROJECT_NAME} SHARED
   src/descartes_opw_kinematics.cpp
-  src/descartes_opw_railed_kinematics.cpp
 )
 target_link_libraries(${PROJECT_NAME} console_bridge opw_kinematics::opw_kinematics descartes::descartes_light)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wsuggest-override -Wconversion -Wsign-conversion)
@@ -33,7 +32,7 @@ install(EXPORT ${PROJECT_NAME}-targets NAMESPACE descartes:: DESTINATION lib/cma
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}
   DESTINATION include
-  FILES_MATCHING PATTERN "*.h"
+  FILES_MATCHING PATTERN "*.h*"
   PATTERN ".svn" EXCLUDE
  )
 

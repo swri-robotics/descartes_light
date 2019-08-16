@@ -22,8 +22,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class CollisionInterface
 {
 public:
@@ -43,6 +42,6 @@ public:
 using CollisionInterfaceF = CollisionInterface<float>;
 using CollisionInterfaceD = CollisionInterface<double>;
 
-} // descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H
+#endif  // DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H

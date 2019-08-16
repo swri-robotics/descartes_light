@@ -19,9 +19,8 @@
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
 template class DAGSearch<float>;
 template class DAGSearch<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

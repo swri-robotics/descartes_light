@@ -19,9 +19,8 @@
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
 template class AxialSymmetricSampler<float>;
 template class AxialSymmetricSampler<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

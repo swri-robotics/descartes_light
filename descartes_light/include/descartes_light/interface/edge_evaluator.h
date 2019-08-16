@@ -24,8 +24,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class EdgeEvaluator
 {
 public:
@@ -41,6 +40,6 @@ public:
 using EdgeEvaluatorF = EdgeEvaluator<float>;
 using EdgeEvaluatorD = EdgeEvaluator<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_CORE_EDGE_EVALUATOR_H
+#endif  // DESCARTES_LIGHT_CORE_EDGE_EVALUATOR_H

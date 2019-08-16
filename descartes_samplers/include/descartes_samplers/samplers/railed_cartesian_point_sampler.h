@@ -26,8 +26,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class RailedCartesianPointSampler : public PositionSampler<FloatType>
 {
 public:
@@ -63,6 +62,6 @@ private:
 using RailedCartesianPointSamplerF = RailedCartesianPointSampler<float>;
 using RailedCartesianPointSamplerD = RailedCartesianPointSampler<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_SAMPLERS_SAMPLERS_RAILED_CARTESIAN_POINT_SAMPLER_H
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_RAILED_CARTESIAN_POINT_SAMPLER_H

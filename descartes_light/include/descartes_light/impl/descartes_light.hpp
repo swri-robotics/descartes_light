@@ -55,15 +55,12 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 
 namespace descartes_light
 {
-
-template<typename FloatType>
-Solver<FloatType>::Solver(const std::size_t dof)
-  : graph_{dof}
+template <typename FloatType>
+Solver<FloatType>::Solver(const std::size_t dof) : graph_{ dof }
 {
-
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
                               const std::vector<typename descartes_core::TimingConstraint<FloatType>>& times,
                               typename EdgeEvaluator<FloatType>::Ptr edge_eval)
@@ -75,7 +72,7 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
   // Build Vertices
   long num_waypoints = trajectory.size();
   long cnt = 0;
-  #pragma omp parallel for
+#pragma omp parallel for
   for (std::size_t i = 0; i < trajectory.size(); ++i)
   {
     std::vector<FloatType> vertex_data;
@@ -86,13 +83,13 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
     }
     else
     {
-      #pragma omp critical
+#pragma omp critical
       {
         failed_vertices_.push_back(i);
       }
     }
 #ifndef NDEBUG
-    #pragma omp critical
+#pragma omp critical
     {
       ++cnt;
       std::stringstream ss;
@@ -104,7 +101,7 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
 
   // Build Edges
   cnt = 0;
-  #pragma omp parallel for
+#pragma omp parallel for
   for (std::size_t i = 1; i < trajectory.size(); ++i)
   {
     const auto& from = graph_.getRung(i - 1);
@@ -112,13 +109,13 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
 
     if (!edge_eval->evaluate(from, to, graph_.getEdges(i - 1)))
     {
-      #pragma omp critical
+#pragma omp critical
       {
-        failed_edges_.push_back(i-1);
+        failed_edges_.push_back(i - 1);
       }
     }
 #ifndef NDEBUG
-    #pragma omp critical
+#pragma omp critical
     {
       ++cnt;
       std::stringstream ss;
@@ -134,10 +131,10 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
   return failed_edges_.empty() && failed_vertices_.empty();
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool Solver<FloatType>::search(std::vector<FloatType>& solution)
 {
-  DAGSearch<FloatType> s (graph_);
+  DAGSearch<FloatType> s(graph_);
   const auto cost = s.run();
 
   if (cost == std::numeric_limits<FloatType>::max())
@@ -158,6 +155,6 @@ bool Solver<FloatType>::search(std::vector<FloatType>& solution)
   return true;
 }
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_LIGHT_IMPL_DESCARTES_LIGHT_HPP
+#endif  // DESCARTES_LIGHT_IMPL_DESCARTES_LIGHT_HPP

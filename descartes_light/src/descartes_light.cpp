@@ -19,9 +19,8 @@
 
 namespace descartes_light
 {
-
 // Explicit template instantiation
 template class Solver<float>;
 template class Solver<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light

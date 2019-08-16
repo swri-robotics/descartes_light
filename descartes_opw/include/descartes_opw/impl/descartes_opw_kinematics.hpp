@@ -25,8 +25,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 OPWKinematics<FloatType>::OPWKinematics(const opw_kinematics::Parameters<FloatType>& params,
                                         const Eigen::Transform<FloatType, 3, Eigen::Isometry>& world_to_base,
                                         const Eigen::Transform<FloatType, 3, Eigen::Isometry>& tool0_to_tip,
@@ -40,14 +39,14 @@ OPWKinematics<FloatType>::OPWKinematics(const opw_kinematics::Parameters<FloatTy
 {
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool OPWKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
                                   std::vector<FloatType>& solution_set) const
 {
   return ik(p, is_valid_fn_, redundant_sol_fn_, solution_set);
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool OPWKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
                                   const IsValidFn<FloatType>& is_valid_fn,
                                   const GetRedundantSolutionsFn<FloatType>& redundant_sol_fn,
@@ -55,7 +54,7 @@ bool OPWKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Is
 {
   Eigen::Transform<FloatType, 3, Eigen::Isometry> tool_pose = world_to_base_.inverse() * p * tool0_to_tip_.inverse();
 
-  std::array<FloatType, 6*8> sols;
+  std::array<FloatType, 6 * 8> sols;
   opw_kinematics::inverse(params_, tool_pose, sols.data());
 
   // Check the output
@@ -64,7 +63,7 @@ bool OPWKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Is
     FloatType* sol = sols.data() + 6 * i;
     if (opw_kinematics::isValid(sol))
     {
-      opw_kinematics::harmonizeTowardZero(sol); // Modifies 'sol' in place
+      opw_kinematics::harmonizeTowardZero(sol);  // Modifies 'sol' in place
 
       if (is_valid_fn && redundant_sol_fn)
       {
@@ -74,12 +73,13 @@ bool OPWKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Is
         std::vector<FloatType> redundant_sols = redundant_sol_fn(sol);
         if (!redundant_sols.empty())
         {
-          int num_sol = redundant_sols.size()/6;
+          int num_sol = redundant_sols.size() / 6;
           for (int s = 0; s < num_sol; ++s)
           {
             FloatType* redundant_sol = redundant_sols.data() + 6 * s;
             if (is_valid_fn_(redundant_sol))
-              solution_set.insert(end(solution_set), redundant_sol, redundant_sol + 6);  // If good then add to solution set
+              solution_set.insert(end(solution_set), redundant_sol, redundant_sol + 6);  // If good then add to solution
+                                                                                         // set
           }
         }
       }
@@ -90,17 +90,17 @@ bool OPWKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Is
       }
       else if (!is_valid_fn && redundant_sol_fn)
       {
-
         solution_set.insert(end(solution_set), sol, sol + 6);  // If good then add to solution set
 
         std::vector<FloatType> redundant_sols = redundant_sol_fn(sol);
         if (!redundant_sols.empty())
         {
-          int num_sol = redundant_sols.size()/6;
+          int num_sol = redundant_sols.size() / 6;
           for (int s = 0; s < num_sol; ++s)
           {
             FloatType* redundant_sol = redundant_sols.data() + 6 * s;
-            solution_set.insert(end(solution_set), redundant_sol, redundant_sol + 6);  // If good then add to solution set
+            solution_set.insert(end(solution_set), redundant_sol, redundant_sol + 6);  // If good then add to solution
+                                                                                       // set
           }
         }
       }
@@ -114,7 +114,7 @@ bool OPWKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Is
   return !solution_set.empty();
 }
 
-template<typename FloatType>
+template <typename FloatType>
 bool OPWKinematics<FloatType>::fk(const FloatType* pose,
                                   Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const
 {
@@ -123,7 +123,13 @@ bool OPWKinematics<FloatType>::fk(const FloatType* pose,
   return true;
 }
 
-template<typename FloatType>
+template <typename FloatType>
+int OPWKinematics<FloatType>::dof() const
+{
+  return 6;
+}
+
+template <typename FloatType>
 void OPWKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const
 {
   Eigen::IOFormat CommaInitFmt(Eigen::StreamPrecision, Eigen::DontAlignCols, ", ", ", ", "", "", "AnalyzeIK: ", ";");
@@ -162,6 +168,6 @@ void OPWKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3, Ei
   CONSOLE_BRIDGE_logInform(ss.str().c_str());
 }
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_OPW_IMPL_DESCARTES_OPW_KINEMATICS_HPP
+#endif  // DESCARTES_OPW_IMPL_DESCARTES_OPW_KINEMATICS_HPP

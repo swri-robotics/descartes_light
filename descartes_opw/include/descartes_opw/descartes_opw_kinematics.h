@@ -7,8 +7,7 @@
 
 namespace descartes_light
 {
-
-template<typename FloatType>
+template <typename FloatType>
 class OPWKinematics : public KinematicsInterface<FloatType>
 {
 public:
@@ -20,8 +19,9 @@ public:
 
   bool ik(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p,
           std::vector<FloatType>& solution_set) const override;
-  bool fk(const FloatType* pose,
-          Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const override;
+  bool fk(const FloatType* pose, Eigen::Transform<FloatType, 3, Eigen::Isometry>& solution) const override;
+
+  int dof() const override;
 
   void analyzeIK(const Eigen::Transform<FloatType, 3, Eigen::Isometry>& p) const override;
 
@@ -41,6 +41,6 @@ private:
 using OPWKinematicsF = OPWKinematics<float>;
 using OPWKinematicsD = OPWKinematics<double>;
 
-} // namespace descartes_light
+}  // namespace descartes_light
 
-#endif // DESCARTES_OPW_DESCARTES_OPW_KINEMATICS_H
+#endif  // DESCARTES_OPW_DESCARTES_OPW_KINEMATICS_H
