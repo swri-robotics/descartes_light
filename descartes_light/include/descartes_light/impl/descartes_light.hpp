@@ -22,6 +22,7 @@
 #include "descartes_light/ladder_graph_dag_search.h"
 #include <console_bridge/console.h>
 #include <sstream>
+#include <algorithm>
 
 static void reportFailedEdges(const std::vector<std::size_t>& indices)
 {
@@ -124,6 +125,9 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
     }
 #endif
   }
+
+  std::sort(failed_vertices_.begin(), failed_vertices_.end());
+  std::sort(failed_edges_.begin(), failed_edges_.end());
 
   reportFailedVertices(failed_vertices_);
   reportFailedEdges(failed_edges_);
