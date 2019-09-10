@@ -57,8 +57,10 @@ bool GantryKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
   const Eigen::Matrix<FloatType, 2, 1> x_range = getRange(origin.x(), rail_lower_limit.x(), rail_upper_limit.x());
   const Eigen::Matrix<FloatType, 2, 1> y_range = getRange(origin.y(), rail_lower_limit.y(), rail_upper_limit.y());
 
-  const FloatType res_x = (x_range[1] - x_range[0]) / std::ceil((x_range[1] - x_range[0]) / rail_sample_resolution_.x());
-  const FloatType res_y = (y_range[1] - y_range[0]) / std::ceil((y_range[1] - y_range[0]) / rail_sample_resolution_.y());
+  const FloatType res_x =
+      (x_range[1] - x_range[0]) / std::ceil((x_range[1] - x_range[0]) / rail_sample_resolution_.x());
+  const FloatType res_y =
+      (y_range[1] - y_range[0]) / std::ceil((y_range[1] - y_range[0]) / rail_sample_resolution_.y());
 
   for (FloatType x = x_range[0]; x < x_range[1]; x += res_x)
     for (FloatType y = y_range[0]; y < y_range[1]; y += res_y)
@@ -148,8 +150,10 @@ void GantryKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3,
   const Eigen::Matrix<FloatType, 2, 1> x_range = getRange(origin.x(), rail_lower_limit.x(), rail_upper_limit.x());
   const Eigen::Matrix<FloatType, 2, 1> y_range = getRange(origin.y(), rail_lower_limit.y(), rail_upper_limit.y());
 
-  const FloatType res_x = (x_range[1] - x_range[0]) / std::ceil((x_range[1] - x_range[0]) / rail_sample_resolution_.x());
-  const FloatType res_y = (y_range[1] - y_range[0]) / std::ceil((y_range[1] - y_range[0]) / rail_sample_resolution_.y());
+  const FloatType res_x =
+      (x_range[1] - x_range[0]) / std::ceil((x_range[1] - x_range[0]) / rail_sample_resolution_.x());
+  const FloatType res_y =
+      (y_range[1] - y_range[0]) / std::ceil((y_range[1] - y_range[0]) / rail_sample_resolution_.y());
 
   for (FloatType x = x_range[0]; x < x_range[1]; x += res_x)
   {
@@ -165,7 +169,7 @@ void GantryKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3,
   }
 }
 
-template<typename FloatType>
+template <typename FloatType>
 Eigen::Matrix<FloatType, 2, 1> GantryKinematics<FloatType>::getRange(const FloatType val,
                                                                      const FloatType min_val,
                                                                      const FloatType max_val) const

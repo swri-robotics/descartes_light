@@ -31,6 +31,7 @@ public:
   bool evaluate(const Rung_<FloatType>& from,
                 const Rung_<FloatType>& to,
                 std::vector<typename LadderGraph<FloatType>::EdgeList>& edges) override;
+
 protected:
   int dof_;
 };

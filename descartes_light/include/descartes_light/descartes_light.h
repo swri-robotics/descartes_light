@@ -25,7 +25,6 @@
 
 namespace descartes_light
 {
-
 template <typename FloatType>
 class Solver
 {

@@ -82,10 +82,7 @@ private:
   Eigen::Matrix<FloatType, 2, 1> rail_sample_resolution_;
   FloatType robot_reach_;
 
-  Eigen::Matrix<FloatType, 2, 1> getRange(const FloatType val,
-                                          const FloatType min_val,
-                                          const FloatType max_val) const;
-
+  Eigen::Matrix<FloatType, 2, 1> getRange(const FloatType val, const FloatType min_val, const FloatType max_val) const;
 };
 
 using GantryKinematicsD = GantryKinematics<double>;

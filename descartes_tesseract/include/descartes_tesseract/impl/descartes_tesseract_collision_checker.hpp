@@ -38,8 +38,10 @@ TesseractCollision<FloatType>::TesseractCollision(tesseract_environment::Environ
   , contact_manager_(collision_env_->getDiscreteContactManager())
 {
   contact_manager_->setActiveCollisionObjects(active_links);
-  contact_manager_->setIsContactAllowedFn(
-      std::bind(&descartes_light::TesseractCollision<FloatType>::isContactAllowed, this, std::placeholders::_1, std::placeholders::_2));
+  contact_manager_->setIsContactAllowedFn(std::bind(&descartes_light::TesseractCollision<FloatType>::isContactAllowed,
+                                                    this,
+                                                    std::placeholders::_1,
+                                                    std::placeholders::_2));
 }
 
 template <typename FloatType>

@@ -31,7 +31,11 @@ AxialSymmetricSampler<FloatType>::AxialSymmetricSampler(
     const FloatType radial_sample_resolution,
     const typename CollisionInterface<FloatType>::Ptr collision,
     const bool allow_collision)
-  : tool_pose_(tool_pose), kin_(robot_kin), collision_(collision), radial_sample_res_(radial_sample_resolution), allow_collision_(allow_collision)
+  : tool_pose_(tool_pose)
+  , kin_(robot_kin)
+  , collision_(collision)
+  , radial_sample_res_(radial_sample_resolution)
+  , allow_collision_(allow_collision)
 {
 }
 
