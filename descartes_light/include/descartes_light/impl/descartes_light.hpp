@@ -63,7 +63,8 @@ Solver<FloatType>::Solver(const std::size_t dof) : graph_{ dof }
 template <typename FloatType>
 bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
                               const std::vector<typename descartes_core::TimingConstraint<FloatType>>& times,
-                              typename EdgeEvaluator<FloatType>::Ptr edge_eval)
+                              typename EdgeEvaluator<FloatType>::Ptr edge_eval,
+                              int num_threads)
 {
   graph_.resize(trajectory.size());
   failed_vertices_.clear();
@@ -72,7 +73,7 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
   // Build Vertices
   long num_waypoints = trajectory.size();
   long cnt = 0;
-#pragma omp parallel for
+#pragma omp parallel for num_threads(num_threads)
   for (std::size_t i = 0; i < trajectory.size(); ++i)
   {
     std::vector<FloatType> vertex_data;
@@ -101,7 +102,7 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
 
   // Build Edges
   cnt = 0;
-#pragma omp parallel for
+#pragma omp parallel for num_threads(num_threads)
   for (std::size_t i = 1; i < trajectory.size(); ++i)
   {
     const auto& from = graph_.getRung(i - 1);
