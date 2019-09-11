@@ -47,7 +47,7 @@ bool CartesianPointSampler<FloatType>::sample(std::vector<FloatType>& solution_s
   for (std::size_t i = 0; i < n_sols; ++i)
   {
     const auto* sol_data = buffer.data() + i * opw_dof;
-    if (CartesianPointSampler<FloatType>::isCollisionFree(sol_data))
+    if (isCollisionFree(sol_data))
       solution_set.insert(end(solution_set), sol_data, sol_data + opw_dof);
   }
 
