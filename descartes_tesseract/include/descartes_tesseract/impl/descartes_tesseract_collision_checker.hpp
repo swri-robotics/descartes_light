@@ -38,8 +38,10 @@ TesseractCollision<FloatType>::TesseractCollision(tesseract_environment::Environ
   , contact_manager_(collision_env_->getDiscreteContactManager())
 {
   contact_manager_->setActiveCollisionObjects(active_links);
-  contact_manager_->setIsContactAllowedFn(
-      std::bind(&TesseractCollision<FloatType>::isContactAllowed, this, std::placeholders::_1, std::placeholders::_2));
+  contact_manager_->setIsContactAllowedFn(std::bind(&descartes_light::TesseractCollision<FloatType>::isContactAllowed,
+                                                    this,
+                                                    std::placeholders::_1,
+                                                    std::placeholders::_2));
 }
 
 template <typename FloatType>
@@ -104,9 +106,7 @@ FloatType TesseractCollision<FloatType>::distance(const FloatType* pos, const st
 template <typename FloatType>
 typename CollisionInterface<FloatType>::Ptr TesseractCollision<FloatType>::clone() const
 {
-  auto sptr = std::make_shared<TesseractCollision>(*this);
-  sptr->contact_manager_ = this->contact_manager_->clone();
-  return sptr;
+  return std::make_shared<TesseractCollision>(collision_env_, active_link_names_, joint_names_);
 }
 
 }  // namespace descartes_light

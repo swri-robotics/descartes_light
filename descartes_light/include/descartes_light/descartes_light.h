@@ -21,6 +21,7 @@
 #include "descartes_light/ladder_graph.h"
 #include "descartes_light/interface/position_sampler.h"
 #include "descartes_light/interface/edge_evaluator.h"
+#include <omp.h>
 
 namespace descartes_light
 {
@@ -32,12 +33,15 @@ public:
 
   bool build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
              const std::vector<descartes_core::TimingConstraint<FloatType>>& times,
-             typename EdgeEvaluator<FloatType>::Ptr edge_eval);
+             typename EdgeEvaluator<FloatType>::Ptr edge_eval,
+             int num_threads = getMaxThreads());
 
   const std::vector<std::size_t>& getFailedVertices() const { return failed_vertices_; }
   const std::vector<std::size_t>& getFailedEdges() const { return failed_edges_; }
 
   bool search(std::vector<FloatType>& solution);
+
+  static int getMaxThreads() { return omp_get_max_threads(); }
 
 private:
   LadderGraph<FloatType> graph_;

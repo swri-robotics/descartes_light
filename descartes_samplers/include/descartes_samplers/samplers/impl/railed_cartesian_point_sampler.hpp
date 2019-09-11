@@ -47,7 +47,7 @@ bool RailedCartesianPointSampler<FloatType>::sample(std::vector<FloatType>& solu
   for (std::size_t i = 0; i < n_sols; ++i)
   {
     const auto* sol_data = buffer.data() + i * dof;
-    if (RailedCartesianPointSampler<FloatType>::isCollisionFree(sol_data))
+    if (isCollisionFree(sol_data))
       solution_set.insert(end(solution_set), sol_data, sol_data + dof);
   }
 

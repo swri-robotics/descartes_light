@@ -49,10 +49,9 @@ EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(int do
 }
 
 template <typename FloatType>
-bool EuclideanDistanceEdgeEvaluator<FloatType>::evaluate(
-    const Rung_<FloatType>& from,
-    const Rung_<FloatType>& to,
-    std::vector<typename LadderGraph<FloatType>::EdgeList>& edges)
+bool EuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const Rung_<FloatType>& from,
+                                                         const Rung_<FloatType>& to,
+                                                         std::vector<typename LadderGraph<FloatType>::EdgeList>& edges)
 {
   const auto n_start = from.data.size() / dof_;
   const auto n_end = to.data.size() / dof_;
