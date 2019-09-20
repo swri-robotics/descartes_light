@@ -31,7 +31,7 @@ static void considerEdge(const FloatType* start,
                          typename descartes_light::LadderGraph<FloatType>::EdgeList& out)
 {
   FloatType cost = 0.0;
-  for (std::size_t i = 2; i < dof; ++i)
+  for (std::size_t i = 0; i < dof; ++i)
   {
     cost += std::pow(end[i] - start[i], 2);
   }
