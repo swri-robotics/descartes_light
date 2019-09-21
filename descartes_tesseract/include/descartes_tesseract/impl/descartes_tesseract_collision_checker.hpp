@@ -25,19 +25,35 @@ namespace descartes_light
 template <typename FloatType>
 bool TesseractCollision<FloatType>::isContactAllowed(const std::string& a, const std::string& b) const
 {
-  return collision_env_->getAllowedCollisionMatrix()->isCollisionAllowed(a, b);
+  return acm_.isCollisionAllowed(a, b);
 }
 
 template <typename FloatType>
-TesseractCollision<FloatType>::TesseractCollision(tesseract_environment::Environment::ConstPtr collision_env,
+TesseractCollision<FloatType>::TesseractCollision(const tesseract_environment::Environment::ConstPtr &collision_env,
                                                   const std::vector<std::string>& active_links,
                                                   const std::vector<std::string>& joint_names)
-  : collision_env_(std::move(collision_env))
+  : state_solver_(collision_env->getStateSolver())
+  , acm_(*(collision_env->getAllowedCollisionMatrix()))
   , active_link_names_(active_links)
   , joint_names_(joint_names)
-  , contact_manager_(collision_env_->getDiscreteContactManager())
+  , contact_manager_(collision_env->getDiscreteContactManager())
 {
   contact_manager_->setActiveCollisionObjects(active_links);
+  contact_manager_->setIsContactAllowedFn(std::bind(&descartes_light::TesseractCollision<FloatType>::isContactAllowed,
+                                                    this,
+                                                    std::placeholders::_1,
+                                                    std::placeholders::_2));
+}
+
+template <typename FloatType>
+TesseractCollision<FloatType>::TesseractCollision(const TesseractCollision& collision_interface)
+  : state_solver_(collision_interface.state_solver_->clone())
+  , acm_(collision_interface.acm_)
+  , active_link_names_(collision_interface.active_link_names_)
+  , joint_names_(collision_interface.joint_names_)
+  , contact_manager_(collision_interface.contact_manager_->clone())
+{
+  contact_manager_->setActiveCollisionObjects(active_link_names_);
   contact_manager_->setIsContactAllowedFn(std::bind(&descartes_light::TesseractCollision<FloatType>::isContactAllowed,
                                                     this,
                                                     std::placeholders::_1,
@@ -50,7 +66,7 @@ bool TesseractCollision<FloatType>::validate(const FloatType* pos, const std::si
   // Happens in two phases:
   // 1. Compute the transform of all objects
   Eigen::Map<const Eigen::VectorXd> joint_angles(reinterpret_cast<const double*>(pos), long(size));
-  tesseract_environment::EnvState::Ptr env_state = collision_env_->getState(joint_names_, joint_angles);
+  tesseract_environment::EnvState::Ptr env_state = state_solver_->getState(joint_names_, joint_angles);
 
   // 2. Update the scene
   contact_manager_->setCollisionObjectsTransform(env_state->transforms);
@@ -79,7 +95,7 @@ FloatType TesseractCollision<FloatType>::distance(const FloatType* pos, const st
   // Happens in two phases:
   // 1. Compute the transform of all objects
   Eigen::Map<const Eigen::VectorXd> joint_angles(reinterpret_cast<const double*>(pos), long(size));
-  tesseract_environment::EnvState::Ptr env_state = collision_env_->getState(joint_names_, joint_angles);
+  tesseract_environment::EnvState::Ptr env_state = state_solver_->getState(joint_names_, joint_angles);
 
   // 2. Update the scene
   contact_manager_->setCollisionObjectsTransform(env_state->transforms);
@@ -106,7 +122,7 @@ FloatType TesseractCollision<FloatType>::distance(const FloatType* pos, const st
 template <typename FloatType>
 typename CollisionInterface<FloatType>::Ptr TesseractCollision<FloatType>::clone() const
 {
-  return std::make_shared<TesseractCollision>(collision_env_, active_link_names_, joint_names_);
+  return std::make_shared<TesseractCollision>(*this);
 }
 
 }  // namespace descartes_light

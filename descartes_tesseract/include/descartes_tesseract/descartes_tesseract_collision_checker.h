@@ -18,9 +18,15 @@ public:
    * @param active_links The list of active links
    * @param joint_names The list of joint names in the order that the data will be provided to the validate function.
    */
-  TesseractCollision(tesseract_environment::Environment::ConstPtr collision_env,
+  TesseractCollision(const tesseract_environment::Environment::ConstPtr& collision_env,
                      const std::vector<std::string>& active_links,
                      const std::vector<std::string>& joint_names);
+
+  /**
+   * @brief Copy constructor that clones the object
+   * @param collision_interface Object to copy/clone
+   */
+  TesseractCollision(const TesseractCollision& collision_interface);
 
   bool validate(const FloatType* pos, const std::size_t size) override;
 
@@ -28,13 +34,11 @@ public:
 
   typename CollisionInterface<FloatType>::Ptr clone() const override;
 
-  tesseract_environment::Environment::ConstPtr& environment() { return collision_env_; }
-  const tesseract_environment::Environment::ConstPtr& environment() const { return collision_env_; }
-
 private:
   bool isContactAllowed(const std::string& a, const std::string& b) const;
 
-  tesseract_environment::Environment::ConstPtr collision_env_;
+  tesseract_environment::StateSolver::Ptr state_solver_;
+  tesseract_scene_graph::AllowedCollisionMatrix acm_;
   std::vector<std::string> active_link_names_;
   std::vector<std::string> joint_names_;
   tesseract_collision::DiscreteContactManager::Ptr contact_manager_;
