@@ -17,6 +17,7 @@ add_library(${PROJECT_NAME} SHARED
   src/samplers/fixed_joint_pose_sampler.cpp
   src/samplers/railed_axial_symmetric_sampler.cpp
   src/samplers/railed_cartesian_point_sampler.cpp
+  src/samplers/axial_symmetric_variable_offset_sampler.cpp
 )
 target_link_libraries(${PROJECT_NAME} descartes::descartes_light)
 descartes_target_compile_options(${PROJECT_NAME} PUBLIC)
