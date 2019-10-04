@@ -8,6 +8,7 @@
   <maintainer email="levi.armstrong@swri.edu">Levi Armstrong</maintainer>
 
   <license>Apache 2.0</license>
+  <depend>libconsole-bridge-dev</depend>
 
   <export>
     <build_type>cmake</build_type>
