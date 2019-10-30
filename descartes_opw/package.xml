@@ -13,6 +13,8 @@
 
   <depend>opw_kinematics</depend>
   <depend>descartes_light</depend>
+  <depend>eigen</depend>
+
   <export>
     <build_type>cmake</build_type>
   </export>

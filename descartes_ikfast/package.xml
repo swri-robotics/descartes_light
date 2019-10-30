@@ -12,6 +12,7 @@
   <depend>descartes_light</depend>
   <depend>libblas-dev</depend>
   <depend>liblapack-dev</depend>
+  <depend>eigen</depend>
 
   <test_depend>gtest</test_depend>
 

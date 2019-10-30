@@ -9,6 +9,7 @@
 
   <license>Apache 2.0</license>
   <depend>libconsole-bridge-dev</depend>
+  <depend>eigen</depend>
 
   <export>
     <build_type>cmake</build_type>
