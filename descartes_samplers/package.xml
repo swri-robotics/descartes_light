@@ -10,8 +10,9 @@
   <maintainer email="michael.ripperger@swri.org">Michael Ripperger</maintainer>
 
   <license>Apache 2.0</license>
-
   <depend>descartes_light</depend>
+  <depend>eigen</depend>
+
   <export>
     <build_type>cmake</build_type>
   </export>
