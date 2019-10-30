@@ -41,36 +41,22 @@ endif()
 
 add_library(${PROJECT_NAME}_robot SHARED descartes_ikfast_fanuc_m20ia10l_manipulator.cpp)
 target_link_libraries(${PROJECT_NAME}_robot PUBLIC ${PROJECT_NAME})
-target_compile_options(${PROJECT_NAME}_robot PRIVATE -Wsuggest-override -Wconversion -Wsign-conversion)
-if(CXX_FEATURE_FOUND EQUAL "-1")
-    target_compile_options(${PROJECT_NAME}_robot PUBLIC -std=c++11)
-else()
-    target_compile_features(${PROJECT_NAME}_robot PRIVATE cxx_std_11)
-endif()
+descartes_target_compile_options(${PROJECT_NAME}_robot PRIVATE)
 target_include_directories(${PROJECT_NAME}_robot PRIVATE
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:include>")
-add_dependencies(${PROJECT_NAME}_robot ${PACKAGE_LIBRARIES})
+add_dependencies(${PROJECT_NAME}_robot ${PROJECT_NAME})
 
 add_executable(${PROJECT_NAME}_unit descartes_ikfast_unit.cpp)
 target_link_libraries(${PROJECT_NAME}_unit PRIVATE GTest::GTest GTest::Main ${PROJECT_NAME}_robot)
-target_compile_options(${PROJECT_NAME}_unit PRIVATE -Wsuggest-override -Wconversion -Wsign-conversion)
-if(CXX_FEATURE_FOUND EQUAL "-1")
-    target_compile_options(${PROJECT_NAME}_unit PUBLIC -std=c++11)
-else()
-    target_compile_features(${PROJECT_NAME}_unit PRIVATE cxx_std_11)
-endif()
+descartes_target_compile_options(${PROJECT_NAME}_unit PRIVATE)
 target_include_directories(${PROJECT_NAME}_unit PRIVATE
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:include>")
-if(${CMAKE_VERSION} VERSION_LESS "3.10.0")
-    gtest_add_tests(${PROJECT_NAME}_unit "" AUTO)
-else()
-    gtest_discover_tests(${PROJECT_NAME}_unit)
-endif()
-add_dependencies(${PROJECT_NAME}_unit ${PACKAGE_LIBRARIES})
+descartes_gtest_discover_tests(${PROJECT_NAME}_unit)
+add_dependencies(${PROJECT_NAME}_unit ${PROJECT_NAME})
 add_dependencies(${PROJECT_NAME}_unit ${PROJECT_NAME}_robot)
 add_dependencies(run_tests ${PROJECT_NAME}_unit)
 if ( NOT ${GTest_FOUND} )
