@@ -75,7 +75,7 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
   long num_waypoints = trajectory.size();
   long cnt = 0;
 #pragma omp parallel for num_threads(num_threads)
-  for (std::size_t i = 0; i < trajectory.size(); ++i)
+  for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
     std::vector<FloatType> vertex_data;
     if (trajectory[i]->sample(vertex_data))
@@ -104,7 +104,7 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
   // Build Edges
   cnt = 0;
 #pragma omp parallel for num_threads(num_threads)
-  for (std::size_t i = 1; i < trajectory.size(); ++i)
+  for (long i = 1; i < static_cast<long>(trajectory.size()); ++i)
   {
     const auto& from = graph_.getRung(i - 1);
     const auto& to = graph_.getRung(i);
