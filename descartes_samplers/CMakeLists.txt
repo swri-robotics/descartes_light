@@ -3,6 +3,9 @@ project(descartes_samplers VERSION 0.1.0 LANGUAGES CXX)
 
 find_package(descartes_light REQUIRED)
 
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
 # Declare a C++ library
 add_library(${PROJECT_NAME} SHARED
   src/evaluators/distance_edge_evaluator.cpp

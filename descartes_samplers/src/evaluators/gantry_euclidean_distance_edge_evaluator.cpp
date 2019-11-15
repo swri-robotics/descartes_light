@@ -15,12 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <descartes_light/visibility_control.h>
 #include <descartes_samplers/evaluators/impl/gantry_euclidean_distance_edge_evaluator.hpp>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class GantryEuclideanDistanceEdgeEvaluator<float>;
-template class GantryEuclideanDistanceEdgeEvaluator<double>;
+template class DESCARTES_PUBLIC GantryEuclideanDistanceEdgeEvaluator<float>;
+template class DESCARTES_PUBLIC GantryEuclideanDistanceEdgeEvaluator<double>;
 
 }  // namespace descartes_light

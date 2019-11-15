@@ -96,7 +96,8 @@ macro(descartes_configure_package)
   install(TARGETS ${ARGV}
           EXPORT ${PROJECT_NAME}-targets
           RUNTIME DESTINATION bin
-          LIBRARY DESTINATION lib)
+          LIBRARY DESTINATION lib
+          ARCHIVE DESTINATION lib)
   install(EXPORT ${PROJECT_NAME}-targets NAMESPACE descartes:: DESTINATION lib/cmake/${PROJECT_NAME})
 
   install(FILES package.xml DESTINATION share/${PROJECT_NAME})

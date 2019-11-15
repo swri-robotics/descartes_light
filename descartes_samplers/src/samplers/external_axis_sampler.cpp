@@ -15,15 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "descartes_samplers/samplers/impl/external_axis_sampler.hpp"
+#include <descartes_light/visibility_control.h>
+#include <descartes_samplers/samplers/impl/external_axis_sampler.hpp>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class ExternalAxisSampler<float>;
-template class ExternalAxisSampler<double>;
+template class DESCARTES_PUBLIC ExternalAxisSampler<float>;
+template class DESCARTES_PUBLIC ExternalAxisSampler<double>;
 
-template class SpoolSampler<float>;
-template class SpoolSampler<double>;
+template class DESCARTES_PUBLIC SpoolSampler<float>;
+template class DESCARTES_PUBLIC SpoolSampler<double>;
 
 }  // namespace descartes_light

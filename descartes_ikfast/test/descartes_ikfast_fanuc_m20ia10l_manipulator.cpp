@@ -15,6 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <descartes_light/visibility_control.h>
 #include <descartes_ikfast/impl/ikfast_kinematics.hpp>
 #include "fanuc_m20ia10l_manipulator_ikfast_solver.cpp"  // generated from ikfast for this robot
 #include "descartes_ikfast_fanuc_m20ia10l_manipulator.h"
@@ -22,7 +23,7 @@
 namespace descartes_ikfast_unit
 {
 // Explicit template instantiation
-template class FanucM20ia10lKinematics<float>;
-template class FanucM20ia10lKinematics<double>;
+template class DESCARTES_PUBLIC FanucM20ia10lKinematics<float>;
+template class DESCARTES_PUBLIC FanucM20ia10lKinematics<double>;
 
 }  // namespace descartes_ikfast_unit

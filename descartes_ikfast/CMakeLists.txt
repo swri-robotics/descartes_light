@@ -6,6 +6,9 @@ find_package(Eigen3 REQUIRED)
 find_package(LAPACK REQUIRED)
 find_package(console_bridge REQUIRED)
 
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
 if(NOT TARGET console_bridge::console_bridge)
   add_library(console_bridge::console_bridge INTERFACE IMPORTED)
   set_target_properties(console_bridge::console_bridge PROPERTIES INTERFACE_INCLUDE_DIRECTORIES "${console_bridge_INCLUDE_DIRS}")
@@ -31,11 +34,11 @@ install(DIRECTORY include/${PROJECT_NAME}
   PATTERN ".svn" EXCLUDE
  )
 
-if (ENABLE_TESTS)
-  enable_testing()
-  add_custom_target(run_tests ALL
-      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-      COMMAND ${CMAKE_CTEST_COMMAND} -V -C $<CONFIGURATION>)
+#if (ENABLE_TESTS)
+#  enable_testing()
+#  add_custom_target(run_tests ALL
+#      WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+#      COMMAND ${CMAKE_CTEST_COMMAND} -V -C $<CONFIGURATION>)
 
-  add_subdirectory(test)
-endif()
+#  add_subdirectory(test)
+#endif()

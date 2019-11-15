@@ -20,7 +20,7 @@
 namespace descartes_light
 {
 // Explicit template instantiation
-template class OPWKinematics<float>;
-template class OPWKinematics<double>;
+template class DESCARTES_PUBLIC OPWKinematics<float>;
+template class DESCARTES_PUBLIC OPWKinematics<double>;
 
 }  // namespace descartes_light

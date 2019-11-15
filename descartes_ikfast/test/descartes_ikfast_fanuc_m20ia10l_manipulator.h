@@ -1,7 +1,9 @@
 #ifndef DESCARTES_IKFAST_FANUC_M20IA10L_MANIPULATOR_H
 #define DESCARTES_IKFAST_FANUC_M20IA10L_MANIPULATOR_H
 
-#include <descartes_ikfast/ikfast_kinematics.h>
+#include <descartes_light/visibility_control.h>
+#include <descartes_ikfast/impl/ikfast_kinematics.hpp>
+#include <descartes_light/utils.h>
 
 namespace descartes_ikfast_unit
 {

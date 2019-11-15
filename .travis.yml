@@ -55,6 +55,9 @@ install:
         python -m pip install --upgrade pip
         rosdep install --from-paths src --ignore-src -r -y
         /c/opt/vcpkg/vcpkg.exe install jsoncpp:x64-windows
+        wstool init src
+        wstool merge -t src ./src/descartes_light/dependencies.rosinstall
+        wstool update -t src
     fi
 script:
   - if [ "$TRAVIS_OS_NAME" != "windows" ]; then .ci_config/travis.sh; fi

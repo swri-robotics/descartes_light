@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.5.0)
 project(descartes_light VERSION 0.1.0 LANGUAGES CXX)
 include(cmake/descartes_light_macros.cmake)
 
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+
 find_package(OpenMP REQUIRED)
 
 if(NOT TARGET OpenMP::OpenMP_CXX)
