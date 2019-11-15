@@ -18,6 +18,7 @@
 #ifndef DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_POSE_SAMPLER_H
 #define DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_POSE_SAMPLER_H
 
+#include <descartes_light/visibility_control.h>
 #include <descartes_light/interface/position_sampler.h>
 
 namespace descartes_light

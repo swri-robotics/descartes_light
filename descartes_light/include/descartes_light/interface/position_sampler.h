@@ -18,6 +18,7 @@
 #ifndef DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
 #define DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
 
+#include <descartes_light/visibility_control.h>
 #include <memory>
 #include <vector>
 

@@ -15,12 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "descartes_samplers/samplers/impl/fixed_joint_pose_sampler.hpp"
+#include <descartes_light/visibility_control.h>
+#include <descartes_samplers/samplers/impl/fixed_joint_pose_sampler.hpp>
 
 namespace descartes_light
 {
 // Explicit template specialization
-template class FixedJointPoseSampler<float>;
-template class FixedJointPoseSampler<double>;
+template class DESCARTES_PUBLIC FixedJointPoseSampler<float>;
+template class DESCARTES_PUBLIC FixedJointPoseSampler<double>;
 
 }  // namespace descartes_light

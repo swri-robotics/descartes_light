@@ -1,6 +1,7 @@
 #ifndef DESCARTES_OPW_DESCARTES_OPW_KINEMATICS_H
 #define DESCARTES_OPW_DESCARTES_OPW_KINEMATICS_H
 
+#include <descartes_light/visibility_control.h>
 #include <descartes_light/interface/kinematics_interface.h>
 #include <descartes_light/utils.h>
 #include <opw_kinematics/opw_kinematics.h>

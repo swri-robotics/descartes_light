@@ -18,6 +18,7 @@
 #ifndef DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H
 #define DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H
 
+#include <descartes_light/visibility_control.h>
 #include <memory>
 
 namespace descartes_light

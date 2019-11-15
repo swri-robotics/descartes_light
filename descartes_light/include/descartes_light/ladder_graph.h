@@ -18,6 +18,7 @@
 #ifndef DESCARTES_LIGHT_LADDER_GRAPH_H
 #define DESCARTES_LIGHT_LADDER_GRAPH_H
 
+#include <descartes_light/visibility_control.h>
 #include <algorithm>
 #include <cassert>
 #include <vector>
@@ -27,7 +28,7 @@ namespace descartes_core
 using TrajectoryID = std::size_t;
 
 template <typename FloatType>
-struct TimingConstraint
+struct DESCARTES_PUBLIC TimingConstraint
 {
   TimingConstraint() : upper(0.0) {}
   TimingConstraint(FloatType time) : upper(time) {}
