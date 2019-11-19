@@ -117,7 +117,7 @@ macro(descartes_configure_package)
     "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
     DESTINATION lib/cmake/${PROJECT_NAME})
 
-  export(EXPORT ${PROJECT_NAME}-targets FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)
+  export(EXPORT ${PROJECT_NAME}-targets NAMESPACE descartes:: FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)
 endmacro()
 
 # This macro call the appropriate gtest function to add a test based on the cmake version
