@@ -28,7 +28,7 @@ namespace descartes_core
 using TrajectoryID = std::size_t;
 
 template <typename FloatType>
-struct DESCARTES_PUBLIC TimingConstraint
+struct TimingConstraint
 {
   TimingConstraint() : upper(0.0) {}
   TimingConstraint(FloatType time) : upper(time) {}

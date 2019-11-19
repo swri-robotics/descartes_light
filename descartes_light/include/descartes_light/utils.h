@@ -34,7 +34,7 @@ using GetRedundantSolutionsFn = std::function<std::vector<FloatType>(const Float
  * @param limits
  */
 template <typename FloatType>
-inline bool DESCARTES_PUBLIC isWithinLimits(const FloatType* vertex, const Eigen::Matrix<FloatType, Eigen::Dynamic, 2>& limits)
+inline bool isWithinLimits(const FloatType* vertex, const Eigen::Matrix<FloatType, Eigen::Dynamic, 2>& limits)
 {
   for (int i = 0; i < limits.rows(); ++i)
     if ((vertex[i] < limits(i, 0)) || (vertex[i] > limits(i, 1)))
@@ -49,7 +49,7 @@ inline bool DESCARTES_PUBLIC isWithinLimits(const FloatType* vertex, const Eigen
  * @param limits The joint limits of the robot
  */
 template <typename FloatType>
-inline std::vector<FloatType> DESCARTES_PUBLIC getRedundantSolutions(const FloatType* sol,
+inline std::vector<FloatType> getRedundantSolutions(const FloatType* sol,
                                                     const Eigen::Matrix<FloatType, Eigen::Dynamic, 2>& limits)
 {
   int dof = limits.rows();
@@ -78,7 +78,7 @@ inline std::vector<FloatType> DESCARTES_PUBLIC getRedundantSolutions(const Float
 }
 
 template <typename FloatType>
-inline bool DESCARTES_PUBLIC isValid(const FloatType* qs, int dof)
+inline bool isValid(const FloatType* qs, int dof)
 {
   for (int i = 0; i < dof; ++i)
     if (!std::isfinite(qs[i]))
@@ -88,7 +88,7 @@ inline bool DESCARTES_PUBLIC isValid(const FloatType* qs, int dof)
 }
 
 template <typename FloatType>
-inline void DESCARTES_PUBLIC harmonizeTowardZero(FloatType* qs, int dof)
+inline void harmonizeTowardZero(FloatType* qs, int dof)
 {
   const static FloatType pi = FloatType(M_PI);
   const static FloatType two_pi = FloatType(2.0 * M_PI);
