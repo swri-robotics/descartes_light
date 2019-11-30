@@ -37,7 +37,7 @@ static void considerEdge(const FloatType* start,
     if (std::abs(step) > delta_thresholds[i])
       return;
 
-    cost += std::pow(step, 2);
+    cost += std::pow(step, FloatType(2));
   }
 
   out.emplace_back(cost, next_idx);

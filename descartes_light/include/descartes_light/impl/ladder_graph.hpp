@@ -145,7 +145,7 @@ void LadderGraph<FloatType>::assignRung(const std::size_t index,
 template <typename FloatType>
 void LadderGraph<FloatType>::removeRung(const std::size_t index)
 {
-  rungs_.erase(std::next(rungs_.begin(), index));
+  rungs_.erase(std::next(rungs_.begin(), static_cast<long>(index)));
 }
 
 template <typename FloatType>
@@ -163,7 +163,7 @@ void LadderGraph<FloatType>::clearEdges(const std::size_t index)
 template <typename FloatType>
 void LadderGraph<FloatType>::insertRung(const std::size_t index)
 {
-  rungs_.insert(std::next(rungs_.begin(), index), Rung());
+  rungs_.insert(std::next(rungs_.begin(), static_cast<long>(index)), Rung());
 }
 
 template <typename FloatType>

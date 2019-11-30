@@ -74,7 +74,7 @@ bool OPWKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Is
         std::vector<FloatType> redundant_sols = redundant_sol_fn(sol);
         if (!redundant_sols.empty())
         {
-          int num_sol = redundant_sols.size() / 6;
+          int num_sol = static_cast<int>(redundant_sols.size() / 6);
           for (int s = 0; s < num_sol; ++s)
           {
             FloatType* redundant_sol = redundant_sols.data() + 6 * s;
@@ -96,7 +96,7 @@ bool OPWKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen::Is
         std::vector<FloatType> redundant_sols = redundant_sol_fn(sol);
         if (!redundant_sols.empty())
         {
-          int num_sol = redundant_sols.size() / 6;
+          int num_sol = static_cast<int>(redundant_sols.size() / 6);
           for (int s = 0; s < num_sol; ++s)
           {
             FloatType* redundant_sol = redundant_sols.data() + 6 * s;
