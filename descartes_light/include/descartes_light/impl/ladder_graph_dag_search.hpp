@@ -65,7 +65,8 @@ FloatType DAGSearch<FloatType>::run()
         if (dv < distance(next_rung, edge.idx))
         {
           distance(next_rung, edge.idx) = dv;
-          predecessor(next_rung, edge.idx) = index;  // the predecessor's rung is implied to be the current rung
+          predecessor(next_rung, edge.idx) =
+              static_cast<unsigned>(index);  // the predecessor's rung is implied to be the current rung
         }
       }
     }  // vertex for loop
@@ -84,13 +85,13 @@ std::vector<typename DAGSearch<FloatType>::predecessor_t> DAGSearch<FloatType>::
   std::vector<predecessor_t> path(solution_.size());
 
   size_type current_rung = path.size() - 1;
-  size_type current_index = min_idx;
+  size_type current_index = static_cast<size_type>(min_idx);
 
   for (unsigned i = 0; i < path.size(); ++i)
   {
     auto count = path.size() - 1 - i;
     assert(current_rung == count);
-    path[count] = current_index;
+    path[count] = static_cast<unsigned>(current_index);
     current_index = predecessor(current_rung, current_index);
     current_rung -= 1;
   }

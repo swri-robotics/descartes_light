@@ -26,14 +26,14 @@ namespace
 template <typename FloatType>
 static void considerEdge(const FloatType* start,
                          const FloatType* end,
-                         const int dof,
+                         std::size_t dof,
                          std::size_t next_idx,
                          typename descartes_light::LadderGraph<FloatType>::EdgeList& out)
 {
   FloatType cost = 0.0;
   for (std::size_t i = 0; i < dof; ++i)
   {
-    cost += std::pow(end[i] - start[i], 2);
+    cost += std::pow(end[i] - start[i], FloatType(2));
   }
 
   out.emplace_back(cost, next_idx);
@@ -44,7 +44,7 @@ static void considerEdge(const FloatType* start,
 namespace descartes_light
 {
 template <typename FloatType>
-EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(int dof) : dof_(dof)
+EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(int dof) : dof_(static_cast<std::size_t>(dof))
 {
 }
 

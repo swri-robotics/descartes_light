@@ -24,6 +24,7 @@
 // This logic was borrowed (then namespaced) from the examples on the gcc wiki:
 //     https://gcc.gnu.org/wiki/Visibility
 
+// clang-format off
 #if defined _WIN32 || defined __CYGWIN__
   #ifdef __GNUC__
     #define DESCARTES_EXPORT __attribute__ ((dllexport))
@@ -51,5 +52,6 @@
   #endif
   #define DESCARTES_PUBLIC_TYPE
 #endif
+// clang-format on
 
-#endif // DESCARTES_LIGHT_VISIBILITY_CONTROL_H
+#endif  // DESCARTES_LIGHT_VISIBILITY_CONTROL_H

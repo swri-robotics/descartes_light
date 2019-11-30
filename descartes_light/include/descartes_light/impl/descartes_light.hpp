@@ -24,6 +24,8 @@
 #include <sstream>
 #include <algorithm>
 
+#define UNUSED(x) (void)(x)
+
 static void reportFailedEdges(const std::vector<std::size_t>& indices)
 {
   if (indices.empty())
@@ -72,22 +74,22 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
   failed_edges_.clear();
 
   // Build Vertices
-  long num_waypoints = trajectory.size();
+  long num_waypoints = static_cast<long>(trajectory.size());
   long cnt = 0;
 #pragma omp parallel for num_threads(num_threads)
   for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
     std::vector<FloatType> vertex_data;
-    if (trajectory[i]->sample(vertex_data))
+    if (trajectory[static_cast<size_t>(i)]->sample(vertex_data))
     {
-      graph_.getRung(i).data = std::move(vertex_data);
-      graph_.getRung(i).timing = times[i];
+      graph_.getRung(static_cast<size_t>(i)).data = std::move(vertex_data);
+      graph_.getRung(static_cast<size_t>(i)).timing = times[static_cast<size_t>(i)];
     }
     else
     {
 #pragma omp critical
       {
-        failed_vertices_.push_back(i);
+        failed_vertices_.push_back(static_cast<size_t>(i));
       }
     }
 #ifndef NDEBUG
@@ -106,14 +108,14 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
 #pragma omp parallel for num_threads(num_threads)
   for (long i = 1; i < static_cast<long>(trajectory.size()); ++i)
   {
-    const auto& from = graph_.getRung(i - 1);
-    const auto& to = graph_.getRung(i);
+    const auto& from = graph_.getRung(static_cast<size_t>(i) - static_cast<size_t>(1));
+    const auto& to = graph_.getRung(static_cast<size_t>(i));
 
-    if (!edge_eval->evaluate(from, to, graph_.getEdges(i - 1)))
+    if (!edge_eval->evaluate(from, to, graph_.getEdges(static_cast<size_t>(i) - static_cast<size_t>(1))))
     {
 #pragma omp critical
       {
-        failed_edges_.push_back(i - 1);
+        failed_edges_.push_back(static_cast<size_t>(i) - static_cast<size_t>(1));
       }
     }
 #ifndef NDEBUG
@@ -126,6 +128,8 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
     }
 #endif
   }
+  UNUSED(cnt);
+  UNUSED(num_waypoints);
 
   std::sort(failed_vertices_.begin(), failed_vertices_.end());
   std::sort(failed_edges_.begin(), failed_edges_.end());

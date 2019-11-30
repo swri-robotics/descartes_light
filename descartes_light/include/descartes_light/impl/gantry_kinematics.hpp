@@ -85,7 +85,7 @@ bool GantryKinematics<FloatType>::ikAt(const Eigen::Transform<FloatType, 3, Eige
   if (!robot_kinematics_->ik(in_robot, sols))
     return false;
 
-  int num_sols = sols.size() / robot_dof;
+  int num_sols = static_cast<int>(sols.size()) / robot_dof;
   // Check the output
   for (int i = 0; i < num_sols; i++)
   {

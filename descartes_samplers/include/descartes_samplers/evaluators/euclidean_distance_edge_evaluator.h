@@ -34,7 +34,7 @@ public:
                 std::vector<typename LadderGraph<FloatType>::EdgeList>& edges) override;
 
 protected:
-  int dof_;
+  std::size_t dof_;
 };
 
 using EuclideanDistanceEdgeEvaluatorF = EuclideanDistanceEdgeEvaluator<float>;
