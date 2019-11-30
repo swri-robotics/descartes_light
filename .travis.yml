@@ -18,6 +18,7 @@ jobs:
       env:
       - ROS_DISTRO="kinetic"
       - CCACHE_DIR=$HOME/.ccache
+      - BADGE=trusty
       cache:
         directories:
           - $HOME/.ccache
@@ -27,11 +28,13 @@ jobs:
       env:
       - ROS_DISTRO="melodic"
       - CCACHE_DIR=$HOME/.ccache
+      - BADGE=xenial
       cache:
         directories:
           - $HOME/.ccache
     - os: windows
       language: cpp
+      env: BADGE=windows
 
 install:
   - if [ "$TRAVIS_OS_NAME" != "windows" ]; then git clone --quiet --depth=1 https://github.com/ros-industrial/industrial_ci.git .ci_config; fi
