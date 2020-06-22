@@ -35,6 +35,11 @@ public:
 
   bool build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
              const std::vector<descartes_core::TimingConstraint<FloatType>>& times,
+             const std::vector<typename EdgeEvaluator<FloatType>::Ptr>& edge_eval,
+             int num_threads = getMaxThreads());
+
+  bool build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
+             const std::vector<descartes_core::TimingConstraint<FloatType>>& times,
              typename EdgeEvaluator<FloatType>::Ptr edge_eval,
              int num_threads = getMaxThreads());
 

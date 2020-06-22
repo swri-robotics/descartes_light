@@ -11,6 +11,7 @@ add_library(${PROJECT_NAME} SHARED
   src/evaluators/distance_edge_evaluator.cpp
   src/evaluators/euclidean_distance_edge_evaluator.cpp
   src/evaluators/gantry_euclidean_distance_edge_evaluator.cpp
+  src/evaluators/compound_edge_evaluator.cpp
   src/samplers/axial_symmetric_sampler.cpp
   src/samplers/cartesian_point_sampler.cpp
   src/samplers/external_axis_sampler.cpp

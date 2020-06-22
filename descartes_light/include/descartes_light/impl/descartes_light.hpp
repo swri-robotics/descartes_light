@@ -66,7 +66,7 @@ Solver<FloatType>::Solver(const std::size_t dof) : graph_{ dof }
 template <typename FloatType>
 bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
                               const std::vector<typename descartes_core::TimingConstraint<FloatType>>& times,
-                              typename EdgeEvaluator<FloatType>::Ptr edge_eval,
+                              const std::vector<typename EdgeEvaluator<FloatType>::Ptr>& edge_eval,
                               int num_threads)
 {
   graph_.resize(trajectory.size());
@@ -111,7 +111,8 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
     const auto& from = graph_.getRung(static_cast<size_t>(i) - static_cast<size_t>(1));
     const auto& to = graph_.getRung(static_cast<size_t>(i));
 
-    if (!edge_eval->evaluate(from, to, graph_.getEdges(static_cast<size_t>(i) - static_cast<size_t>(1))))
+    if (!edge_eval[static_cast<size_t>(i - 1)]->evaluate(
+            from, to, graph_.getEdges(static_cast<size_t>(i) - static_cast<size_t>(1))))
     {
 #pragma omp critical
       {
@@ -138,6 +139,16 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
   reportFailedEdges(failed_edges_);
 
   return failed_edges_.empty() && failed_vertices_.empty();
+}
+
+template <typename FloatType>
+bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
+                              const std::vector<typename descartes_core::TimingConstraint<FloatType>>& times,
+                              typename EdgeEvaluator<FloatType>::Ptr edge_eval,
+                              int num_threads)
+{
+  std::vector<typename EdgeEvaluator<FloatType>::Ptr> evaluators(trajectory.size() - 1, edge_eval);
+  return build(trajectory, times, evaluators, num_threads);
 }
 
 template <typename FloatType>
