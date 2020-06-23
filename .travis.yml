@@ -32,6 +32,17 @@ jobs:
       cache:
         directories:
           - $HOME/.ccache
+    - os: linux
+      dist: xenial
+      language: cpp
+      env:
+      - ROS_DISTRO="melodic"
+      - CCACHE_DIR=$HOME/.ccache
+      - BADGE=xenial-clang-compiler
+      - TARGET_CMAKE_ARGS="-DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++"
+      cache:
+        directories:
+          - $HOME/.ccache          
     - os: windows
       language: cpp
       env: BADGE=windows
