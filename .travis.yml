@@ -39,7 +39,7 @@ jobs:
       - ROS_DISTRO="melodic"
       - CCACHE_DIR=$HOME/.ccache
       - BADGE=xenial-clang-compiler
-      - ADDITIONAL_DEBS="clang-8"
+      - ADDITIONAL_DEBS="clang"
       - CMAKE_ARGS="-DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++ -DENABLE_TESTS=ON"
       cache:
         directories:
