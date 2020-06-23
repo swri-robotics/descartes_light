@@ -39,7 +39,7 @@ jobs:
       - ROS_DISTRO="melodic"
       - CCACHE_DIR=$HOME/.ccache
       - BADGE=xenial-clang-compiler
-      - TARGET_CMAKE_ARGS="-DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++"
+      - CMAKE_ARGS="-DCMAKE_C_COMPILER=/usr/bin/clang -DCMAKE_CXX_COMPILER=/usr/bin/clang++"
       cache:
         directories:
           - $HOME/.ccache          
@@ -48,7 +48,7 @@ jobs:
       env: BADGE=windows
 
 install:
-  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then git clone --quiet --depth=1 https://github.com/ros-industrial/industrial_ci.git .ci_config; fi
+  - if [ "$TRAVIS_OS_NAME" != "windows" ]; then git clone --quiet --depth=1 https://github.com/ros-industrial/industrial_ci.git .ci_config -b legacy ; fi
   - |
     if [ "$TRAVIS_OS_NAME" = "windows" ]; then
         unset CXX CXX_FOR_BUILD CC CC_FOR_BUILD
