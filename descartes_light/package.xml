@@ -10,6 +10,7 @@
   <license>Apache 2.0</license>
   <depend>libconsole-bridge-dev</depend>
   <depend>eigen</depend>
+  <build_depend>cmake_common_scripts</build_depend>
 
   <export>
     <build_type>cmake</build_type>

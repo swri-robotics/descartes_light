@@ -20,10 +20,15 @@
 
 #define IKFAST_HAS_LIBRARY
 #define IKFAST_NO_MAIN
+
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <descartes_ikfast/external/ikfast.h>
+#include <console_bridge/console.h>
+DESCARTES_IGNORE_WARNINGS_POP
+
 #include <descartes_ikfast/ikfast_kinematics.h>
 #include <descartes_light/utils.h>
-#include <console_bridge/console.h>
 
 namespace descartes_light
 {
@@ -72,7 +77,7 @@ bool IKFastKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
 
   // Unpack the solutions into the output vector
   const auto n_sols = ikfast_solution_set.GetNumSolutions();
-  int ikfast_dof = dof();
+  std::size_t ikfast_dof = static_cast<std::size_t>(dof());
 
   std::vector<IkReal> ikfast_output;
   ikfast_output.resize(n_sols * ikfast_dof);
@@ -89,13 +94,13 @@ bool IKFastKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
   sols.insert(end(sols), ikfast_output.begin(), ikfast_output.end());
 
   // Check the output
-  int num_sol = sols.size() / ikfast_dof;
-  for (int i = 0; i < num_sol; i++)
+  std::size_t num_sol = sols.size() / ikfast_dof;
+  for (std::size_t i = 0; i < num_sol; i++)
   {
     FloatType* sol = sols.data() + ikfast_dof * i;
-    if (isValid<FloatType>(sol, ikfast_dof))
+    if (isValid<FloatType>(sol, static_cast<int>(ikfast_dof)))
     {
-      harmonizeTowardZero<FloatType>(sol, ikfast_dof);  // Modifies 'sol' in place
+      harmonizeTowardZero<FloatType>(sol, static_cast<int>(ikfast_dof));  // Modifies 'sol' in place
 
       std::vector<FloatType> full_sol;
       full_sol.insert(end(full_sol), sol, sol + ikfast_dof);  // And then insert the robot arm configuration
@@ -109,8 +114,8 @@ bool IKFastKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
         std::vector<FloatType> redundant_sols = redundant_sol_fn(full_sol.data());
         if (!redundant_sols.empty())
         {
-          int num_sol = redundant_sols.size() / ikfast_dof;
-          for (int s = 0; s < num_sol; ++s)
+          std::size_t num_sol = redundant_sols.size() / ikfast_dof;
+          for (std::size_t s = 0; s < num_sol; ++s)
           {
             FloatType* redundant_sol = redundant_sols.data() + ikfast_dof * s;
             if (is_valid_fn(redundant_sol))
@@ -133,8 +138,8 @@ bool IKFastKinematics<FloatType>::ik(const Eigen::Transform<FloatType, 3, Eigen:
         std::vector<FloatType> redundant_sols = redundant_sol_fn(full_sol.data());
         if (!redundant_sols.empty())
         {
-          int num_sol = redundant_sols.size() / ikfast_dof;
-          for (int s = 0; s < num_sol; ++s)
+          std::size_t num_sol = redundant_sols.size() / ikfast_dof;
+          for (std::size_t s = 0; s < num_sol; ++s)
           {
             FloatType* redundant_sol = redundant_sols.data() + ikfast_dof * s;
             solution_set.insert(end(solution_set), redundant_sol, redundant_sol + ikfast_dof);  // If good then add to
@@ -186,9 +191,9 @@ void IKFastKinematics<FloatType>::analyzeIK(const Eigen::Transform<FloatType, 3,
   ss << p.matrix().format(CommaInitFmt);
   CONSOLE_BRIDGE_logInform(ss.str().c_str());
 
-  std::string is_valid_fn_defined = "\tIs Valid Function: " ? "True" : "False";
+  std::string is_valid_fn_defined = "\tIs Valid Function: " ? "True" : "False";  // NOLINT
   CONSOLE_BRIDGE_logInform(is_valid_fn_defined.c_str());
-  std::string is_redundant_fn_defined = "\tGet Redundant Solutions Function: " ? "True" : "False";
+  std::string is_redundant_fn_defined = "\tGet Redundant Solutions Function: " ? "True" : "False";  // NOLINT
   CONSOLE_BRIDGE_logInform(is_redundant_fn_defined.c_str());
 
   std::vector<FloatType> solution_set;

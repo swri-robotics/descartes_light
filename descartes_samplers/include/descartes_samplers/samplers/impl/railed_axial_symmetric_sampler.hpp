@@ -18,7 +18,7 @@
 #ifndef DESCARTES_SAMPLERS_SAMPLERS_IMPL_RAILED_AXIAL_SYMMETRIC_SAMPLER_HPP
 #define DESCARTES_SAMPLERS_SAMPLERS_IMPL_RAILED_AXIAL_SYMMETRIC_SAMPLER_HPP
 
-#include "descartes_samplers/samplers/railed_axial_symmetric_sampler.h"
+#include <descartes_samplers/samplers/railed_axial_symmetric_sampler.h>
 
 const static std::size_t dof = 8;
 

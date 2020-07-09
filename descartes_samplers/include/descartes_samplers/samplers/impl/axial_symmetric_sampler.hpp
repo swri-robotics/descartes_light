@@ -18,7 +18,7 @@
 #ifndef DESCARTES_SAMPLERS_SAMPLERS_IMPL_AXIAL_SYMMETRIC_SAMPLER_HPP
 #define DESCARTES_SAMPLERS_SAMPLERS_IMPL_AXIAL_SYMMETRIC_SAMPLER_HPP
 
-#include "descartes_samplers/samplers/axial_symmetric_sampler.h"
+#include <descartes_samplers/samplers/axial_symmetric_sampler.h>
 
 const static std::size_t opw_dof = 6;
 

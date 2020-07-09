@@ -19,6 +19,7 @@ if(NOT TARGET OpenMP::OpenMP_CXX)
 endif()
 
 find_package(Eigen3 REQUIRED)
+find_package(cmake_common_scripts REQUIRED)
 find_package(console_bridge)
 
 if(NOT TARGET console_bridge::console_bridge)
@@ -27,10 +28,25 @@ if(NOT TARGET console_bridge::console_bridge)
   set_target_properties(console_bridge::console_bridge PROPERTIES INTERFACE_LINK_LIBRARIES "${console_bridge_LIBRARIES}")
 endif()
 
+# If testing is enabled the clang tidy will errors instead of warning.
+if(DESCARTES_ENABLE_TESTING)
+  set(CLANG_ARGS ${DEFAULT_CLANG_TIDY_ERROR_ARGS})
+else()
+  set(DESCARTES_ENABLE_TESTING OFF) # Since this is being passed to the macros it must have a value otherwise it causes issues
+  set(CLANG_ARGS ${DEFAULT_CLANG_TIDY_WARNING_ARGS})
+endif()
+
+add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
+
 # Interface Library
 add_library(${PROJECT_NAME}_core INTERFACE)
 target_link_libraries(${PROJECT_NAME}_core INTERFACE console_bridge::console_bridge)
+target_cxx_version(${PROJECT_NAME}_core INTERFACE VERSION 11)
 descartes_target_compile_options(${PROJECT_NAME}_core INTERFACE)
+if(NOT MSVC)
+  target_clang_tidy(${PROJECT_NAME}_core ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_code_coverage(${PROJECT_NAME}_core INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
+endif()
 target_include_directories(${PROJECT_NAME}_core INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
@@ -44,7 +60,12 @@ add_library(${PROJECT_NAME} SHARED
   src/ladder_graph_dag_search.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC console_bridge::console_bridge OpenMP::OpenMP_CXX)
+target_cxx_version(${PROJECT_NAME} INTERFACE VERSION 11)
 descartes_target_compile_options(${PROJECT_NAME} PUBLIC)
+if(NOT MSVC)
+  target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_code_coverage(${PROJECT_NAME} INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
+endif()
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
@@ -54,19 +75,24 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
 # Declare a C++ library
 add_library(${PROJECT_NAME}_gantry SHARED src/gantry_kinematics.cpp)
 target_link_libraries(${PROJECT_NAME}_gantry PUBLIC console_bridge::console_bridge ${PROJECT_NAME}_core)
+target_cxx_version(${PROJECT_NAME}_gantry INTERFACE VERSION 11)
 descartes_target_compile_options(${PROJECT_NAME}_gantry PUBLIC)
+if(NOT MSVC)
+  target_clang_tidy(${PROJECT_NAME}_gantry ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_code_coverage(${PROJECT_NAME}_gantry INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
+endif()
 target_include_directories(${PROJECT_NAME}_gantry PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
 target_include_directories(${PROJECT_NAME}_gantry SYSTEM PUBLIC
   ${EIGEN3_INCLUDE_DIRS})
 
-descartes_configure_package(${PROJECT_NAME}_core ${PROJECT_NAME} ${PROJECT_NAME}_gantry)
+configure_package(NAMESPACE descartes TARGETS ${PROJECT_NAME}_core ${PROJECT_NAME} ${PROJECT_NAME}_gantry)
 
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}
   DESTINATION include
-  FILES_MATCHING PATTERN "*.h*"
+  FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp" PATTERN "*.hxx"
   PATTERN ".svn" EXCLUDE
  )
 

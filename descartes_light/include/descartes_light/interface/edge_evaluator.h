@@ -18,8 +18,12 @@
 #ifndef DESCARTES_LIGHT_CORE_EDGE_EVALUATOR_H
 #define DESCARTES_LIGHT_CORE_EDGE_EVALUATOR_H
 
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
 #include <vector>
+DESCARTES_IGNORE_WARNINGS_POP
+
 #include "descartes_light/ladder_graph.h"
 
 namespace descartes_light

@@ -18,8 +18,12 @@
 #ifndef DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H
 #define DESCARTES_LIGHT_CORE_COLLISION_INTERFACE_H
 
-#include <descartes_light/visibility_control.h>
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
+DESCARTES_IGNORE_WARNINGS_POP
+
+#include <descartes_light/visibility_control.h>
 
 namespace descartes_light
 {

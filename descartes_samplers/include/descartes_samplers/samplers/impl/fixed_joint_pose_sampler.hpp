@@ -18,7 +18,7 @@
 #ifndef DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_POSE_SAMPLER_HPP
 #define DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_POSE_SAMPLER_HPP
 
-#include "descartes_samplers/samplers/fixed_joint_pose_sampler.h"
+#include <descartes_samplers/samplers/fixed_joint_pose_sampler.h>
 
 namespace descartes_light
 {

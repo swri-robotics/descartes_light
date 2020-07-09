@@ -18,11 +18,15 @@
 #ifndef DESCARTES_LIGHT_GANTRY_KINEMATICS_H
 #define DESCARTES_LIGHT_GANTRY_KINEMATICS_H
 
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
+#include <Eigen/Dense>
+#include <vector>
+DESCARTES_IGNORE_WARNINGS_POP
+
 #include <descartes_light/visibility_control.h>
 #include <descartes_light/interface/kinematics_interface.h>
 #include <descartes_light/utils.h>
-#include <Eigen/Dense>
-#include <vector>
 
 namespace descartes_light
 {

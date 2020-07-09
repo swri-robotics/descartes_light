@@ -36,8 +36,6 @@ macro(descartes_target_compile_options target)
     message(FATAL_ERROR "tesseract_target_compile_options() called with unused arguments: ${ARG_UNPARSED_ARGUMENTS}")
   endif()
 
-  list(FIND CMAKE_CXX_COMPILE_FEATURES cxx_std_11 CXX_FEATURE_FOUND)
-
   if (ARG_INTERFACE)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -51,12 +49,6 @@ macro(descartes_target_compile_options target)
       target_compile_definitions(${target} INTERFACE _USE_MATH_DEFINES=ON DESCARTES_BUILDING_LIBRARY=ON)
     else()
       message(WARNING "${CMAKE_CXX_COMPILER_ID} compiler detected. If using AVX instructions, Eigen alignment issues may result.")
-    endif()
-
-    if(CXX_FEATURE_FOUND EQUAL "-1")
-      target_compile_options("${target}" INTERFACE -std=c++11)
-    else()
-      target_compile_features("${target}" INTERFACE cxx_std_11)
     endif()
   elseif(ARG_PUBLIC)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
@@ -73,12 +65,6 @@ macro(descartes_target_compile_options target)
     else()
       message(WARNING "${CMAKE_CXX_COMPILER_ID} compiler detected. If using AVX instructions, Eigen alignment issues may result.")
     endif()
-
-    if(CXX_FEATURE_FOUND EQUAL "-1")
-      target_compile_options(${target} PUBLIC -std=c++11)
-    else()
-      target_compile_features(${target} PUBLIC cxx_std_11)
-    endif()
   elseif(ARG_PRIVATE)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
       if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
@@ -93,55 +79,5 @@ macro(descartes_target_compile_options target)
     else()
       message(WARNING "${CMAKE_CXX_COMPILER_ID} compiler detected. If using AVX instructions, Eigen alignment issues may result.")
     endif()
-
-    if(CXX_FEATURE_FOUND EQUAL "-1")
-      target_compile_options(${target} PRIVATE -std=c++11)
-    else()
-      target_compile_features(${target} PRIVATE cxx_std_11)
-    endif()
-  endif()
-endmacro()
-
-# Performs multiple operation so other packages may find a package
-# Usage: descartes_configure_package(targetA targetb)
-#   * It installs the provided targets
-#   * It exports the provided targets under the namespace descartes::
-#   * It installs the package.xml file
-#   * It create and install the ${PROJECT_NAME}-config.cmake and ${PROJECT_NAME}-config-version.cmake
-macro(descartes_configure_package)
-  install(TARGETS ${ARGV}
-          EXPORT ${PROJECT_NAME}-targets
-          RUNTIME DESTINATION bin
-          LIBRARY DESTINATION lib
-          ARCHIVE DESTINATION lib)
-  install(EXPORT ${PROJECT_NAME}-targets NAMESPACE descartes:: DESTINATION lib/cmake/${PROJECT_NAME})
-
-  install(FILES package.xml DESTINATION share/${PROJECT_NAME})
-
-  # Create cmake config files
-  include(CMakePackageConfigHelpers)
-  configure_package_config_file(${CMAKE_CURRENT_LIST_DIR}/cmake/${PROJECT_NAME}-config.cmake.in
-    ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake
-    INSTALL_DESTINATION lib/cmake/${PROJECT_NAME}
-    NO_CHECK_REQUIRED_COMPONENTS_MACRO)
-
-  write_basic_package_version_file(${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake
-    VERSION ${PROJECT_VERSION} COMPATIBILITY ExactVersion)
-
-  install(FILES
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config.cmake"
-    "${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-config-version.cmake"
-    DESTINATION lib/cmake/${PROJECT_NAME})
-
-  export(EXPORT ${PROJECT_NAME}-targets NAMESPACE descartes:: FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)
-endmacro()
-
-# This macro call the appropriate gtest function to add a test based on the cmake version
-# Usage: tesseract_gtest_discover_tests(target)
-macro(descartes_gtest_discover_tests target)
-  if(${CMAKE_VERSION} VERSION_LESS "3.10.0")
-      gtest_add_tests(${target} "" AUTO)
-  else()
-      gtest_discover_tests(${target})
   endif()
 endmacro()

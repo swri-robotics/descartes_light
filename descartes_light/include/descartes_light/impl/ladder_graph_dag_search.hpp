@@ -18,7 +18,7 @@
 #ifndef DESCARTES_LIGHT_IMPL_LADDER_GRAPH_DAG_SEARCH_HPP
 #define DESCARTES_LIGHT_IMPL_LADDER_GRAPH_DAG_SEARCH_HPP
 
-#include "descartes_light/ladder_graph_dag_search.h"
+#include <descartes_light/ladder_graph_dag_search.h>
 
 namespace descartes_light
 {

@@ -18,8 +18,12 @@
 #ifndef DESCARTES_SAMPLERS_EVALUATORS_EUCLIDEAN_DISTANCE_EDGE_EVALUATOR_HPP
 #define DESCARTES_SAMPLERS_EVALUATORS_EUCLIDEAN_DISTANCE_EDGE_EVALUATOR_HPP
 
-#include <descartes_samplers/evaluators/euclidean_distance_edge_evaluator.h>
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <cmath>
+DESCARTES_IGNORE_WARNINGS_POP
+
+#include <descartes_samplers/evaluators/euclidean_distance_edge_evaluator.h>
 
 namespace
 {

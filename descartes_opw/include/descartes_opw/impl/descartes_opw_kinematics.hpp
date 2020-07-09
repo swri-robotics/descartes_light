@@ -19,10 +19,14 @@
 #define DESCARTES_OPW_IMPL_DESCARTES_OPW_KINEMATICS_HPP
 
 //#include "descartes_opw/impl/descartes_opw_half.hpp"
-#include "descartes_opw/descartes_opw_kinematics.h"
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <opw_kinematics/opw_utilities.h>
 #include <console_bridge/console.h>
 #include <array>
+DESCARTES_IGNORE_WARNINGS_POP
+
+#include <descartes_opw/descartes_opw_kinematics.h>
 
 namespace descartes_light
 {

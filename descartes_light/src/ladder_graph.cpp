@@ -1,4 +1,4 @@
-#include "descartes_light/impl/ladder_graph.hpp"
+#include <descartes_light/impl/ladder_graph.hpp>
 
 namespace descartes_light
 {
