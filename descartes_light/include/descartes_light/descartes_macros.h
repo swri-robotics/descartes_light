@@ -21,6 +21,8 @@
   _Pragma("GCC diagnostic ignored \"-Wfloat-conversion\"")		\
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")		\
   _Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
+
+#define DESCARTES_IGNORE_WARNINGS_POP _Pragma("GCC diagnostic pop")
 #elif defined(__GNUC__)
 #define DESCARTES_IGNORE_WARNINGS_PUSH				\
   _Pragma("GCC diagnostic push") _Pragma("GCC diagnostic ignored \"-Wall\"") \
@@ -31,14 +33,14 @@
   _Pragma("GCC diagnostic ignored \"-Wfloat-conversion\"")		\
   _Pragma("GCC diagnostic ignored \"-Wunused-variable\"")		\
   _Pragma("GCC diagnostic ignored \"-Wsign-conversion\"")
+
+#define DESCARTES_IGNORE_WARNINGS_POP _Pragma("GCC diagnostic pop")
 #elif defined(_MSC_VER)
 #define DESCARTES_IGNORE_WARNINGS_PUSH
 #define DESCARTES_IGNORE_WARNINGS_POP
 #else
 #pragma message("WARNING: You need to implement DESCARTES_IGNORE_WARNINGS_PUSH and DESCARTES_IGNORE_WARNINGS_POP for this compiler")
 #endif
-
-#define DESCARTES_IGNORE_WARNINGS_POP _Pragma("GCC diagnostic pop")
 
 // clang-format on
 #endif  // DESCARTES_MACROS_H
