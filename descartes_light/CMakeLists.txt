@@ -60,11 +60,11 @@ add_library(${PROJECT_NAME} SHARED
   src/ladder_graph_dag_search.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC console_bridge::console_bridge OpenMP::OpenMP_CXX)
-target_cxx_version(${PROJECT_NAME} INTERFACE VERSION 11)
+target_cxx_version(${PROJECT_NAME} PUBLIC VERSION 11)
 descartes_target_compile_options(${PROJECT_NAME} PUBLIC)
 if(NOT MSVC)
   target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
-  target_code_coverage(${PROJECT_NAME} INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
+  target_code_coverage(${PROJECT_NAME} ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
@@ -75,11 +75,11 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
 # Declare a C++ library
 add_library(${PROJECT_NAME}_gantry SHARED src/gantry_kinematics.cpp)
 target_link_libraries(${PROJECT_NAME}_gantry PUBLIC console_bridge::console_bridge ${PROJECT_NAME}_core)
-target_cxx_version(${PROJECT_NAME}_gantry INTERFACE VERSION 11)
+target_cxx_version(${PROJECT_NAME}_gantry PUBLIC VERSION 11)
 descartes_target_compile_options(${PROJECT_NAME}_gantry PUBLIC)
 if(NOT MSVC)
   target_clang_tidy(${PROJECT_NAME}_gantry ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
-  target_code_coverage(${PROJECT_NAME}_gantry INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
+  target_code_coverage(${PROJECT_NAME}_gantry ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 target_include_directories(${PROJECT_NAME}_gantry PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"

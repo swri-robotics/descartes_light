@@ -45,7 +45,7 @@ target_cxx_version(${PROJECT_NAME}_robot PUBLIC VERSION 11)
 descartes_target_compile_options(${PROJECT_NAME}_robot PUBLIC)
 if(NOT MSVC)
   target_clang_tidy(${PROJECT_NAME}_robot ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
-  target_code_coverage(${PROJECT_NAME}_robot INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
+  target_code_coverage(${PROJECT_NAME}_robot ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 target_include_directories(${PROJECT_NAME}_robot PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
