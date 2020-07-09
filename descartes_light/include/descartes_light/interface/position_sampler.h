@@ -18,9 +18,13 @@
 #ifndef DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
 #define DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
 
-#include <descartes_light/visibility_control.h>
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
 #include <vector>
+DESCARTES_IGNORE_WARNINGS_POP
+
+#include <descartes_light/visibility_control.h>
 
 namespace descartes_light
 {

@@ -18,10 +18,14 @@
 #ifndef DESCARTES_LIGHT_LADDER_GRAPH_H
 #define DESCARTES_LIGHT_LADDER_GRAPH_H
 
-#include <descartes_light/visibility_control.h>
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <algorithm>
 #include <cassert>
 #include <vector>
+DESCARTES_IGNORE_WARNINGS_POP
+
+#include <descartes_light/visibility_control.h>
 
 namespace descartes_core
 {

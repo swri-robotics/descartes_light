@@ -18,7 +18,7 @@
 #ifndef DESCARTES_SAMPLERS_SAMPLERS_IMPL_EXTERNAL_AXIS_SAMPLER_HPP
 #define DESCARTES_SAMPLERS_SAMPLERS_IMPL_EXTERNAL_AXIS_SAMPLER_HPP
 
-#include "descartes_samplers/samplers/external_axis_sampler.h"
+#include <descartes_samplers/samplers/external_axis_sampler.h>
 
 namespace descartes_light
 {

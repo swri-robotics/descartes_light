@@ -1,8 +1,11 @@
 
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <gtest/gtest.h>
 #include <algorithm>
 #include <memory>
 #include <ostream>
+DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_ikfast_fanuc_m20ia10l_manipulator.h>
 
@@ -21,7 +24,7 @@ TEST(DescartesIkFastUnit, Instantiation)
   EXPECT_TRUE(robot.ik(pose, ik_solution));
 
   int num_dof = robot.dof();
-  int num_sol = ik_solution.size() / num_dof;
+  int num_sol = static_cast<int>(ik_solution.size()) / num_dof;
   for (int i = 0; i < num_sol; ++i)
   {
     double* sol = ik_solution.data() + i * num_dof;

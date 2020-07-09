@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include "descartes_opw/impl/descartes_opw_kinematics.hpp"
+#include <descartes_opw/impl/descartes_opw_kinematics.hpp>
 
 namespace descartes_light
 {

@@ -18,11 +18,15 @@
 #ifndef DESCARTES_LIGHT_IMPL_DESCARTES_LIGHT_HPP
 #define DESCARTES_LIGHT_IMPL_DESCARTES_LIGHT_HPP
 
-#include "descartes_light/descartes_light.h"
-#include "descartes_light/ladder_graph_dag_search.h"
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <console_bridge/console.h>
 #include <sstream>
 #include <algorithm>
+DESCARTES_IGNORE_WARNINGS_POP
+
+#include <descartes_light/descartes_light.h>
+#include <descartes_light/ladder_graph_dag_search.h>
 
 #define UNUSED(x) (void)(x)
 

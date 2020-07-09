@@ -18,9 +18,13 @@
 #ifndef DESCARTES_LIGHT_GANTRY_KINEMATICS_HPP
 #define DESCARTES_LIGHT_GANTRY_KINEMATICS_HPP
 
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
+#include <console_bridge/console.h>
+DESCARTES_IGNORE_WARNINGS_POP
+
 #include <descartes_light/impl/gantry_kinematics.h>
 #include <descartes_light/utils.h>
-#include <console_bridge/console.h>
 
 namespace descartes_light
 {

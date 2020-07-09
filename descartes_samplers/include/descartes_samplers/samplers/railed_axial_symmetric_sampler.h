@@ -18,12 +18,16 @@
 #ifndef DESCARTES_SAMPLERS_SAMPLERS_RAILED_AXIAL_SYMMETRIC_SAMPLER_H
 #define DESCARTES_SAMPLERS_SAMPLERS_RAILED_AXIAL_SYMMETRIC_SAMPLER_H
 
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
+#include <memory>
+DESCARTES_IGNORE_WARNINGS_POP
+
 #include <descartes_light/visibility_control.h>
 #include <descartes_light/interface/kinematics_interface.h>
 #include <descartes_light/interface/collision_interface.h>
 #include <descartes_light/interface/position_sampler.h>
 #include <descartes_light/utils.h>
-#include <memory>
 
 namespace descartes_light
 {

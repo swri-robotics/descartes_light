@@ -18,7 +18,7 @@
 #ifndef DESCARTES_SAMPLERS_SAMPLERS_IMPL_CARTESIAN_POINT_SAMPLER_HPP
 #define DESCARTES_SAMPLERS_SAMPLERS_IMPL_CARTESIAN_POINT_SAMPLER_HPP
 
-#include "descartes_samplers/samplers/cartesian_point_sampler.h"
+#include <descartes_samplers/samplers/cartesian_point_sampler.h>
 
 const static std::size_t opw_dof = 6;
 

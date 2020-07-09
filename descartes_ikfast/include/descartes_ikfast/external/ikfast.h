@@ -32,12 +32,17 @@
    - IKFAST_NAMESPACE - Enclose all functions and classes in this namespace, the ``main`` function is excluded.
 
  */
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <vector>
 #include <list>
 #include <stdexcept>
+DESCARTES_IGNORE_WARNINGS_POP
 
-#ifndef IKFAST_HEADER_COMMON
-#define IKFAST_HEADER_COMMON
+#include <descartes_light/visibility_control.h>
+
+#ifndef DESCARTES_IKFAST_HEADER_COMMON
+#define DESCARTES_IKFAST_HEADER_COMMON
 
 /// should be the same as ikfast.__version__
 #define IKFAST_VERSION 61
@@ -90,7 +95,7 @@ public:
   virtual const std::vector<int>& GetFree() const = 0;
 
   /// \brief the dof of the solution
-  virtual const int GetDOF() const = 0;
+  virtual int GetDOF() const = 0;
 };
 
 /// \brief manages all the solutions
@@ -197,7 +202,7 @@ public:
   }
 
   virtual const std::vector<int>& GetFree() const { return _vfree; }
-  virtual const int GetDOF() const { return static_cast<int>(_vbasesol.size()); }
+  virtual int GetDOF() const { return static_cast<int>(_vbasesol.size()); }
 
   virtual void Validate() const
   {
@@ -326,34 +331,34 @@ typedef double IkReal;
    - For **TranslationLocalGlobal6D**, the diagonal elements ([0],[4],[8]) are the local translation inside the end
    effector coordinate system.
  */
-IKFAST_API bool ComputeIk(const IkReal* eetrans,
-                          const IkReal* eerot,
-                          const IkReal* pfree,
-                          ikfast::IkSolutionListBase<IkReal>& solutions);
+DESCARTES_PUBLIC IKFAST_API bool ComputeIk(const IkReal* eetrans,
+                                           const IkReal* eerot,
+                                           const IkReal* pfree,
+                                           ikfast::IkSolutionListBase<IkReal>& solutions);
 
 /// \brief Computes the end effector coordinates given the joint values. This function is used to double check ik.
-IKFAST_API void ComputeFk(const IkReal* joints, IkReal* eetrans, IkReal* eerot);
+DESCARTES_PUBLIC IKFAST_API void ComputeFk(const IkReal* joints, IkReal* eetrans, IkReal* eerot);
 
 /// \brief returns the number of free parameters users has to set apriori
-IKFAST_API int GetNumFreeParameters();
+DESCARTES_PUBLIC IKFAST_API int GetNumFreeParameters();
 
 /// \brief the indices of the free parameters indexed by the chain joints
-IKFAST_API int* GetFreeParameters();
+DESCARTES_PUBLIC IKFAST_API int* GetFreeParameters();
 
 /// \brief the total number of indices of the chain
-IKFAST_API int GetNumJoints();
+DESCARTES_PUBLIC IKFAST_API int GetNumJoints();
 
 /// \brief the size in bytes of the configured number type
-IKFAST_API int GetIkRealSize();
+DESCARTES_PUBLIC IKFAST_API int GetIkRealSize();
 
 /// \brief the ikfast version used to generate this file
-IKFAST_API const char* GetIkFastVersion();
+DESCARTES_PUBLIC IKFAST_API const char* GetIkFastVersion();
 
 /// \brief the ik type ID
-IKFAST_API int GetIkType();
+DESCARTES_PUBLIC IKFAST_API int GetIkType();
 
 /// \brief a hash of all the chain values used for double checking that the correct IK is used.
-IKFAST_API const char* GetKinematicsHash();
+DESCARTES_PUBLIC IKFAST_API const char* GetKinematicsHash();
 
 #ifdef IKFAST_NAMESPACE
 }

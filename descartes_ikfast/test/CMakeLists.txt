@@ -41,8 +41,13 @@ endif()
 
 add_library(${PROJECT_NAME}_robot SHARED descartes_ikfast_fanuc_m20ia10l_manipulator.cpp)
 target_link_libraries(${PROJECT_NAME}_robot PUBLIC ${PROJECT_NAME})
-descartes_target_compile_options(${PROJECT_NAME}_robot PRIVATE)
-target_include_directories(${PROJECT_NAME}_robot PRIVATE
+target_cxx_version(${PROJECT_NAME}_robot PUBLIC VERSION 11)
+descartes_target_compile_options(${PROJECT_NAME}_robot PUBLIC)
+if(NOT MSVC)
+  target_clang_tidy(${PROJECT_NAME}_robot ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_code_coverage(${PROJECT_NAME}_robot INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
+endif()
+target_include_directories(${PROJECT_NAME}_robot PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:include>")
@@ -50,12 +55,17 @@ add_dependencies(${PROJECT_NAME}_robot ${PROJECT_NAME})
 
 add_executable(${PROJECT_NAME}_unit descartes_ikfast_unit.cpp)
 target_link_libraries(${PROJECT_NAME}_unit PRIVATE GTest::GTest GTest::Main ${PROJECT_NAME}_robot)
+target_cxx_version(${PROJECT_NAME}_unit PRIVATE VERSION 11)
 descartes_target_compile_options(${PROJECT_NAME}_unit PRIVATE)
+if(NOT MSVC)
+  target_clang_tidy(${PROJECT_NAME}_unit ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_code_coverage(${PROJECT_NAME}_unit ALL ENABLE ${DESCARTES_ENABLE_TESTING})
+endif()
 target_include_directories(${PROJECT_NAME}_unit PRIVATE
     "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}/include>"
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
     "$<INSTALL_INTERFACE:include>")
-descartes_gtest_discover_tests(${PROJECT_NAME}_unit)
+add_gtest_discover_tests(${PROJECT_NAME}_unit)
 add_dependencies(${PROJECT_NAME}_unit ${PROJECT_NAME})
 add_dependencies(${PROJECT_NAME}_unit ${PROJECT_NAME}_robot)
 add_dependencies(run_tests ${PROJECT_NAME}_unit)

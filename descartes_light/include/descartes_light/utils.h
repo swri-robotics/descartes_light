@@ -1,12 +1,16 @@
 #ifndef DESCARTES_LIGHT_UTILS_H
 #define DESCARTES_LIGHT_UTILS_H
 
-#include <descartes_light/visibility_control.h>
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
 #include <functional>
 #include <vector>
 #include <cmath>
 #include <Eigen/Geometry>
+DESCARTES_IGNORE_WARNINGS_POP
+
+#include <descartes_light/visibility_control.h>
 
 namespace descartes_light
 {

@@ -15,6 +15,7 @@
   <depend>descartes_light</depend>
   <depend>eigen</depend>
   <depend>libconsole-bridge-dev</depend>
+  <build_depend>cmake_common_scripts</build_depend>
 
   <export>
     <build_type>cmake</build_type>

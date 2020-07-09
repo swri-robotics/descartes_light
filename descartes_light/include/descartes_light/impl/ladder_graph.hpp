@@ -18,7 +18,7 @@
 #ifndef DESCARTES_LIGHT_IMPL_LADDER_GRAPH_HPP
 #define DESCARTES_LIGHT_IMPL_LADDER_GRAPH_HPP
 
-#include "descartes_light/ladder_graph.h"
+#include <descartes_light/ladder_graph.h>
 
 namespace descartes_light
 {

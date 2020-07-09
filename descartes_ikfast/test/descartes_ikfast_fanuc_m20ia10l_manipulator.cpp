@@ -15,10 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
+#include "fanuc_m20ia10l_manipulator_ikfast_solver.cpp"  // generated from ikfast for this robot
+DESCARTES_IGNORE_WARNINGS_POP
+
 #include <descartes_light/visibility_control.h>
 #include <descartes_ikfast/impl/ikfast_kinematics.hpp>
-#include "fanuc_m20ia10l_manipulator_ikfast_solver.cpp"  // generated from ikfast for this robot
-#include "descartes_ikfast_fanuc_m20ia10l_manipulator.h"
+#include <descartes_ikfast_fanuc_m20ia10l_manipulator.h>
 
 namespace descartes_ikfast_unit
 {
