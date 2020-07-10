@@ -44,6 +44,5 @@ configure_package(NAMESPACE descartes TARGETS ${PROJECT_NAME})
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}
   DESTINATION include
-  FILES_MATCHING PATTERN "*.h" PATTERN "*.hpp" PATTERN "*.hxx"
   PATTERN ".svn" EXCLUDE
  )
