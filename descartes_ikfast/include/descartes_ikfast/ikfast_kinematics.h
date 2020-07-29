@@ -62,8 +62,6 @@ protected:
           std::vector<FloatType>& solution_set) const;
 };
 
-#include <descartes_ikfast/impl/ikfast_kinematics.hpp>
-
 using IKFastKinematicsD = IKFastKinematics<double>;
 using IKFastKinematicsF = IKFastKinematics<float>;
 

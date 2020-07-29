@@ -43,6 +43,7 @@ add_library(${PROJECT_NAME}_robot SHARED descartes_ikfast_fanuc_m20ia10l_manipul
 target_link_libraries(${PROJECT_NAME}_robot PUBLIC ${PROJECT_NAME})
 target_cxx_version(${PROJECT_NAME}_robot PUBLIC VERSION 11)
 descartes_target_compile_options(${PROJECT_NAME}_robot PUBLIC)
+target_compile_definitions(${PROJECT_NAME}_robot PUBLIC -DIKFAST_NO_MAIN -DIKFAST_CLIBRARY -DIKFAST_HAS_LIBRARY)
 if(NOT MSVC)
   target_clang_tidy(${PROJECT_NAME}_robot ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
   target_code_coverage(${PROJECT_NAME}_robot ALL ENABLE ${DESCARTES_ENABLE_TESTING})

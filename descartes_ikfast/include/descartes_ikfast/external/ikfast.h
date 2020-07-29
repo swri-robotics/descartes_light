@@ -41,8 +41,8 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_light/visibility_control.h>
 
-#ifndef DESCARTES_IKFAST_HEADER_COMMON
-#define DESCARTES_IKFAST_HEADER_COMMON
+#ifndef IKFAST_HEADER_COMMON
+#define IKFAST_HEADER_COMMON
 
 /// should be the same as ikfast.__version__
 #define IKFAST_VERSION 61
@@ -303,7 +303,7 @@ protected:
 #ifdef _MSC_VER
 #define IKFAST_API extern "C" __declspec(dllexport)
 #else
-#define IKFAST_API extern "C"
+#define IKFAST_API extern "C" __attribute__((visibility("default")))
 #endif
 #else
 #define IKFAST_API
@@ -331,34 +331,34 @@ typedef double IkReal;
    - For **TranslationLocalGlobal6D**, the diagonal elements ([0],[4],[8]) are the local translation inside the end
    effector coordinate system.
  */
-DESCARTES_PUBLIC IKFAST_API bool ComputeIk(const IkReal* eetrans,
-                                           const IkReal* eerot,
-                                           const IkReal* pfree,
-                                           ikfast::IkSolutionListBase<IkReal>& solutions);
+IKFAST_API bool ComputeIk(const IkReal* eetrans,
+                          const IkReal* eerot,
+                          const IkReal* pfree,
+                          ikfast::IkSolutionListBase<IkReal>& solutions);
 
 /// \brief Computes the end effector coordinates given the joint values. This function is used to double check ik.
-DESCARTES_PUBLIC IKFAST_API void ComputeFk(const IkReal* joints, IkReal* eetrans, IkReal* eerot);
+IKFAST_API void ComputeFk(const IkReal* joints, IkReal* eetrans, IkReal* eerot);
 
 /// \brief returns the number of free parameters users has to set apriori
-DESCARTES_PUBLIC IKFAST_API int GetNumFreeParameters();
+IKFAST_API int GetNumFreeParameters();
 
 /// \brief the indices of the free parameters indexed by the chain joints
-DESCARTES_PUBLIC IKFAST_API int* GetFreeParameters();
+IKFAST_API int* GetFreeParameters();
 
 /// \brief the total number of indices of the chain
-DESCARTES_PUBLIC IKFAST_API int GetNumJoints();
+IKFAST_API int GetNumJoints();
 
 /// \brief the size in bytes of the configured number type
-DESCARTES_PUBLIC IKFAST_API int GetIkRealSize();
+IKFAST_API int GetIkRealSize();
 
 /// \brief the ikfast version used to generate this file
-DESCARTES_PUBLIC IKFAST_API const char* GetIkFastVersion();
+IKFAST_API const char* GetIkFastVersion();
 
 /// \brief the ik type ID
-DESCARTES_PUBLIC IKFAST_API int GetIkType();
+IKFAST_API int GetIkType();
 
 /// \brief a hash of all the chain values used for double checking that the correct IK is used.
-DESCARTES_PUBLIC IKFAST_API const char* GetKinematicsHash();
+IKFAST_API const char* GetKinematicsHash();
 
 #ifdef IKFAST_NAMESPACE
 }
