@@ -24,13 +24,17 @@
 namespace descartes_light
 {
 template <typename FloatType>
-class CompoundEdgeEvaluator : public std::vector<typename EdgeEvaluator<FloatType>::Ptr>,
-                              public EdgeEvaluator<FloatType>
+class CompoundEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
-  bool evaluate(const Rung_<FloatType>& from,
-                const Rung_<FloatType>& to,
-                std::vector<typename LadderGraph<FloatType>::EdgeList>& edges) override;
+  CompoundEdgeEvaluator(int dof);
+
+  std::pair<bool, FloatType> considerEdge(const Rung_<FloatType>& from,
+                                          const FloatType* start,
+                                          const Rung_<FloatType>& to,
+                                          const FloatType* end) override;
+
+  std::vector<typename EdgeEvaluator<FloatType>::Ptr> evaluators;
 };
 
 using CompoundEdgeEvaluatorF = CompoundEdgeEvaluator<float>;

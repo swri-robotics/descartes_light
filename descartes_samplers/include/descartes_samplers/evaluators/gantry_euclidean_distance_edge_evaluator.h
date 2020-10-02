@@ -29,12 +29,10 @@ class GantryEuclideanDistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   GantryEuclideanDistanceEdgeEvaluator(int dof);
 
-  bool evaluate(const Rung_<FloatType>& from,
-                const Rung_<FloatType>& to,
-                std::vector<typename LadderGraph<FloatType>::EdgeList>& edges) override;
-
-protected:
-  std::size_t dof_;
+  std::pair<bool, FloatType> considerEdge(const Rung_<FloatType>& from,
+                                          const FloatType* start,
+                                          const Rung_<FloatType>& to,
+                                          const FloatType* end) override;
 };
 
 using GantryEuclideanDistanceEdgeEvaluatorF = GantryEuclideanDistanceEdgeEvaluator<float>;
