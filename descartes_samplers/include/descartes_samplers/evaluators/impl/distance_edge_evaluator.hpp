@@ -25,54 +25,27 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_samplers/evaluators/distance_edge_evaluator.h>
 
-namespace
-{
-template <typename FloatType>
-static void considerEdge(const FloatType* start,
-                         const FloatType* end,
-                         const std::vector<FloatType>& delta_thresholds,
-                         std::size_t next_idx,
-                         typename descartes_light::LadderGraph<FloatType>::EdgeList& out)
-{
-  FloatType cost = static_cast<FloatType>(0.0);
-  for (std::size_t i = 0; i < delta_thresholds.size(); ++i)
-  {
-    FloatType step = end[i] - start[i];
-    if (std::abs(step) > delta_thresholds[i])
-      return;
-
-    cost += std::pow(step, FloatType(2));
-  }
-
-  out.emplace_back(cost, next_idx);
-}
-
-}  // namespace
-
 namespace descartes_light
 {
 template <typename FloatType>
 DistanceEdgeEvaluator<FloatType>::DistanceEdgeEvaluator(const std::vector<FloatType>& velocity_limits)
-  : velocity_limits_(velocity_limits)
+  : EdgeEvaluator<FloatType>(velocity_limits.size()), velocity_limits_(velocity_limits)
 {
 }
 
 template <typename FloatType>
-bool DistanceEdgeEvaluator<FloatType>::evaluate(const Rung_<FloatType>& from,
-                                                const Rung_<FloatType>& to,
-                                                std::vector<typename LadderGraph<FloatType>::EdgeList>& edges)
+std::pair<bool, FloatType> DistanceEdgeEvaluator<FloatType>::considerEdge(const Rung_<FloatType>&,
+                                                                          const FloatType* start,
+                                                                          const Rung_<FloatType>& to,
+                                                                          const FloatType* end)
 {
-  const auto dof = velocity_limits_.size();
-  const auto n_start = from.data.size() / dof;
-  const auto n_end = to.data.size() / dof;
-
   // Compute thresholds
   const auto dt = to.timing;
 
-  std::vector<FloatType> delta_thresholds(velocity_limits_.size());
+  std::vector<FloatType> joint_distance_threshold(velocity_limits_.size());
   std::transform(velocity_limits_.begin(),
                  velocity_limits_.end(),
-                 delta_thresholds.begin(),
+                 joint_distance_threshold.begin(),
                  [dt](const FloatType& vel_limit) -> FloatType {
                    if (dt.upper != static_cast<FloatType>(0.0))
                    {
@@ -85,26 +58,17 @@ bool DistanceEdgeEvaluator<FloatType>::evaluate(const Rung_<FloatType>& from,
                    }
                  });
 
-  // Allocate
-  edges.resize(n_start);
-
-  for (std::size_t i = 0; i < n_start; ++i)
+  FloatType cost = static_cast<FloatType>(0.0);
+  for (std::size_t i = 0; i < joint_distance_threshold.size(); ++i)
   {
-    const auto* start_vertex = from.data.data() + dof * i;
-    for (std::size_t j = 0; j < n_end; ++j)
-    {
-      const auto* end_vertex = to.data.data() + dof * j;
+    FloatType step = end[i] - start[i];
+    if (std::abs(step) > joint_distance_threshold[i])
+      return std::make_pair(false, cost);
 
-      // Consider the edge:
-      considerEdge(start_vertex, end_vertex, delta_thresholds, j, edges[i]);
-    }
+    cost += std::pow(step, FloatType(2));
   }
 
-  for (const auto& rung : edges)
-    if (!rung.empty())
-      return true;
-
-  return false;
+  return std::make_pair(true, cost);
 }
 
 }  // namespace descartes_light
