@@ -29,10 +29,12 @@ class DistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   DistanceEdgeEvaluator(const std::vector<FloatType>& velocity_limits);
 
-  bool evaluate(const Rung_<FloatType>& from,
-                const Rung_<FloatType>& to,
-                std::vector<typename LadderGraph<FloatType>::EdgeList>& edges) override;
+  std::pair<bool, FloatType> considerEdge(const Rung_<FloatType>& from,
+                                          const FloatType* start,
+                                          const Rung_<FloatType>& to,
+                                          const FloatType* end) override;
 
+protected:
   std::vector<FloatType> velocity_limits_;
 };
 

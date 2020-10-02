@@ -23,15 +23,29 @@
 namespace descartes_light
 {
 template <typename FloatType>
-bool CompoundEdgeEvaluator<FloatType>::evaluate(const Rung_<FloatType>& from,
-                                                const Rung_<FloatType>& to,
-                                                std::vector<typename LadderGraph<FloatType>::EdgeList>& edges)
+CompoundEdgeEvaluator<FloatType>::CompoundEdgeEvaluator(int dof)
+  : EdgeEvaluator<FloatType>(static_cast<std::size_t>(dof))
 {
-  for (auto& evaluator : *this)
-    if (!evaluator->evaluate(from, to, edges))
-      return false;
+}
 
-  return true;
+template <typename FloatType>
+std::pair<bool, FloatType> CompoundEdgeEvaluator<FloatType>::considerEdge(const Rung_<FloatType>& from,
+                                                                          const FloatType* start,
+                                                                          const Rung_<FloatType>& to,
+                                                                          const FloatType* end)
+{
+  FloatType cost = 0.0;
+  for (auto& evaluator : evaluators)
+  {
+    auto results = evaluator->considerEdge(from, start, to, end);
+    if (!results.first)
+      return std::make_pair(false, cost);
+
+    cost += results.second;
+  }
+
+  return std::make_pair(true, cost);
+  ;
 }
 
 }  // namespace descartes_light
