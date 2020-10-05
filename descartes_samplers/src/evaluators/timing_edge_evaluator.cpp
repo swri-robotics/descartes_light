@@ -16,12 +16,12 @@
  * limitations under the License.
  */
 #include <descartes_light/visibility_control.h>
-#include <descartes_samplers/evaluators/impl/distance_edge_evaluator.hpp>
+#include <descartes_samplers/evaluators/impl/timing_edge_evaluator.hpp>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DESCARTES_PUBLIC DistanceEdgeEvaluator<float>;
-template class DESCARTES_PUBLIC DistanceEdgeEvaluator<double>;
+template class DESCARTES_PUBLIC TimingEdgeEvaluator<float>;
+template class DESCARTES_PUBLIC TimingEdgeEvaluator<double>;
 
 }  // namespace descartes_light

@@ -3,6 +3,7 @@ project(descartes_samplers VERSION 0.1.0 LANGUAGES CXX)
 
 find_package(descartes_light REQUIRED)
 find_package(cmake_common_scripts REQUIRED)
+find_package(Eigen3 REQUIRED)
 
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
@@ -19,7 +20,7 @@ add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
 
 # Declare a C++ library
 add_library(${PROJECT_NAME} SHARED
-  src/evaluators/distance_edge_evaluator.cpp
+  src/evaluators/timing_edge_evaluator.cpp
   src/evaluators/euclidean_distance_edge_evaluator.cpp
   src/evaluators/gantry_euclidean_distance_edge_evaluator.cpp
   src/evaluators/compound_edge_evaluator.cpp
@@ -40,7 +41,7 @@ endif()
 target_include_directories(${PROJECT_NAME} PUBLIC
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC)
+target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC ${EIGEN3_INCLUDE_DIRS})
 
 configure_package(NAMESPACE descartes TARGETS ${PROJECT_NAME})
 
