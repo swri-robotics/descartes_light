@@ -36,19 +36,14 @@ public:
   EdgeEvaluator(std::size_t dof) : dof_(dof) {}
   virtual ~EdgeEvaluator() {}
 
-  virtual bool evaluate(const Rung_<FloatType>& from,
-                        const Rung_<FloatType>& to,
-                        std::vector<typename LadderGraph<FloatType>::EdgeList>& edge_lists)
+  bool evaluate(const Rung_<FloatType>& from,
+                const Rung_<FloatType>& to,
+                std::vector<typename LadderGraph<FloatType>::EdgeList>& edge_lists)
   {
     const auto n_start = from.data.size() / dof_;
     const auto n_end = to.data.size() / dof_;
 
-    // Allocate if needed because of Compound Evaluator
-    if (edge_lists.size() == 0)
-      edge_lists.resize(n_start);
-
-    assert(edge_lists.size() == n_start);
-
+    edge_lists.resize(n_start);
     for (std::size_t i = 0; i < n_start; ++i)
     {
       const auto* start_vertex = from.data.data() + dof_ * i;
@@ -57,7 +52,7 @@ public:
         const FloatType* end_vertex = to.data.data() + dof_ * j;
 
         // Consider the edge:
-        std::pair<bool, FloatType> results = considerEdge(from, start_vertex, to, end_vertex);
+        std::pair<bool, FloatType> results = considerEdge(start_vertex, end_vertex);
         if (results.first)
           edge_lists[i].emplace_back(results.second, j);
       }
@@ -72,17 +67,12 @@ public:
 
   /**
    * @brief Determines whether the edge between two vertices is valid and, if so, its cost.
-   * @param from The rung associated with the start state
    * @param start The start state of the edge
-   * @param to The rung associated with the end state
    * @param end The end state of the edge
    * @return A pair <True/False, Cost>, True if edge is valid, false otherwise. Cost to move from the first vertex to
    * the next
    */
-  virtual std::pair<bool, FloatType> considerEdge(const Rung_<FloatType>& from,
-                                                  const FloatType* start,
-                                                  const Rung_<FloatType>& to,
-                                                  const FloatType* end) = 0;
+  virtual std::pair<bool, FloatType> considerEdge(const FloatType* start, const FloatType* end) = 0;
 
 protected:
   std::size_t dof_;

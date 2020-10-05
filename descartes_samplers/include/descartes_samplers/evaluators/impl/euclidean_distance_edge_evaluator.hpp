@@ -34,9 +34,7 @@ EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(int do
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> EuclideanDistanceEdgeEvaluator<FloatType>::considerEdge(const Rung_<FloatType>&,
-                                                                                   const FloatType* start,
-                                                                                   const Rung_<FloatType>&,
+std::pair<bool, FloatType> EuclideanDistanceEdgeEvaluator<FloatType>::considerEdge(const FloatType* start,
                                                                                    const FloatType* end)
 {
   FloatType cost = 0.0;

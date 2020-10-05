@@ -127,12 +127,10 @@ void LadderGraph<FloatType>::assignEdges(const std::size_t rung,
 template <typename FloatType>
 void LadderGraph<FloatType>::assignRung(const std::size_t index,
                                         descartes_core::TrajectoryID id,
-                                        descartes_core::TimingConstraint<FloatType> time,
                                         const std::vector<std::vector<FloatType>>& sols)
 {
   Rung& r = getRung(index);
   r.id = id;
-  r.timing = time;
   r.data.reserve(sols.size() * dof_);
   for (const auto& sol : sols)
   {
