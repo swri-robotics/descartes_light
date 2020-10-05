@@ -15,29 +15,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_SAMPLERS_EVALUATORS_DISTANCE_EDGE_EVALUATOR_H
-#define DESCARTES_SAMPLERS_EVALUATORS_DISTANCE_EDGE_EVALUATOR_H
+#ifndef DESCARTES_SAMPLERS_EVALUATORS_TIMING_EDGE_EVALUATOR_H
+#define DESCARTES_SAMPLERS_EVALUATORS_TIMING_EDGE_EVALUATOR_H
 
 #include <descartes_light/visibility_control.h>
 #include <descartes_light/interface/edge_evaluator.h>
+#include <Eigen/Geometry>
 
 namespace descartes_light
 {
 template <typename FloatType>
-class DistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
+class TimingEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
-  DistanceEdgeEvaluator(const std::vector<FloatType>& velocity_limits, FloatType dt);
+  EIGEN_MAKE_ALIGNED_OPERATOR_NEW
+
+  TimingEdgeEvaluator(const std::vector<FloatType>& velocity_limits, FloatType dt, FloatType safety_factor);
 
   std::pair<bool, FloatType> considerEdge(const FloatType* start, const FloatType* end) override;
 
 protected:
-  std::vector<FloatType> joint_distance_threshold_;
+  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> velocity_limits_;
+  FloatType dt_;
+  FloatType safety_factor_;
 };
 
-using DistanceEdgeEvaluatorF = DistanceEdgeEvaluator<float>;
-using DistanceEdgeEvaluatorD = DistanceEdgeEvaluator<double>;
+using TimingEdgeEvaluatorF = TimingEdgeEvaluator<float>;
+using TimingEdgeEvaluatorD = TimingEdgeEvaluator<double>;
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_SAMPLERS_EVALUATORS_DISTANCE_EDGE_EVALUATOR_H
+#endif  // DESCARTES_SAMPLERS_EVALUATORS_TIMING_EDGE_EVALUATOR_H
