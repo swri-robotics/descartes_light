@@ -28,41 +28,35 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 template <typename FloatType>
-DistanceEdgeEvaluator<FloatType>::DistanceEdgeEvaluator(const std::vector<FloatType>& velocity_limits)
-  : EdgeEvaluator<FloatType>(velocity_limits.size()), velocity_limits_(velocity_limits)
+DistanceEdgeEvaluator<FloatType>::DistanceEdgeEvaluator(const std::vector<FloatType>& velocity_limits, FloatType dt)
+  : EdgeEvaluator<FloatType>(velocity_limits.size())
 {
-}
-
-template <typename FloatType>
-std::pair<bool, FloatType> DistanceEdgeEvaluator<FloatType>::considerEdge(const Rung_<FloatType>&,
-                                                                          const FloatType* start,
-                                                                          const Rung_<FloatType>& to,
-                                                                          const FloatType* end)
-{
-  // Compute thresholds
-  const auto dt = to.timing;
-
-  std::vector<FloatType> joint_distance_threshold(velocity_limits_.size());
-  std::transform(velocity_limits_.begin(),
-                 velocity_limits_.end(),
-                 joint_distance_threshold.begin(),
+  joint_distance_threshold_.resize(velocity_limits.size());
+  std::vector<FloatType> joint_distance_threshold(velocity_limits.size());
+  std::transform(velocity_limits.begin(),
+                 velocity_limits.end(),
+                 joint_distance_threshold_.begin(),
                  [dt](const FloatType& vel_limit) -> FloatType {
-                   if (dt.upper != static_cast<FloatType>(0.0))
+                   if (dt != static_cast<FloatType>(0.0))
                    {
                      const static FloatType safety_factor = static_cast<FloatType>(0.9);
-                     return dt.upper * vel_limit * safety_factor;
+                     return dt * vel_limit * safety_factor;
                    }
                    else
                    {
                      return std::numeric_limits<FloatType>::max();
                    }
                  });
+}
 
+template <typename FloatType>
+std::pair<bool, FloatType> DistanceEdgeEvaluator<FloatType>::considerEdge(const FloatType* start, const FloatType* end)
+{
   FloatType cost = static_cast<FloatType>(0.0);
-  for (std::size_t i = 0; i < joint_distance_threshold.size(); ++i)
+  for (std::size_t i = 0; i < joint_distance_threshold_.size(); ++i)
   {
     FloatType step = end[i] - start[i];
-    if (std::abs(step) > joint_distance_threshold[i])
+    if (std::abs(step) > joint_distance_threshold_[i])
       return std::make_pair(false, cost);
 
     cost += std::pow(step, FloatType(2));

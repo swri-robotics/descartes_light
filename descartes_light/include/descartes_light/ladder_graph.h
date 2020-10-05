@@ -30,18 +30,6 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_core
 {
 using TrajectoryID = std::size_t;
-
-template <typename FloatType>
-struct TimingConstraint
-{
-  TimingConstraint() : upper(0.0) {}
-  TimingConstraint(FloatType time) : upper(time) {}
-  FloatType upper;
-};
-
-using TimingConstraintF = TimingConstraint<float>;
-using TimingConstraintD = TimingConstraint<double>;
-
 }  // namespace descartes_core
 
 namespace descartes_light
@@ -61,9 +49,8 @@ struct Rung_
   using Edge = Edge_<FloatType>;
   using EdgeList = std::vector<Edge>;
 
-  descartes_core::TrajectoryID id;                     // corresponds to user's input ID
-  descartes_core::TimingConstraint<FloatType> timing;  // user input timing
-  std::vector<FloatType> data;                         // joint values stored in one contiguous array
+  descartes_core::TrajectoryID id;  // corresponds to user's input ID
+  std::vector<FloatType> data;      // joint values stored in one contiguous array
   std::vector<EdgeList> edges;
 };
 
@@ -152,7 +139,6 @@ public:
    */
   void assignRung(const std::size_t index,
                   descartes_core::TrajectoryID id,
-                  descartes_core::TimingConstraint<FloatType> time,
                   const std::vector<std::vector<FloatType>>& sols);
 
   void removeRung(const std::size_t index);

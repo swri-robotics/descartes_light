@@ -29,15 +29,12 @@ CompoundEdgeEvaluator<FloatType>::CompoundEdgeEvaluator(int dof)
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> CompoundEdgeEvaluator<FloatType>::considerEdge(const Rung_<FloatType>& from,
-                                                                          const FloatType* start,
-                                                                          const Rung_<FloatType>& to,
-                                                                          const FloatType* end)
+std::pair<bool, FloatType> CompoundEdgeEvaluator<FloatType>::considerEdge(const FloatType* start, const FloatType* end)
 {
   FloatType cost = 0.0;
   for (auto& evaluator : evaluators)
   {
-    auto results = evaluator->considerEdge(from, start, to, end);
+    auto results = evaluator->considerEdge(start, end);
     if (!results.first)
       return std::make_pair(false, cost);
 
