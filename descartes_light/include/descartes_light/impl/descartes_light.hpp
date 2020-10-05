@@ -69,7 +69,6 @@ Solver<FloatType>::Solver(const std::size_t dof) : graph_{ dof }
 
 template <typename FloatType>
 bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
-                              const std::vector<typename descartes_core::TimingConstraint<FloatType>>& times,
                               const std::vector<typename EdgeEvaluator<FloatType>::Ptr>& edge_eval,
                               int num_threads)
 {
@@ -87,7 +86,6 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
     if (trajectory[static_cast<size_t>(i)]->sample(vertex_data))
     {
       graph_.getRung(static_cast<size_t>(i)).data = std::move(vertex_data);
-      graph_.getRung(static_cast<size_t>(i)).timing = times[static_cast<size_t>(i)];
     }
     else
     {
@@ -147,12 +145,11 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
 
 template <typename FloatType>
 bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
-                              const std::vector<typename descartes_core::TimingConstraint<FloatType>>& times,
                               typename EdgeEvaluator<FloatType>::Ptr edge_eval,
                               int num_threads)
 {
   std::vector<typename EdgeEvaluator<FloatType>::Ptr> evaluators(trajectory.size() - 1, edge_eval);
-  return build(trajectory, times, evaluators, num_threads);
+  return build(trajectory, evaluators, num_threads);
 }
 
 template <typename FloatType>

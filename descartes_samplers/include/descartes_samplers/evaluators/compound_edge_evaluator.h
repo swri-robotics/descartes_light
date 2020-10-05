@@ -29,10 +29,7 @@ class CompoundEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   CompoundEdgeEvaluator(int dof);
 
-  std::pair<bool, FloatType> considerEdge(const Rung_<FloatType>& from,
-                                          const FloatType* start,
-                                          const Rung_<FloatType>& to,
-                                          const FloatType* end) override;
+  std::pair<bool, FloatType> considerEdge(const FloatType* start, const FloatType* end) override;
 
   std::vector<typename EdgeEvaluator<FloatType>::Ptr> evaluators;
 };

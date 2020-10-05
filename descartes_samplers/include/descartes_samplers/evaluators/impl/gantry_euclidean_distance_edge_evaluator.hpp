@@ -34,9 +34,7 @@ GantryEuclideanDistanceEdgeEvaluator<FloatType>::GantryEuclideanDistanceEdgeEval
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> GantryEuclideanDistanceEdgeEvaluator<FloatType>::considerEdge(const Rung_<FloatType>&,
-                                                                                         const FloatType* start,
-                                                                                         const Rung_<FloatType>&,
+std::pair<bool, FloatType> GantryEuclideanDistanceEdgeEvaluator<FloatType>::considerEdge(const FloatType* start,
                                                                                          const FloatType* end)
 {
   FloatType cost = 0.0;

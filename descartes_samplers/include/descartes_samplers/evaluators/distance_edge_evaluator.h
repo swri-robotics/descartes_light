@@ -27,15 +27,12 @@ template <typename FloatType>
 class DistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
-  DistanceEdgeEvaluator(const std::vector<FloatType>& velocity_limits);
+  DistanceEdgeEvaluator(const std::vector<FloatType>& velocity_limits, FloatType dt);
 
-  std::pair<bool, FloatType> considerEdge(const Rung_<FloatType>& from,
-                                          const FloatType* start,
-                                          const Rung_<FloatType>& to,
-                                          const FloatType* end) override;
+  std::pair<bool, FloatType> considerEdge(const FloatType* start, const FloatType* end) override;
 
 protected:
-  std::vector<FloatType> velocity_limits_;
+  std::vector<FloatType> joint_distance_threshold_;
 };
 
 using DistanceEdgeEvaluatorF = DistanceEdgeEvaluator<float>;
