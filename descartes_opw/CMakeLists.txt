@@ -15,23 +15,20 @@ if(NOT TARGET console_bridge::console_bridge)
   set_target_properties(console_bridge::console_bridge PROPERTIES INTERFACE_LINK_LIBRARIES "${console_bridge_LIBRARIES}")
 endif()
 
-# If testing is enabled the clang tidy will errors instead of warning.
-if(DESCARTES_ENABLE_TESTING)
-  set(CLANG_ARGS ${DEFAULT_CLANG_TIDY_ERROR_ARGS})
-else()
-  set(DESCARTES_ENABLE_TESTING OFF) # Since this is being passed to the macros it must have a value otherwise it causes issues
-  set(CLANG_ARGS ${DEFAULT_CLANG_TIDY_WARNING_ARGS})
+descartes_variables()
+
+if(NOT MSVC)
+  add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 
-add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
-
 # Declare a C++ library
-add_library(${PROJECT_NAME} SHARED src/descartes_opw_kinematics.cpp)
+add_library(${PROJECT_NAME} src/descartes_opw_kinematics.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC console_bridge::console_bridge opw_kinematics::opw_kinematics descartes::descartes_light)
-target_cxx_version(${PROJECT_NAME} PUBLIC VERSION 11)
-descartes_target_compile_options(${PROJECT_NAME} PUBLIC)
+target_cxx_version(${PROJECT_NAME} PUBLIC VERSION ${DESCARTES_CXX_VERSION})
+target_compile_options(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_OPTIONS})
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
 if(NOT MSVC)
-  target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
   target_code_coverage(${PROJECT_NAME} ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 target_include_directories(${PROJECT_NAME} PUBLIC
