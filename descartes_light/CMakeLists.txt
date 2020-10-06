@@ -28,23 +28,20 @@ if(NOT TARGET console_bridge::console_bridge)
   set_target_properties(console_bridge::console_bridge PROPERTIES INTERFACE_LINK_LIBRARIES "${console_bridge_LIBRARIES}")
 endif()
 
-# If testing is enabled the clang tidy will errors instead of warning.
-if(DESCARTES_ENABLE_TESTING)
-  set(CLANG_ARGS ${DEFAULT_CLANG_TIDY_ERROR_ARGS})
-else()
-  set(DESCARTES_ENABLE_TESTING OFF) # Since this is being passed to the macros it must have a value otherwise it causes issues
-  set(CLANG_ARGS ${DEFAULT_CLANG_TIDY_WARNING_ARGS})
-endif()
+descartes_variables()
 
-add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
+if(NOT MSVC)
+  add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
+endif()
 
 # Interface Library
 add_library(${PROJECT_NAME}_core INTERFACE)
 target_link_libraries(${PROJECT_NAME}_core INTERFACE console_bridge::console_bridge)
-target_cxx_version(${PROJECT_NAME}_core INTERFACE VERSION 11)
-descartes_target_compile_options(${PROJECT_NAME}_core INTERFACE)
+target_cxx_version(${PROJECT_NAME}_core INTERFACE VERSION ${DESCARTES_CXX_VERSION})
+target_compile_options(${PROJECT_NAME}_core INTERFACE ${DESCARTES_COMPILE_OPTIONS})
+target_compile_definitions(${PROJECT_NAME}_core INTERFACE ${DESCARTES_COMPILE_DEFINITIONS})
 if(NOT MSVC)
-  target_clang_tidy(${PROJECT_NAME}_core ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_clang_tidy(${PROJECT_NAME}_core ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
   target_code_coverage(${PROJECT_NAME}_core INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 target_include_directories(${PROJECT_NAME}_core INTERFACE
@@ -54,16 +51,17 @@ target_include_directories(${PROJECT_NAME}_core SYSTEM INTERFACE
     ${EIGEN3_INCLUDE_DIRS})
 
 # Core Library
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME}
   src/descartes_light.cpp
   src/ladder_graph.cpp
   src/ladder_graph_dag_search.cpp
 )
 target_link_libraries(${PROJECT_NAME} PUBLIC console_bridge::console_bridge OpenMP::OpenMP_CXX)
-target_cxx_version(${PROJECT_NAME} PUBLIC VERSION 11)
-descartes_target_compile_options(${PROJECT_NAME} PUBLIC)
+target_cxx_version(${PROJECT_NAME} PUBLIC VERSION ${DESCARTES_CXX_VERSION})
+target_compile_options(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_OPTIONS})
+target_compile_definitions(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
 if(NOT MSVC)
-  target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
   target_code_coverage(${PROJECT_NAME} ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 target_include_directories(${PROJECT_NAME} PUBLIC
@@ -73,12 +71,13 @@ target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${EIGEN3_INCLUDE_DIRS})
 
 # Declare a C++ library
-add_library(${PROJECT_NAME}_gantry SHARED src/gantry_kinematics.cpp)
+add_library(${PROJECT_NAME}_gantry src/gantry_kinematics.cpp)
 target_link_libraries(${PROJECT_NAME}_gantry PUBLIC console_bridge::console_bridge ${PROJECT_NAME}_core)
-target_cxx_version(${PROJECT_NAME}_gantry PUBLIC VERSION 11)
-descartes_target_compile_options(${PROJECT_NAME}_gantry PUBLIC)
+target_cxx_version(${PROJECT_NAME}_gantry PUBLIC VERSION ${DESCARTES_CXX_VERSION})
+target_compile_options(${PROJECT_NAME}_gantry PUBLIC ${DESCARTES_COMPILE_OPTIONS})
+target_compile_definitions(${PROJECT_NAME}_gantry PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
 if(NOT MSVC)
-  target_clang_tidy(${PROJECT_NAME}_gantry ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_clang_tidy(${PROJECT_NAME}_gantry ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
   target_code_coverage(${PROJECT_NAME}_gantry ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 target_include_directories(${PROJECT_NAME}_gantry PUBLIC
