@@ -16,22 +16,19 @@ if(NOT TARGET console_bridge::console_bridge)
   set_target_properties(console_bridge::console_bridge PROPERTIES INTERFACE_LINK_LIBRARIES "${console_bridge_LIBRARIES}")
 endif()
 
-# If testing is enabled the clang tidy will errors instead of warning.
-if(DESCARTES_ENABLE_TESTING)
-  set(CLANG_ARGS "-line-filter=[{'name':'ikfast.h','lines':[[9999999,9999999]]}, {'name':'fanuc_m20ia10l_manipulator_ikfast_solver.cpp','lines':[[9999999,9999999]]}, {'name':'.h'}, {'name':'.hpp'}, {'name':'.cpp'}]" ${DEFAULT_CLANG_TIDY_ERROR_ARGS})
-else()
-  set(DESCARTES_ENABLE_TESTING OFF) # Since this is being passed to the macros it must have a value otherwise it causes issues
-  set(CLANG_ARGS "-line-filter=[{'name':'ikfast.h','lines':[[9999999,9999999]]}, {'name':'fanuc_m20ia10l_manipulator_ikfast_solver.cpp','lines':[[9999999,9999999]]}, {'name':'.h'}, {'name':'.hpp'}, {'name':'.cpp'}]" ${DEFAULT_CLANG_TIDY_WARNING_ARGS})
-endif()
+descartes_variables()
 
-add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
+if(NOT MSVC)
+  add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
+endif()
 
 add_library(${PROJECT_NAME} INTERFACE)
 target_link_libraries(${PROJECT_NAME} INTERFACE console_bridge::console_bridge descartes::descartes_light_core ${LAPACK_LIBRARIES})
-target_cxx_version(${PROJECT_NAME} INTERFACE VERSION 11)
-descartes_target_compile_options(${PROJECT_NAME} INTERFACE)
+target_cxx_version(${PROJECT_NAME} INTERFACE VERSION ${DESCARTES_CXX_VERSION})
+target_compile_options(${PROJECT_NAME} INTERFACE ${DESCARTES_COMPILE_OPTIONS})
+target_compile_definitions(${PROJECT_NAME} INTERFACE ${DESCARTES_COMPILE_DEFINITIONS})
 if(NOT MSVC)
-  target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_TESTING} ARGUMENTS ${CLANG_ARGS})
+  target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
   target_code_coverage(${PROJECT_NAME} INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 target_include_directories(${PROJECT_NAME} INTERFACE
@@ -51,6 +48,6 @@ install(DIRECTORY include/${PROJECT_NAME}
 
 if (DESCARTES_ENABLE_TESTING)
   enable_testing()
-  add_run_tests_target()
+  add_run_tests_target(ENABLE ${DESCARTES_ENABLE_RUN_TESTING})
   add_subdirectory(test)
 endif()
