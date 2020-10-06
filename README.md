@@ -1,10 +1,13 @@
 # Descartes Light
 
-Platform       | CI Status
----------------|:---------
-Linux (Trusty) | [![ Linux Trusty Build Status](http://badges.herokuapp.com/travis.com/swri-robotics/descartes_light?env=BADGE=trusty&label=build&branch=master)](https://travis-ci.com/swri-robotics/descartes_light)
-Linux (Xenial) | [![ Linux Xenial Build Status](http://badges.herokuapp.com/travis.com/swri-robotics/descartes_light?env=BADGE=xenial&label=build&branch=master)](https://travis-ci.com/swri-robotics/descartes_light)
-Windows        | [![ Windows Build Status](http://badges.herokuapp.com/travis.com/swri-robotics/descartes_light?env=BADGE=windows&label=build&branch=master)](https://travis-ci.com/swri-robotics/descartes_light)
+Platform             | CI Status
+---------------------|:---------
+Linux (Xenial)       | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Xenial-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
+Linux (Bionic)       | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Bionic-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
+Linux (Focal)        | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Focal-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
+Windows              | [![ Windows Build Status](http://badges.herokuapp.com/travis.com/swri-robotics/descartes_light?env=BADGE=windows&label=build&branch=master)](https://travis-ci.com/swri-robotics/descartes_light)
+Lint  (Clang-Format) | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Clang-Format/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
+Lint  (CodeCov)      | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/CodeCov/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
 
 [![Github Issues](https://img.shields.io/github/issues/swri-robotics/descartes_light.svg)](https://github.com/swri-robotics/descartes_light/issues)
 [![Github Pull Requests](https://img.shields.io/github/issues-pr/swri-robotics/descartes_light.svg)](https://github.com/swri-robotics/descartes_light/pulls)
