@@ -55,7 +55,9 @@ add_library(${PROJECT_NAME}
   src/descartes_light.cpp
   src/ladder_graph.cpp
   src/ladder_graph_dag_search.cpp
+  src/gantry_kinematics.cpp
 )
+target_process_export(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC console_bridge::console_bridge OpenMP::OpenMP_CXX)
 target_cxx_version(${PROJECT_NAME} PUBLIC VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_OPTIONS})
@@ -70,23 +72,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
     ${EIGEN3_INCLUDE_DIRS})
 
-# Declare a C++ library
-add_library(${PROJECT_NAME}_gantry src/gantry_kinematics.cpp)
-target_link_libraries(${PROJECT_NAME}_gantry PUBLIC console_bridge::console_bridge ${PROJECT_NAME}_core)
-target_cxx_version(${PROJECT_NAME}_gantry PUBLIC VERSION ${DESCARTES_CXX_VERSION})
-target_compile_options(${PROJECT_NAME}_gantry PUBLIC ${DESCARTES_COMPILE_OPTIONS})
-target_compile_definitions(${PROJECT_NAME}_gantry PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
-if(NOT MSVC)
-  target_clang_tidy(${PROJECT_NAME}_gantry ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
-  target_code_coverage(${PROJECT_NAME}_gantry ALL ENABLE ${DESCARTES_ENABLE_TESTING})
-endif()
-target_include_directories(${PROJECT_NAME}_gantry PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:include>")
-target_include_directories(${PROJECT_NAME}_gantry SYSTEM PUBLIC
-  ${EIGEN3_INCLUDE_DIRS})
-
-configure_package(NAMESPACE descartes TARGETS ${PROJECT_NAME}_core ${PROJECT_NAME} ${PROJECT_NAME}_gantry)
+configure_package(NAMESPACE descartes TARGETS ${PROJECT_NAME}_core ${PROJECT_NAME})
 
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}

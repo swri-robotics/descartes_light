@@ -24,8 +24,6 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <vector>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/visibility_control.h>
-
 namespace descartes_light
 {
 template <typename FloatType>

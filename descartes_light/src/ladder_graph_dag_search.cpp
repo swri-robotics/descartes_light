@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 #include <descartes_light/impl/ladder_graph_dag_search.hpp>
+#include <descartes_light/visibility_control.h>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DAGSearch<float>;
-template class DAGSearch<double>;
+template class DESCARTES_LIGHT_LOCAL DAGSearch<float>;
+template class DESCARTES_LIGHT_LOCAL DAGSearch<double>;
 
 }  // namespace descartes_light

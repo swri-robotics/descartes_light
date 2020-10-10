@@ -6,7 +6,6 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <opw_kinematics/opw_kinematics.h>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/visibility_control.h>
 #include <descartes_light/interface/kinematics_interface.h>
 #include <descartes_light/utils.h>
 

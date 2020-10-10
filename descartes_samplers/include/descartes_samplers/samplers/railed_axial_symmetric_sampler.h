@@ -23,7 +23,6 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/visibility_control.h>
 #include <descartes_light/interface/kinematics_interface.h>
 #include <descartes_light/interface/collision_interface.h>
 #include <descartes_light/interface/position_sampler.h>

@@ -16,11 +16,12 @@
  * limitations under the License.
  */
 #include <descartes_opw/impl/descartes_opw_kinematics.hpp>
+#include <descartes_opw/visibility_control.h>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DESCARTES_PUBLIC OPWKinematics<float>;
-template class DESCARTES_PUBLIC OPWKinematics<double>;
+template class DESCARTES_OPW_PUBLIC OPWKinematics<float>;
+template class DESCARTES_OPW_PUBLIC OPWKinematics<double>;
 
 }  // namespace descartes_light
