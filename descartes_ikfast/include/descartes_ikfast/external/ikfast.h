@@ -39,8 +39,6 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <stdexcept>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/visibility_control.h>
-
 #ifndef IKFAST_HEADER_COMMON
 #define IKFAST_HEADER_COMMON
 

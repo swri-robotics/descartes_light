@@ -24,7 +24,6 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <vector>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/visibility_control.h>
 #include <descartes_light/ladder_graph.h>
 #include <descartes_light/interface/position_sampler.h>
 #include <descartes_light/interface/edge_evaluator.h>

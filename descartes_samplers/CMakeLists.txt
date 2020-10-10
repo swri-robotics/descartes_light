@@ -25,8 +25,8 @@ add_library(${PROJECT_NAME}
   src/samplers/external_axis_sampler.cpp
   src/samplers/fixed_joint_pose_sampler.cpp
   src/samplers/railed_axial_symmetric_sampler.cpp
-  src/samplers/railed_cartesian_point_sampler.cpp
-)
+  src/samplers/railed_cartesian_point_sampler.cpp)
+target_process_export(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC descartes::descartes_light)
 target_cxx_version(${PROJECT_NAME} PUBLIC VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_OPTIONS})
