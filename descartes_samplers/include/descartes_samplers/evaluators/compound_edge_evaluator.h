@@ -18,7 +18,6 @@
 #ifndef DESCARTES_SAMPLERS_EVALUATORS_COMPOUND_EDGE_EVALUATOR_H
 #define DESCARTES_SAMPLERS_EVALUATORS_COMPOUND_EDGE_EVALUATOR_H
 
-#include <descartes_light/visibility_control.h>
 #include <descartes_light/interface/edge_evaluator.h>
 
 namespace descartes_light

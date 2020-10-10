@@ -15,13 +15,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <descartes_light/visibility_control.h>
 #include <descartes_samplers/evaluators/impl/timing_edge_evaluator.hpp>
+#include <descartes_samplers/visibility_control.h>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DESCARTES_PUBLIC TimingEdgeEvaluator<float>;
-template class DESCARTES_PUBLIC TimingEdgeEvaluator<double>;
+template class DESCARTES_SAMPLERS_PUBLIC TimingEdgeEvaluator<float>;
+template class DESCARTES_SAMPLERS_PUBLIC TimingEdgeEvaluator<double>;
 
 }  // namespace descartes_light

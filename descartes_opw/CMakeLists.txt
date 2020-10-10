@@ -23,6 +23,7 @@ endif()
 
 # Declare a C++ library
 add_library(${PROJECT_NAME} src/descartes_opw_kinematics.cpp)
+target_process_export(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC console_bridge::console_bridge opw_kinematics::opw_kinematics descartes::descartes_light)
 target_cxx_version(${PROJECT_NAME} PUBLIC VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_OPTIONS})
