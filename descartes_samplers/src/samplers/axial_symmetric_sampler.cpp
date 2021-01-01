@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 #include <descartes_samplers/samplers/impl/axial_symmetric_sampler.hpp>
-#include <descartes_samplers/visibility_control.h>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DESCARTES_SAMPLERS_PUBLIC AxialSymmetricSampler<float>;
-template class DESCARTES_SAMPLERS_PUBLIC AxialSymmetricSampler<double>;
+template class AxialSymmetricSampler<float>;
+template class AxialSymmetricSampler<double>;
 
 }  // namespace descartes_light

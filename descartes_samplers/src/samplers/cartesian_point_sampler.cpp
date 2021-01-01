@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 #include <descartes_samplers/samplers/impl/cartesian_point_sampler.hpp>
-#include <descartes_samplers/visibility_control.h>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DESCARTES_SAMPLERS_PUBLIC CartesianPointSampler<float>;
-template class DESCARTES_SAMPLERS_PUBLIC CartesianPointSampler<double>;
+template class CartesianPointSampler<float>;
+template class CartesianPointSampler<double>;
 
 }  // namespace descartes_light
