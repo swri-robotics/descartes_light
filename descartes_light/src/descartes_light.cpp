@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 #include <descartes_light/impl/descartes_light.hpp>
-#include <descartes_light/visibility_control.h>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DESCARTES_LIGHT_PUBLIC Solver<float>;
-template class DESCARTES_LIGHT_PUBLIC Solver<double>;
+template class Solver<float>;
+template class Solver<double>;
 
 }  // namespace descartes_light

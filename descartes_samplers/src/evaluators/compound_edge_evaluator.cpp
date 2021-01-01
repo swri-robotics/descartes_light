@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 #include <descartes_samplers/evaluators/impl/compound_edge_evaluator.hpp>
-#include <descartes_samplers/visibility_control.h>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DESCARTES_SAMPLERS_PUBLIC CompoundEdgeEvaluator<float>;
-template class DESCARTES_SAMPLERS_PUBLIC CompoundEdgeEvaluator<double>;
+template class CompoundEdgeEvaluator<float>;
+template class CompoundEdgeEvaluator<double>;
 
 }  // namespace descartes_light
