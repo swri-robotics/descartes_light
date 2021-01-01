@@ -16,12 +16,11 @@
  * limitations under the License.
  */
 #include <descartes_light/impl/gantry_kinematics.hpp>
-#include <descartes_light/visibility_control.h>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DESCARTES_LIGHT_PUBLIC GantryKinematics<float>;
-template class DESCARTES_LIGHT_PUBLIC GantryKinematics<double>;
+template class GantryKinematics<float>;
+template class GantryKinematics<double>;
 
 }  // namespace descartes_light

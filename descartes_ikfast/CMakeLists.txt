@@ -1,14 +1,18 @@
 cmake_minimum_required(VERSION 3.5.0)
-project(descartes_ikfast VERSION 0.1.0 LANGUAGES CXX)
+
+# Extract package name and version
+find_package(cmake_common_scripts REQUIRED)
+extract_package_metadata(pkg)
+project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
 
 find_package(descartes_light REQUIRED)
 find_package(Eigen3 REQUIRED)
 find_package(LAPACK REQUIRED)
 find_package(console_bridge REQUIRED)
-find_package(cmake_common_scripts REQUIRED)
 
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN 1)
+if(WIN32)
+  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
+endif()
 
 if(NOT TARGET console_bridge::console_bridge)
   add_library(console_bridge::console_bridge INTERFACE IMPORTED)
@@ -24,6 +28,7 @@ endif()
 descartes_variables()
 
 if(NOT MSVC)
+  initialize_code_coverage()
   add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 
