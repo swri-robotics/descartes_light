@@ -3,11 +3,15 @@
   <name>descartes_light</name>
   <version>0.1.0</version>
   <description>The descartes_light package</description>
-
-  <maintainer email="jmeyer1292@github.com">Jon Meyer</maintainer>
-  <maintainer email="levi.armstrong@swri.edu">Levi Armstrong</maintainer>
-
+  <author email="jmeyer1292@github.com">Jon Meyer</author>
+  <maintainer email="michael.ripperger@swri.org">Michael Ripperger</maintainer>
+  <maintainer email="levi.armstrong@swri.org">Levi Armstrong</maintainer>
   <license>Apache 2.0</license>
+
+  <!-- Following recommendations of REP 136 -->
+  <exec_depend>catkin</exec_depend>
+  <buildtool_depend>cmake</buildtool_depend>
+
   <depend>libconsole-bridge-dev</depend>
   <depend>eigen</depend>
   <build_depend>cmake_common_scripts</build_depend>

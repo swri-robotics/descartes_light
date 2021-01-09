@@ -3,13 +3,16 @@
   <name>descartes_opw</name>
   <version>0.1.0</version>
   <description>The descartes_opw package</description>
-
   <author email="michael.ripperger@swri.org">Michael Ripperger</author>
   <author email="levi.armstrong@swri.org">Levi Armstrong</author>
   <author email="jmeyer1292@github.com">Jon Meyer</author>
   <maintainer email="michael.ripperger@swri.org">Michael Ripperger</maintainer>
-
+  <maintainer email="levi.armstrong@swri.org">Levi Armstrong</maintainer>
   <license>Apache 2.0</license>
+
+  <!-- Following recommendations of REP 136 -->
+  <exec_depend>catkin</exec_depend>
+  <buildtool_depend>cmake</buildtool_depend>
 
   <depend>opw_kinematics</depend>
   <depend>descartes_light</depend>
