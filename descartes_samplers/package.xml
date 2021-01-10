@@ -3,10 +3,9 @@
   <name>descartes_samplers</name>
   <version>0.1.0</version>
   <description>The descartes_samplers package</description>
-
-  <author email="michael.ripperger@swri.org">Michael Ripperger</author>
-  <author email="levi.armstrong@swri.org">Levi Armstrong</author>
-  <author email="jmeyer1292@github.com">Jon Meyer</author>
+  <author>Michael Ripperger</author>
+  <author>Levi Armstrong</author>
+  <author>Jon Meyer</author>
   <maintainer email="michael.ripperger@swri.org">Michael Ripperger</maintainer>
   <maintainer email="levi.armstrong@swri.org">Levi Armstrong</maintainer>
   <license>Apache 2.0</license>
