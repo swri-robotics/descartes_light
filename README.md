@@ -2,8 +2,6 @@
 
 This package is intented to be a simple ladder graph building library. The core algorithm only requires vertex samplers and edge evaluators.
 
-The kinematics and collision interface are not required and were created to support the initial testing which will be removed in the future.
-
 [![Github Issues](https://img.shields.io/github/issues/swri-robotics/descartes_light.svg)](https://github.com/swri-robotics/descartes_light/issues)
 [![Github Pull Requests](https://img.shields.io/github/issues-pr/swri-robotics/descartes_light.svg)](https://github.com/swri-robotics/descartes_light/pulls)
 
