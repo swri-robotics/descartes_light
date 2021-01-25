@@ -67,7 +67,6 @@ add_library(${PROJECT_NAME}
   src/descartes_light.cpp
   src/ladder_graph.cpp
   src/ladder_graph_dag_search.cpp
-  src/gantry_kinematics.cpp
 )
 target_process_export(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC console_bridge::console_bridge OpenMP::OpenMP_CXX)

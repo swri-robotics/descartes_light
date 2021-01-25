@@ -25,12 +25,7 @@ add_library(${PROJECT_NAME}
   src/evaluators/euclidean_distance_edge_evaluator.cpp
   src/evaluators/gantry_euclidean_distance_edge_evaluator.cpp
   src/evaluators/compound_edge_evaluator.cpp
-  src/samplers/axial_symmetric_sampler.cpp
-  src/samplers/cartesian_point_sampler.cpp
-  src/samplers/external_axis_sampler.cpp
-  src/samplers/fixed_joint_pose_sampler.cpp
-  src/samplers/railed_axial_symmetric_sampler.cpp
-  src/samplers/railed_cartesian_point_sampler.cpp)
+  src/samplers/fixed_joint_pose_sampler.cpp)
 target_process_export(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC descartes::descartes_light)
 target_cxx_version(${PROJECT_NAME} PUBLIC VERSION ${DESCARTES_CXX_VERSION})
