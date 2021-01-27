@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.5.0)
 
 # Extract package name and version
-find_package(cmake_common_scripts REQUIRED)
+find_package(ros_industrial_cmake_boilerplate REQUIRED)
 extract_package_metadata(pkg)
 project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
 
@@ -25,7 +25,7 @@ if(NOT TARGET OpenMP::OpenMP_CXX)
 endif()
 
 find_package(Eigen3 REQUIRED)
-find_package(cmake_common_scripts REQUIRED)
+find_package(ros_industrial_cmake_boilerplate REQUIRED)
 find_package(console_bridge)
 
 if(NOT TARGET console_bridge::console_bridge)

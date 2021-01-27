@@ -19,7 +19,7 @@ jobs:
       ROS_DISTRO: melodic
       ROS_REPO: main
       UPSTREAM_WORKSPACE: 'dependencies.rosinstall'
-      ROSDEP_SKIP_KEYS: "iwyu cmake_common_scripts"
+      ROSDEP_SKIP_KEYS: "iwyu ros_industrial_cmake_boilerplate"
       CCACHE_DIR: "/home/runner/work/descartes_light/descartes_light/Bionic-Build/.ccache"
       TARGET_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON"
     steps:

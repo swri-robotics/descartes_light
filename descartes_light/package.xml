@@ -14,7 +14,7 @@
 
   <depend>libconsole-bridge-dev</depend>
   <depend>eigen</depend>
-  <build_depend>cmake_common_scripts</build_depend>
+  <build_depend>ros_industrial_cmake_boilerplate</build_depend>
 
   <export>
     <build_type>cmake</build_type>
