@@ -10,10 +10,10 @@ on:
 
 jobs:
   windows_ci:
-    name: Melodic
+    name: Noetic
     runs-on: windows-latest
     env:
-      ROS_DISTRO: melodic
+      ROS_DISTRO: noetic
     steps:
     - uses: actions/checkout@v2
       with:
