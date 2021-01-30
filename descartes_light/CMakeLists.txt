@@ -77,20 +77,21 @@ if(NOT MSVC)
   target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
   target_code_coverage(${PROJECT_NAME} ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
-target_include_directories(${PROJECT_NAME} PUBLIC
-    "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
-    "$<INSTALL_INTERFACE:include>")
-target_include_directories(${PROJECT_NAME} SYSTEM PUBLIC
-    ${EIGEN3_INCLUDE_DIRS})
+target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}_core)
 
 configure_package(NAMESPACE descartes TARGETS ${PROJECT_NAME}_core ${PROJECT_NAME})
 
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}
   DESTINATION include
-  PATTERN ".svn" EXCLUDE
  )
 
 install(FILES
   "${CMAKE_CURRENT_LIST_DIR}/cmake/descartes_light_macros.cmake"
   DESTINATION lib/cmake/${PROJECT_NAME})
+
+if(DESCARTES_ENABLE_TESTING)
+  enable_testing()
+  add_run_tests_target(ENABLE ${DESCARTES_ENABLE_RUN_TESTING})
+  add_subdirectory(test)
+endif()
