@@ -10,7 +10,7 @@ extern template class descartes_light::DAGSearch<double>;
 
 static std::mt19937 RAND_GEN(0);
 
-std::vector<double> generateRandomSolution(const std::size_t dof)
+std::vector<double> generateRandomState(const std::size_t dof)
 {
   static std::normal_distribution<double> dist;
   std::vector<double> sol(dof);
@@ -30,9 +30,9 @@ void addRandomVertices(descartes_light::LadderGraphD& graph, const int max_verti
     // Create a random number of vertices for this rung
     std::size_t n_vertices = static_cast<std::size_t>(vertex_count_dist(RAND_GEN));
 
-    // Create solutions for each vertex
+    // Create random joint states for each vertex
     std::vector<std::vector<double>> sols(n_vertices);
-    std::generate(sols.begin(), sols.end(), std::bind(generateRandomSolution, graph.dof()));
+    std::generate(sols.begin(), sols.end(), std::bind(generateRandomState, graph.dof()));
     graph.assignRung(rung_idx, {}, sols);
   }
 }
@@ -56,7 +56,7 @@ void addRandomEdges(descartes_light::LadderGraphD& graph)
       // Create a randomly shuffled list of vertex indices from the next rung
       std::vector<unsigned> next_rung_vertex_idx(next_rung_size);
       std::iota(next_rung_vertex_idx.begin(), next_rung_vertex_idx.end(), 0);
-      std::random_shuffle(next_rung_vertex_idx.begin(), next_rung_vertex_idx.end() /*, RAND_GEN*/);
+      std::random_shuffle(next_rung_vertex_idx.begin(), next_rung_vertex_idx.end());
 
       // Create the edges for this vertex
       descartes_light::LadderGraphD::EdgeList edges(n_edges);
@@ -142,6 +142,51 @@ TEST(DAGSearch, CorrectGraph)
   std::cout << std::endl;
 
   ASSERT_TRUE(std::abs(total_cost - reconstructed_cost) < std::numeric_limits<double>::epsilon());
+}
+
+TEST(DAGSearch, KnownPathTest)
+{
+  const std::size_t dof = 6;
+  const std::size_t n_rungs = 10;
+  const int max_vertices_per_rung = 10;
+
+  descartes_light::LadderGraphD graph = generateRandomGraph(dof, n_rungs, max_vertices_per_rung);
+
+  std::vector<std::size_t> known_path;
+  known_path.reserve(graph.size());
+
+  // Choose a random start vertex and add it to the path
+  {
+    std::uniform_int_distribution<std::size_t> vertex_idx_dist(0, graph.getRung(0).edges.size() - 1);
+    std::size_t vertex_idx = vertex_idx_dist(RAND_GEN);
+    known_path.push_back(vertex_idx);
+  }
+
+  for (std::size_t i = 0; i < graph.size() - 1; ++i)
+  {
+    // Get the current rung
+    descartes_light::LadderGraphD::Rung& rung = graph.getRung(i);
+
+    // Choose a random edge from the selected vertex and set its cost to 0 so the search should choose it
+    descartes_light::LadderGraphD::EdgeList& edges = rung.edges.at(known_path.at(i));
+    std::uniform_int_distribution<std::size_t> edge_idx_dist(0, edges.size() - 1);
+    std::size_t edge_idx = edge_idx_dist(RAND_GEN);
+    descartes_light::LadderGraphD::Rung::Edge& edge = edges.at(edge_idx);
+    edge.cost = 0.0;
+
+    // Add the vertex associated with this edge to the path
+    known_path.push_back(edge.idx);
+  }
+
+  descartes_light::DAGSearchD search(graph);
+  double total_cost = search.run();
+  EXPECT_NEAR(total_cost, 0.0, std::numeric_limits<double>::epsilon());
+
+  auto path = search.shortestPath();
+  for (std::size_t i = 0; i < path.size(); ++i)
+  {
+    EXPECT_EQ(path.at(i), known_path.at(i));
+  }
 }
 
 int main(int argc, char** argv)
