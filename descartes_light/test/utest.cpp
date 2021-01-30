@@ -4,6 +4,7 @@
 #include <functional>
 #include <iostream>
 #include <random>
+#include <numeric>
 
 extern template class descartes_light::LadderGraph<double>;
 extern template class descartes_light::DAGSearch<double>;
