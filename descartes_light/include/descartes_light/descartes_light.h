@@ -25,7 +25,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_light/ladder_graph.h>
-#include <descartes_light/interface/position_sampler.h>
+#include <descartes_light/interface/waypoint_sampler.h>
 #include <descartes_light/interface/edge_evaluator.h>
 
 namespace descartes_light
@@ -36,18 +36,18 @@ class Solver
 public:
   Solver(const std::size_t dof);
 
-  bool build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
+  bool build(const std::vector<typename WaypointSampler<FloatType>::Ptr>& trajectory,
              const std::vector<typename EdgeEvaluator<FloatType>::Ptr>& edge_eval,
              int num_threads = getMaxThreads());
 
-  bool build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
+  bool build(const std::vector<typename WaypointSampler<FloatType>::Ptr>& trajectory,
              typename EdgeEvaluator<FloatType>::Ptr edge_eval,
              int num_threads = getMaxThreads());
 
   const std::vector<std::size_t>& getFailedVertices() const { return failed_vertices_; }
   const std::vector<std::size_t>& getFailedEdges() const { return failed_edges_; }
 
-  bool search(std::vector<FloatType>& solution);
+  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> search();
 
   static int getMaxThreads() { return omp_get_max_threads(); }
 

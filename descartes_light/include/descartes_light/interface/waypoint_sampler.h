@@ -15,26 +15,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_POSE_SAMPLER_HPP
-#define DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_POSE_SAMPLER_HPP
+#ifndef DESCARTES_LIGHT_CORE_WAYPOINT_SAMPLER_H
+#define DESCARTES_LIGHT_CORE_WAYPOINT_SAMPLER_H
 
-#include <descartes_samplers/samplers/fixed_joint_pose_sampler.h>
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
+#include <memory>
+#include <vector>
+#include <Eigen/Geometry>
+DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
+/**
+ * @brief For a given waypoint this should return a vector of solutions
+ * @details Example for joint space planning
+ */
 template <typename FloatType>
-FixedJointPoseSampler<FloatType>::FixedJointPoseSampler(const std::vector<FloatType>& fixed_joint_position)
-  : fixed_joint_position_(fixed_joint_position)
+class WaypointSampler
 {
-}
+public:
+  virtual ~WaypointSampler() {}
 
-template <typename FloatType>
-bool FixedJointPoseSampler<FloatType>::sample(std::vector<FloatType>& solution_set)
-{
-  solution_set.insert(solution_set.end(), fixed_joint_position_.begin(), fixed_joint_position_.end());
-  return true;
-}
+  virtual std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() = 0;
+
+  typedef typename std::shared_ptr<WaypointSampler<FloatType>> Ptr;
+};
+
+using WaypointSamplerF = WaypointSampler<float>;
+using WaypointSamplerD = WaypointSampler<double>;
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_POSE_SAMPLER_HPP
+#endif  // DESCARTES_LIGHT_CORE_WAYPOINT_SAMPLER_H

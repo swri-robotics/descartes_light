@@ -68,7 +68,6 @@ add_library(${PROJECT_NAME}
   src/ladder_graph.cpp
   src/ladder_graph_dag_search.cpp
 )
-target_process_export(${PROJECT_NAME})
 target_link_libraries(${PROJECT_NAME} PUBLIC console_bridge::console_bridge OpenMP::OpenMP_CXX)
 target_cxx_version(${PROJECT_NAME} PUBLIC VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_OPTIONS})

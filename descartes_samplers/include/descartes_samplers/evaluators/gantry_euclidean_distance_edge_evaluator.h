@@ -26,9 +26,10 @@ template <typename FloatType>
 class GantryEuclideanDistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
-  GantryEuclideanDistanceEdgeEvaluator(int dof);
+  GantryEuclideanDistanceEdgeEvaluator(Eigen::Index dof);
 
-  std::pair<bool, FloatType> considerEdge(const FloatType* start, const FloatType* end) override;
+  std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
+                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) override;
 };
 
 using GantryEuclideanDistanceEdgeEvaluatorF = GantryEuclideanDistanceEdgeEvaluator<float>;

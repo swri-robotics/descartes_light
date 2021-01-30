@@ -15,28 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_POSE_SAMPLER_H
-#define DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_POSE_SAMPLER_H
+#ifndef DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_WAYPOINT_SAMPLER_HPP
+#define DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_WAYPOINT_SAMPLER_HPP
 
-#include <descartes_light/interface/position_sampler.h>
+#include <descartes_samplers/samplers/fixed_joint_waypoint_sampler.h>
 
 namespace descartes_light
 {
 template <typename FloatType>
-class FixedJointPoseSampler : public PositionSampler<FloatType>
+FixedJointWaypointSampler<FloatType>::FixedJointWaypointSampler(
+    const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& fixed_joint_position)
+  : fixed_joint_position_(fixed_joint_position)
 {
-public:
-  FixedJointPoseSampler(const std::vector<FloatType>& fixed_joint_position);
+}
 
-  bool sample(std::vector<FloatType>& solution_set) override;
-
-private:
-  std::vector<FloatType> fixed_joint_position_;
-};
-
-using FixedJointPoseSamplerF = FixedJointPoseSampler<float>;
-using FixedJointPoseSamplerD = FixedJointPoseSampler<double>;
+template <typename FloatType>
+std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> FixedJointWaypointSampler<FloatType>::sample()
+{
+  return { fixed_joint_position_ };
+}
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_POSE_SAMPLER_H
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_WAYPOINT_SAMPLER_HPP

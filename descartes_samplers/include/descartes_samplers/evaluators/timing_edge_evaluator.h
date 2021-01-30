@@ -29,9 +29,12 @@ class TimingEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
 
-  TimingEdgeEvaluator(const std::vector<FloatType>& velocity_limits, FloatType dt, FloatType safety_factor);
+  TimingEdgeEvaluator(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& velocity_limits,
+                      FloatType dt,
+                      FloatType safety_factor);
 
-  std::pair<bool, FloatType> considerEdge(const FloatType* start, const FloatType* end) override;
+  std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
+                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) override;
 
 protected:
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> velocity_limits_;

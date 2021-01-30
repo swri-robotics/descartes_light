@@ -28,18 +28,19 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 template <typename FloatType>
-EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(int dof)
-  : EdgeEvaluator<FloatType>(static_cast<std::size_t>(dof))
+EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(Eigen::Index dof)
+  : EdgeEvaluator<FloatType>(dof)
 {
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> EuclideanDistanceEdgeEvaluator<FloatType>::considerEdge(const FloatType* start,
-                                                                                   const FloatType* end)
+std::pair<bool, FloatType>
+EuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
+                                                    const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end)
 {
   FloatType cost = 0.0;
-  for (std::size_t i = 0; i < this->dof_; ++i)
-    cost += std::pow(end[i] - start[i], FloatType(2));
+  for (Eigen::Index i = 0; i < this->dof_; ++i)
+    cost += std::pow(end(i) - start(i), FloatType(2));
 
   return std::make_pair(true, cost);
 }

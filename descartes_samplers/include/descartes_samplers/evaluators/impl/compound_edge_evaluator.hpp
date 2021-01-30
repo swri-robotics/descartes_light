@@ -23,18 +23,19 @@
 namespace descartes_light
 {
 template <typename FloatType>
-CompoundEdgeEvaluator<FloatType>::CompoundEdgeEvaluator(int dof)
-  : EdgeEvaluator<FloatType>(static_cast<std::size_t>(dof))
+CompoundEdgeEvaluator<FloatType>::CompoundEdgeEvaluator(Eigen::Index dof) : EdgeEvaluator<FloatType>(dof)
 {
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> CompoundEdgeEvaluator<FloatType>::considerEdge(const FloatType* start, const FloatType* end)
+std::pair<bool, FloatType>
+CompoundEdgeEvaluator<FloatType>::evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
+                                           const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end)
 {
   FloatType cost = 0.0;
   for (auto& evaluator : evaluators)
   {
-    auto results = evaluator->considerEdge(start, end);
+    auto results = evaluator->evaluate(start, end);
     if (!results.first)
       return std::make_pair(false, cost);
 

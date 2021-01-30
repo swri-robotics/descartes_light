@@ -23,6 +23,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <console_bridge/console.h>
 #include <sstream>
 #include <algorithm>
+#include <Eigen/Geometry>
 DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_light/descartes_light.h>
@@ -68,7 +69,7 @@ Solver<FloatType>::Solver(const std::size_t dof) : graph_{ dof }
 }
 
 template <typename FloatType>
-bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
+bool Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::Ptr>& trajectory,
                               const std::vector<typename EdgeEvaluator<FloatType>::Ptr>& edge_eval,
                               int num_threads)
 {
@@ -82,10 +83,15 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
 #pragma omp parallel for num_threads(num_threads)
   for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
-    std::vector<FloatType> vertex_data;
-    if (trajectory[static_cast<size_t>(i)]->sample(vertex_data))
+    std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> vertex_data = trajectory[static_cast<size_t>(i)]->sample();
+    if (!vertex_data.empty())
     {
-      graph_.getRung(static_cast<size_t>(i)).data = std::move(vertex_data);
+      Rung<FloatType>& r = graph_.getRung(static_cast<size_t>(i));
+      r.nodes.reserve(vertex_data.size());
+      for (const auto& v : vertex_data)
+      {
+        r.nodes.push_back(Node<FloatType>(v));
+      }
     }
     else
     {
@@ -110,11 +116,26 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
 #pragma omp parallel for num_threads(num_threads)
   for (long i = 1; i < static_cast<long>(trajectory.size()); ++i)
   {
-    const auto& from = graph_.getRung(static_cast<size_t>(i) - static_cast<size_t>(1));
+    auto& from = graph_.getRung(static_cast<size_t>(i) - static_cast<size_t>(1));
     const auto& to = graph_.getRung(static_cast<size_t>(i));
 
-    if (!edge_eval[static_cast<size_t>(i - 1)]->evaluate(
-            from, to, graph_.getEdges(static_cast<size_t>(i) - static_cast<size_t>(1))))
+    bool found = false;
+    for (std::size_t i = 0; i < from.nodes.size(); ++i)
+    {
+      for (std::size_t j = 0; j < to.nodes.size(); ++j)
+      {
+        // Consider the edge:
+        std::pair<bool, FloatType> results =
+            edge_eval[static_cast<size_t>(i - 1)]->evaluate(from.nodes[i].state, to.nodes[j].state);
+        if (results.first)
+        {
+          found = true;
+          from.nodes[i].edges.emplace_back(results.second, j);
+        }
+      }
+    }
+
+    if (!found)
     {
 #pragma omp critical
       {
@@ -144,7 +165,7 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
 }
 
 template <typename FloatType>
-bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatType>::Ptr>& trajectory,
+bool Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::Ptr>& trajectory,
                               typename EdgeEvaluator<FloatType>::Ptr edge_eval,
                               int num_threads)
 {
@@ -153,27 +174,24 @@ bool Solver<FloatType>::build(const std::vector<typename PositionSampler<FloatTy
 }
 
 template <typename FloatType>
-bool Solver<FloatType>::search(std::vector<FloatType>& solution)
+std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> Solver<FloatType>::search()
 {
   DAGSearch<FloatType> s(graph_);
   const auto cost = s.run();
 
+  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> solution;
   if (cost == std::numeric_limits<FloatType>::max())
-    return false;
+    return solution;
 
   const auto indices = s.shortestPath();
-
   for (std::size_t i = 0; i < indices.size(); ++i)
-  {
-    const auto* pose = graph_.vertex(i, indices[i]);
-    solution.insert(end(solution), pose, pose + graph_.dof());
-  }
+    solution.push_back(graph_.getNode(i, indices[i]).state);
 
   std::stringstream ss;
   ss << "Solution found w/ cost = " << cost;
   CONSOLE_BRIDGE_logInform(ss.str().c_str());
 
-  return true;
+  return solution;
 }
 
 }  // namespace descartes_light

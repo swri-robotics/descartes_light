@@ -28,24 +28,22 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 template <typename FloatType>
-TimingEdgeEvaluator<FloatType>::TimingEdgeEvaluator(const std::vector<FloatType>& velocity_limits,
+TimingEdgeEvaluator<FloatType>::TimingEdgeEvaluator(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& velocity_limits,
                                                     FloatType dt,
                                                     FloatType safety_factor)
   : EdgeEvaluator<FloatType>(velocity_limits.size())
-  , velocity_limits_(Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>>(
-        velocity_limits.data(),
-        static_cast<Eigen::Index>(velocity_limits.size())))
+  , velocity_limits_(velocity_limits)
   , dt_(dt)
   , safety_factor_(safety_factor)
 {
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> TimingEdgeEvaluator<FloatType>::considerEdge(const FloatType* start, const FloatType* end)
+std::pair<bool, FloatType>
+TimingEdgeEvaluator<FloatType>::evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
+                                         const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end)
 {
-  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> delta =
-      Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>>(end, static_cast<Eigen::Index>(this->dof_)) -
-      Eigen::Map<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>>(start, static_cast<Eigen::Index>(this->dof_));
+  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> delta = end - start;
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> joint_times = delta.cwiseQuotient(velocity_limits_).cwiseAbs();
   FloatType cost = joint_times.maxCoeff();
 
