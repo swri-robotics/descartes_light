@@ -27,7 +27,6 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
-
 template <typename FloatType>
 std::pair<bool, FloatType>
 EuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,

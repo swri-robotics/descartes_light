@@ -67,7 +67,7 @@ Rung<FloatType>& LadderGraph<FloatType>::getRung(std::size_t rung_index) noexcep
 template <typename FloatType>
 const Rung<FloatType>& LadderGraph<FloatType>::getRung(std::size_t rung_index) const noexcept
 {
-  assert(index < rungs_.size());
+  assert(rung_index < rungs_.size());
   return rungs_[rung_index];
 }
 

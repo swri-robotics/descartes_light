@@ -22,7 +22,6 @@
 
 namespace descartes_light
 {
-
 template <typename FloatType>
 std::pair<bool, FloatType>
 CompoundEdgeEvaluator<FloatType>::evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,

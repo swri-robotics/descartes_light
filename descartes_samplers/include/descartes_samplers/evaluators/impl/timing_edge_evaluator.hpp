@@ -31,9 +31,7 @@ template <typename FloatType>
 TimingEdgeEvaluator<FloatType>::TimingEdgeEvaluator(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& velocity_limits,
                                                     FloatType dt,
                                                     FloatType safety_factor)
-  : velocity_limits_(velocity_limits)
-  , dt_(dt)
-  , safety_factor_(safety_factor)
+  : velocity_limits_(velocity_limits), dt_(dt), safety_factor_(safety_factor)
 {
 }
 
