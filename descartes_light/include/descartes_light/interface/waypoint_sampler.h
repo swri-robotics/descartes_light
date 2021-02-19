@@ -35,11 +35,12 @@ template <typename FloatType>
 class WaypointSampler
 {
 public:
-  virtual ~WaypointSampler() {}
+  using Ptr = std::shared_ptr<WaypointSampler<FloatType>>;
+  using ConstPtr = std::shared_ptr<const WaypointSampler<FloatType>>;
 
-  virtual std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() = 0;
+  virtual ~WaypointSampler() = default;
 
-  typedef typename std::shared_ptr<WaypointSampler<FloatType>> Ptr;
+  virtual std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() const = 0;
 };
 
 using WaypointSamplerF = WaypointSampler<float>;

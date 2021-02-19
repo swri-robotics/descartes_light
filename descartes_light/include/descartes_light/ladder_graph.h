@@ -55,9 +55,6 @@ struct Node
   Node() noexcept = default;
   Node(const Eigen::Matrix<FloatT, Eigen::Dynamic, 1>& state) noexcept : state{ state } {}
 
-  //  /** @brief Vertex cost from vertex who owns this object to 'idx' in next rung */
-  //  FloatT cost{0};
-
   /** @brief state */
   Eigen::Matrix<FloatT, Eigen::Dynamic, 1> state;
 
@@ -97,31 +94,21 @@ public:
    * @brief LadderGraph
    * @param dof The number of joints that constitute a single 'DOF'
    */
-  explicit LadderGraph(const std::size_t dof) noexcept;
+  explicit LadderGraph(std::size_t dof) noexcept;
 
   /**
    * @brief resize Resizes the internal ladder to have 'n_rung' rungs
    * @param n_rungs Number of individual rungs
    */
-  void resize(const std::size_t n_rungs);
+  void resize(std::size_t n_rungs);
 
   std::vector<Rung<FloatType>>& getRungs() noexcept;
   const std::vector<Rung<FloatType>>& getRungs() const noexcept;
 
-  Rung<FloatType>& getRung(const std::size_t index) noexcept;
-  const Rung<FloatType>& getRung(const std::size_t index) const noexcept;
+  Rung<FloatType>& getRung(std::size_t rung_index) noexcept;
+  const Rung<FloatType>& getRung(std::size_t rung_index) const noexcept;
 
-  NodeList& getNodes(const std::size_t index) noexcept;
-  const NodeList& getNodes(const std::size_t index) const noexcept;
-
-  Node<FloatType>& getNode(const std::size_t rung, const std::size_t index);
-  const Node<FloatType>& getNode(const std::size_t rung, const std::size_t index) const;
-
-  EdgeList& getEdges(const std::size_t rung,
-                     const std::size_t index) noexcept;  // see p.23 Effective C++ (Scott Meyers)
-  const EdgeList& getEdges(const std::size_t rung, const std::size_t index) const noexcept;
-
-  std::size_t rungSize(const std::size_t index) const noexcept;
+  std::size_t rungSize(std::size_t rung_index) const noexcept;
 
   /** @brief numVertices Counts the total number of vertices in the graph */
   std::size_t numVertices() const noexcept;
@@ -137,12 +124,12 @@ public:
   /**
    * @brief isLast tests to see if a given index is the last one in the graph
    */
-  bool isLast(const std::size_t index) const noexcept;
+  bool isLast(std::size_t rung_index) const noexcept;
 
   /**
    * @brief isFirst tests to see if given index is the first in the graph
    */
-  bool isFirst(const std::size_t index) const noexcept;
+  bool isFirst(std::size_t rung_index) const noexcept;
 
   /**
    * @brief The number of rungs
@@ -156,17 +143,17 @@ public:
    */
   std::size_t dof() const noexcept;
 
-  void removeRung(const std::size_t index);
+  void removeRung(std::size_t rung_index);
 
-  void clearNodes(const std::size_t index);
+  void clearNodes(std::size_t rung_index);
 
-  void clearEdges(const std::size_t index);
+  void clearEdges(std::size_t rung_index);
 
   /**
    * @brief insertRung Adds a new rung at the 'index'-th position. E.g., insertRung(0) will add a new
    *        rung to the beginning of the graph and the previous 0th index is now at 1.
    */
-  void insertRung(const std::size_t index);
+  void insertRung(std::size_t rung_index);
 
   /**
    * @brief Clears all existing rungs & associated data

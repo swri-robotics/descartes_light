@@ -33,8 +33,9 @@ class EdgeEvaluator
 {
 public:
   using Ptr = typename std::shared_ptr<EdgeEvaluator<FloatType>>;
-  EdgeEvaluator(Eigen::Index dof) : dof_(dof) {}
-  virtual ~EdgeEvaluator() {}
+  using ConstPtr = typename std::shared_ptr<const EdgeEvaluator<FloatType>>;
+
+  virtual ~EdgeEvaluator() = default;
 
   /**
    * @brief Determines whether the edge between two vertices is valid and, if so, its cost.
@@ -44,10 +45,7 @@ public:
    * the next
    */
   virtual std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
-                                              const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) = 0;
-
-protected:
-  Eigen::Index dof_;
+                                              const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) const = 0;
 };
 
 using EdgeEvaluatorF = EdgeEvaluator<float>;

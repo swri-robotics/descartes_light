@@ -28,7 +28,7 @@ class FixedJointWaypointSampler : public WaypointSampler<FloatType>
 public:
   FixedJointWaypointSampler(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& fixed_joint_position);
 
-  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() override;
+  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() const override;
 
 private:
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> fixed_joint_position_;

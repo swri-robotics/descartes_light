@@ -30,7 +30,7 @@ FixedJointWaypointSampler<FloatType>::FixedJointWaypointSampler(
 }
 
 template <typename FloatType>
-std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> FixedJointWaypointSampler<FloatType>::sample()
+std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> FixedJointWaypointSampler<FloatType>::sample() const
 {
   return { fixed_joint_position_ };
 }

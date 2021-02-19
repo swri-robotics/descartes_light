@@ -69,8 +69,8 @@ Solver<FloatType>::Solver(const std::size_t dof) : graph_{ dof }
 }
 
 template <typename FloatType>
-bool Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::Ptr>& trajectory,
-                              const std::vector<typename EdgeEvaluator<FloatType>::Ptr>& edge_eval,
+void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                              const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
                               int num_threads)
 {
   graph_.resize(trajectory.size());
@@ -161,16 +161,17 @@ bool Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
   reportFailedVertices(failed_vertices_);
   reportFailedEdges(failed_edges_);
 
-  return failed_edges_.empty() && failed_vertices_.empty();
+  if (!failed_edges_.empty() || !failed_vertices_.empty())
+    throw std::runtime_error("Failed to build graph.");
 }
 
 template <typename FloatType>
-bool Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::Ptr>& trajectory,
-                              typename EdgeEvaluator<FloatType>::Ptr edge_eval,
+void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                              typename EdgeEvaluator<FloatType>::ConstPtr edge_eval,
                               int num_threads)
 {
-  std::vector<typename EdgeEvaluator<FloatType>::Ptr> evaluators(trajectory.size() - 1, edge_eval);
-  return build(trajectory, evaluators, num_threads);
+  std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> evaluators(trajectory.size() - 1, edge_eval);
+  build(trajectory, evaluators, num_threads);
 }
 
 template <typename FloatType>
@@ -185,7 +186,7 @@ std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> Solver<FloatType>::sear
 
   const auto indices = s.shortestPath();
   for (std::size_t i = 0; i < indices.size(); ++i)
-    solution.push_back(graph_.getNode(i, indices[i]).state);
+    solution.push_back(graph_.getRung(i).nodes[indices[i]].state);
 
   std::stringstream ss;
   ss << "Solution found w/ cost = " << cost;

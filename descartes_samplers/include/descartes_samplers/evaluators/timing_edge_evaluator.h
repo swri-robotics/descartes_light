@@ -34,7 +34,7 @@ public:
                       FloatType safety_factor);
 
   std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
-                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) override;
+                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) const override;
 
 protected:
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> velocity_limits_;

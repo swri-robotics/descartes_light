@@ -23,13 +23,13 @@
 namespace descartes_light
 {
 template <typename FloatType>
-LadderGraph<FloatType>::LadderGraph(const std::size_t dof) noexcept : dof_(dof)
+LadderGraph<FloatType>::LadderGraph(std::size_t dof) noexcept : dof_(dof)
 {
   assert(dof != 0);
 }
 
 template <typename FloatType>
-void LadderGraph<FloatType>::resize(const std::size_t n_rungs)
+void LadderGraph<FloatType>::resize(std::size_t n_rungs)
 {
   rungs_.resize(n_rungs);
 }
@@ -59,66 +59,22 @@ const std::vector<Rung<FloatType>>& LadderGraph<FloatType>::getRungs() const noe
 }
 
 template <typename FloatType>
-Rung<FloatType>& LadderGraph<FloatType>::getRung(const std::size_t index) noexcept
+Rung<FloatType>& LadderGraph<FloatType>::getRung(std::size_t rung_index) noexcept
 {
-  return const_cast<Rung<FloatType>&>(static_cast<const LadderGraph&>(*this).getRung(index));
+  return const_cast<Rung<FloatType>&>(static_cast<const LadderGraph&>(*this).getRung(rung_index));
 }
 
 template <typename FloatType>
-const Rung<FloatType>& LadderGraph<FloatType>::getRung(const std::size_t index) const noexcept
+const Rung<FloatType>& LadderGraph<FloatType>::getRung(std::size_t rung_index) const noexcept
 {
   assert(index < rungs_.size());
-  return rungs_[index];
+  return rungs_[rung_index];
 }
 
 template <typename FloatType>
-Node<FloatType>& LadderGraph<FloatType>::getNode(const std::size_t rung, const std::size_t index)
+std::size_t LadderGraph<FloatType>::rungSize(std::size_t rung_index) const noexcept
 {
-  return const_cast<Node<FloatType>&>(static_cast<const LadderGraph&>(*this).getNode(rung, index));
-}
-
-template <typename FloatType>
-const Node<FloatType>& LadderGraph<FloatType>::getNode(const std::size_t rung, const std::size_t index) const
-{
-  return getRung(rung).nodes[index];
-}
-
-template <typename FloatType>
-typename LadderGraph<FloatType>::EdgeList&
-LadderGraph<FloatType>::getEdges(const std::size_t rung,
-                                 const std::size_t index) noexcept  // see p.23 Effective C++ (Scott Meyers)
-{
-  return const_cast<EdgeList&>(static_cast<const LadderGraph&>(*this).getEdges(rung, index));
-}
-
-template <typename FloatType>
-const typename LadderGraph<FloatType>::EdgeList& LadderGraph<FloatType>::getEdges(const std::size_t rung,
-                                                                                  const std::size_t index) const
-    noexcept
-{
-  assert(index < rungs_.size());
-  return rungs_[rung].nodes[index].edges;
-}
-
-template <typename FloatType>
-typename LadderGraph<FloatType>::NodeList& LadderGraph<FloatType>::getNodes(const std::size_t index) noexcept
-{
-  assert(index < rungs_.size());
-  return const_cast<NodeList&>(static_cast<const LadderGraph&>(*this).getNodes(index));
-}
-
-template <typename FloatType>
-const typename LadderGraph<FloatType>::NodeList& LadderGraph<FloatType>::getNodes(const std::size_t index) const
-    noexcept
-{
-  assert(index < rungs_.size());
-  return rungs_[index].nodes;
-}
-
-template <typename FloatType>
-std::size_t LadderGraph<FloatType>::rungSize(const std::size_t index) const noexcept
-{
-  return getRung(index).nodes.size();
+  return getRung(rung_index).nodes.size();
 }
 
 template <typename FloatType>
@@ -141,40 +97,40 @@ std::pair<std::size_t, bool> LadderGraph<FloatType>::indexOf(descartes_core::Tra
 }
 
 template <typename FloatType>
-bool LadderGraph<FloatType>::isLast(const std::size_t index) const noexcept
+bool LadderGraph<FloatType>::isLast(std::size_t rung_index) const noexcept
 {
-  return index + 1 == size();
+  return rung_index + 1 == size();
 }
 
 template <typename FloatType>
-bool LadderGraph<FloatType>::isFirst(const std::size_t index) const noexcept
+bool LadderGraph<FloatType>::isFirst(std::size_t rung_index) const noexcept
 {
-  return index == 0;
+  return rung_index == 0;
 }
 
 template <typename FloatType>
-void LadderGraph<FloatType>::removeRung(const std::size_t index)
+void LadderGraph<FloatType>::removeRung(std::size_t rung_index)
 {
-  rungs_.erase(std::next(rungs_.begin(), static_cast<long>(index)));
+  rungs_.erase(std::next(rungs_.begin(), static_cast<long>(rung_index)));
 }
 
 template <typename FloatType>
-void LadderGraph<FloatType>::clearNodes(const std::size_t index)
+void LadderGraph<FloatType>::clearNodes(std::size_t rung_index)
 {
-  rungs_[index].nodes.clear();
+  rungs_[rung_index].nodes.clear();
 }
 
 template <typename FloatType>
-void LadderGraph<FloatType>::clearEdges(const std::size_t index)
+void LadderGraph<FloatType>::clearEdges(std::size_t rung_index)
 {
-  for (auto& n : rungs_[index].nodes)
+  for (auto& n : rungs_[rung_index].nodes)
     n.edges.clear();
 }
 
 template <typename FloatType>
-void LadderGraph<FloatType>::insertRung(const std::size_t index)
+void LadderGraph<FloatType>::insertRung(std::size_t rung_index)
 {
-  rungs_.insert(std::next(rungs_.begin(), static_cast<long>(index)), Rung<FloatType>());
+  rungs_.insert(std::next(rungs_.begin(), static_cast<long>(rung_index)), Rung<FloatType>());
 }
 
 template <typename FloatType>

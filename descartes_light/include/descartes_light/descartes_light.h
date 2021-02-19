@@ -36,12 +36,12 @@ class Solver
 public:
   Solver(const std::size_t dof);
 
-  bool build(const std::vector<typename WaypointSampler<FloatType>::Ptr>& trajectory,
-             const std::vector<typename EdgeEvaluator<FloatType>::Ptr>& edge_eval,
+  void build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+             const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
              int num_threads = getMaxThreads());
 
-  bool build(const std::vector<typename WaypointSampler<FloatType>::Ptr>& trajectory,
-             typename EdgeEvaluator<FloatType>::Ptr edge_eval,
+  void build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+             typename EdgeEvaluator<FloatType>::ConstPtr edge_eval,
              int num_threads = getMaxThreads());
 
   const std::vector<std::size_t>& getFailedVertices() const { return failed_vertices_; }

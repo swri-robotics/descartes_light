@@ -26,12 +26,12 @@ template <typename FloatType>
 class CompoundEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
-  CompoundEdgeEvaluator(Eigen::Index dof);
+  CompoundEdgeEvaluator() = default;
 
   std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
-                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) override;
+                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) const override;
 
-  std::vector<typename EdgeEvaluator<FloatType>::Ptr> evaluators;
+  std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> evaluators;
 };
 
 using CompoundEdgeEvaluatorF = CompoundEdgeEvaluator<float>;

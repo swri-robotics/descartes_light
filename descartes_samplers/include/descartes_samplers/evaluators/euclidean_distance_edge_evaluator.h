@@ -26,10 +26,10 @@ template <typename FloatType>
 class EuclideanDistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
-  EuclideanDistanceEdgeEvaluator(Eigen::Index dof);
+  EuclideanDistanceEdgeEvaluator() = default;
 
   std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
-                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) override;
+                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) const override;
 };
 
 using EuclideanDistanceEdgeEvaluatorF = EuclideanDistanceEdgeEvaluator<float>;

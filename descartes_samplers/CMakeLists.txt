@@ -23,7 +23,6 @@ endif()
 add_library(${PROJECT_NAME}
   src/evaluators/timing_edge_evaluator.cpp
   src/evaluators/euclidean_distance_edge_evaluator.cpp
-  src/evaluators/gantry_euclidean_distance_edge_evaluator.cpp
   src/evaluators/compound_edge_evaluator.cpp
   src/samplers/fixed_joint_pose_sampler.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC descartes::descartes_light)
