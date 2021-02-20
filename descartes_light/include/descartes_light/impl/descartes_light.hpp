@@ -120,17 +120,17 @@ void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
     const auto& to = graph_.getRung(static_cast<size_t>(i));
 
     bool found = false;
-    for (std::size_t i = 0; i < from.nodes.size(); ++i)
+    for (std::size_t j = 0; j < from.nodes.size(); ++j)
     {
-      for (std::size_t j = 0; j < to.nodes.size(); ++j)
+      for (std::size_t k = 0; k < to.nodes.size(); ++k)
       {
         // Consider the edge:
         std::pair<bool, FloatType> results =
-            edge_eval[static_cast<size_t>(i - 1)]->evaluate(from.nodes[i].state, to.nodes[j].state);
+            edge_eval[static_cast<size_t>(i - 1)]->evaluate(from.nodes[j].state, to.nodes[k].state);
         if (results.first)
         {
           found = true;
-          from.nodes[i].edges.emplace_back(results.second, j);
+          from.nodes[j].edges.emplace_back(results.second, k);
         }
       }
     }
