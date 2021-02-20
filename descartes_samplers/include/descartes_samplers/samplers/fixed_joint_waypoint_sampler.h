@@ -15,25 +15,28 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_SAMPLERS_EVALUATORS_GANTRY_EUCLIDEAN_DISTANCE_EDGE_EVALUATOR_H
-#define DESCARTES_SAMPLERS_EVALUATORS_GANTRY_EUCLIDEAN_DISTANCE_EDGE_EVALUATOR_H
+#ifndef DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_WAYPOINT_SAMPLER_H
+#define DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_WAYPOINT_SAMPLER_H
 
-#include <descartes_light/interface/edge_evaluator.h>
+#include <descartes_light/interface/waypoint_sampler.h>
 
 namespace descartes_light
 {
 template <typename FloatType>
-class GantryEuclideanDistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
+class FixedJointWaypointSampler : public WaypointSampler<FloatType>
 {
 public:
-  GantryEuclideanDistanceEdgeEvaluator(int dof);
+  FixedJointWaypointSampler(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& fixed_joint_position);
 
-  std::pair<bool, FloatType> considerEdge(const FloatType* start, const FloatType* end) override;
+  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() const override;
+
+private:
+  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> fixed_joint_position_;
 };
 
-using GantryEuclideanDistanceEdgeEvaluatorF = GantryEuclideanDistanceEdgeEvaluator<float>;
-using GantryEuclideanDistanceEdgeEvaluatorD = GantryEuclideanDistanceEdgeEvaluator<double>;
+using FixedJointWaypointSamplerF = FixedJointWaypointSampler<float>;
+using FixedJointWaypointSamplerD = FixedJointWaypointSampler<double>;
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_SAMPLERS_EVALUATORS_GANTRY_EUCLIDEAN_DISTANCE_EDGE_EVALUATOR_H
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_FIXED_JOINT_WAYPOINT_SAMPLER_H

@@ -49,24 +49,24 @@ FloatType DAGSearch<FloatType>::run()
   }
 
   // Now we iterate over the graph in 'topological' order
-  for (size_type rung = 0; rung < solution_.size() - 1; ++rung)
+  for (size_type r = 0; r < solution_.size() - 1; ++r)
   {
-    const auto n_vertices = graph_.rungSize(rung);
-    const auto next_rung = rung + 1;
+    const auto next_r = r + 1;
+    const Rung<FloatType>& rung = graph_.getRung(r);
+
     // For each vertex in the out edge list
-    for (size_t index = 0; index < n_vertices; ++index)
+    for (size_t v = 0; v < rung.nodes.size(); ++v)
     {
-      const auto u_cost = distance(rung, index);
-      const auto& edges = graph_.getEdges(rung)[index];
+      const auto u_cost = distance(r, v);
       // for each out edge
-      for (const auto& edge : edges)
+      for (const auto& edge : rung.nodes[v].edges)
       {
         auto dv = u_cost + edge.cost;  // new cost
-        if (dv < distance(next_rung, edge.idx))
+        if (dv < distance(next_r, edge.idx))
         {
-          distance(next_rung, edge.idx) = dv;
-          predecessor(next_rung, edge.idx) =
-              static_cast<unsigned>(index);  // the predecessor's rung is implied to be the current rung
+          distance(next_r, edge.idx) = dv;
+          // the predecessor's rung is implied to be the current rung
+          predecessor(next_r, edge.idx) = static_cast<unsigned>(v);
         }
       }
     }  // vertex for loop

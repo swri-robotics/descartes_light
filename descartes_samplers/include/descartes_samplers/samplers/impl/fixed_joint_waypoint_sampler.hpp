@@ -15,12 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <descartes_samplers/evaluators/impl/gantry_euclidean_distance_edge_evaluator.hpp>
+#ifndef DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_WAYPOINT_SAMPLER_HPP
+#define DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_WAYPOINT_SAMPLER_HPP
+
+#include <descartes_samplers/samplers/fixed_joint_waypoint_sampler.h>
 
 namespace descartes_light
 {
-// Explicit template instantiation
-template class GantryEuclideanDistanceEdgeEvaluator<float>;
-template class GantryEuclideanDistanceEdgeEvaluator<double>;
+template <typename FloatType>
+FixedJointWaypointSampler<FloatType>::FixedJointWaypointSampler(
+    const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& fixed_joint_position)
+  : fixed_joint_position_(fixed_joint_position)
+{
+}
+
+template <typename FloatType>
+std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> FixedJointWaypointSampler<FloatType>::sample() const
+{
+  return { fixed_joint_position_ };
+}
 
 }  // namespace descartes_light
+
+#endif  // DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_WAYPOINT_SAMPLER_HPP

@@ -23,18 +23,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-macro(target_process_export target)
-  string(TOUPPER "${target}" EXPORT_PREFIX)
-
-  if (NOT DEFINED ${EXPORT_PREFIX}_LIBRARY_SHARED)
-    target_compile_definitions(${target} PRIVATE "${EXPORT_PREFIX}_LIBRARY_SHARED")
-  endif()
-
-  if(NOT BUILD_SHARED_LIBS)
-      target_compile_definitions(${target} PUBLIC "${EXPORT_PREFIX}_STATIC_LIBRARY")
-  endif()
-endmacro()
-
 macro(descartes_variables)
   if (NOT DEFINED BUILD_SHARED_LIBS)
     set(BUILD_SHARED_LIBS ON)

@@ -15,31 +15,37 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
-#define DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
+#ifndef DESCARTES_LIGHT_CORE_WAYPOINT_SAMPLER_H
+#define DESCARTES_LIGHT_CORE_WAYPOINT_SAMPLER_H
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
 #include <vector>
+#include <Eigen/Geometry>
 DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
+/**
+ * @brief For a given waypoint this should return a vector of solutions
+ * @details Example for joint space planning
+ */
 template <typename FloatType>
-class PositionSampler
+class WaypointSampler
 {
 public:
-  virtual ~PositionSampler() {}
+  using Ptr = std::shared_ptr<WaypointSampler<FloatType>>;
+  using ConstPtr = std::shared_ptr<const WaypointSampler<FloatType>>;
 
-  virtual bool sample(std::vector<FloatType>& solution_set) = 0;
+  virtual ~WaypointSampler() = default;
 
-  typedef typename std::shared_ptr<PositionSampler<FloatType>> Ptr;
+  virtual std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() const = 0;
 };
 
-using PositionSamplerF = PositionSampler<float>;
-using PositionSamplerD = PositionSampler<double>;
+using WaypointSamplerF = WaypointSampler<float>;
+using WaypointSamplerD = WaypointSampler<double>;
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_LIGHT_CORE_POSITION_SAMPLER_H
+#endif  // DESCARTES_LIGHT_CORE_WAYPOINT_SAMPLER_H
