@@ -24,6 +24,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <sstream>
 #include <algorithm>
 #include <Eigen/Geometry>
+#include <chrono>
 DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_light/descartes_light.h>
@@ -80,6 +81,9 @@ void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
   // Build Vertices
   long num_waypoints = static_cast<long>(trajectory.size());
   long cnt = 0;
+
+  using Clock = std::chrono::high_resolution_clock;
+  std::chrono::time_point<Clock> start_time = Clock::now();
 #pragma omp parallel for num_threads(num_threads)
   for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
@@ -110,9 +114,12 @@ void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
     }
 #endif
   }
+  double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
+  CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build vertices.", duration);
 
   // Build Edges
   cnt = 0;
+  start_time = Clock::now();
 #pragma omp parallel for num_threads(num_threads)
   for (long i = 1; i < static_cast<long>(trajectory.size()); ++i)
   {
@@ -154,6 +161,8 @@ void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
   }
   UNUSED(cnt);
   UNUSED(num_waypoints);
+  duration = std::chrono::duration<double>(Clock::now() - start_time).count();
+  CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build edges.", duration);
 
   std::sort(failed_vertices_.begin(), failed_vertices_.end());
   std::sort(failed_edges_.begin(), failed_edges_.end());
@@ -184,14 +193,14 @@ std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> Solver<FloatType>::sear
   if (cost == std::numeric_limits<FloatType>::max())
     return solution;
 
+  using Clock = std::chrono::high_resolution_clock;
+  std::chrono::time_point<Clock> start_time = Clock::now();
   const auto indices = s.shortestPath();
   for (std::size_t i = 0; i < indices.size(); ++i)
     solution.push_back(graph_.getRung(i).nodes[indices[i]].state);
 
-  std::stringstream ss;
-  ss << "Solution found w/ cost = " << cost;
-  CONSOLE_BRIDGE_logInform(ss.str().c_str());
-
+  double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
+  CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to search graph for solution with cost %0.4f.", duration, cost);
   return solution;
 }
 
