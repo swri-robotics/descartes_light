@@ -114,8 +114,8 @@ void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
     }
 #endif
   }
-  double duration = std::chrono::duration<double, std::milli>(Clock::now() - start_time).count() / 1000.0;
-  CONSOLE_BRIDGE_logDebug("Descartes took %f seconds to build vertices.", duration);
+  double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
+  CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build vertices.", duration);
 
   // Build Edges
   cnt = 0;
@@ -161,8 +161,8 @@ void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
   }
   UNUSED(cnt);
   UNUSED(num_waypoints);
-  duration = std::chrono::duration<double, std::milli>(Clock::now() - start_time).count() / 1000.0;
-  CONSOLE_BRIDGE_logDebug("Descartes took %f seconds to build edges.", duration);
+  duration = std::chrono::duration<double>(Clock::now() - start_time).count();
+  CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build edges.", duration);
 
   std::sort(failed_vertices_.begin(), failed_vertices_.end());
   std::sort(failed_edges_.begin(), failed_edges_.end());
@@ -199,8 +199,8 @@ std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> Solver<FloatType>::sear
   for (std::size_t i = 0; i < indices.size(); ++i)
     solution.push_back(graph_.getRung(i).nodes[indices[i]].state);
 
-  double duration = std::chrono::duration<double, std::milli>(Clock::now() - start_time).count() / 1000.0;
-  CONSOLE_BRIDGE_logDebug("Descartes took %f seconds to search graph for solution with cost &f.", duration, cost);
+  double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
+  CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to search graph for solution with cost %0.4f.", duration, cost);
   return solution;
 }
 
