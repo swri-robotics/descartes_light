@@ -15,7 +15,7 @@ endif()
 descartes_variables()
 
 if(NOT MSVC)
-  initialize_code_coverage()
+  initialize_code_coverage(ENABLE ${DESCARTES_ENABLE_TESTING})
   add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
 endif()
 
