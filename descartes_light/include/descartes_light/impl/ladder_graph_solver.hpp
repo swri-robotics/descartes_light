@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_IMPL_DESCARTES_LIGHT_HPP
-#define DESCARTES_LIGHT_IMPL_DESCARTES_LIGHT_HPP
+#ifndef DESCARTES_LIGHT_IMPL_LADDER_GRAPH_SOLVER_HPP
+#define DESCARTES_LIGHT_IMPL_LADDER_GRAPH_SOLVER_HPP
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
@@ -27,8 +27,8 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <chrono>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/descartes_light.h>
-#include <descartes_light/ladder_graph_dag_search.h>
+#include <descartes_light/ladder_graph/ladder_graph_solver.h>
+#include <descartes_light/ladder_graph/ladder_graph_dag_search.h>
 
 #define UNUSED(x) (void)(x)
 
@@ -64,19 +64,43 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 
 namespace descartes_light
 {
-template <typename FloatType>
-Solver<FloatType>::Solver(const std::size_t dof) : graph_{ dof }
+template <typename FloatType, template <typename, typename...> class ContainerType>
+LadderGraphSolver<FloatType, ContainerType>::LadderGraphSolver(const std::size_t dof) : graph_{ dof }
 {
 }
 
-template <typename FloatType>
-void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                              const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                              int num_threads)
+template <typename FloatType, template <typename, typename...> class ContainerType>
+bool LadderGraphSolver<FloatType, ContainerType>::build(
+    const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval,
+    int num_threads)
 {
   graph_.resize(trajectory.size());
   failed_vertices_.clear();
   failed_edges_.clear();
+
+  std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> edge_evaluators;
+  if (edge_eval.size() == 1)
+  {
+    edge_evaluators.resize(trajectory.size() - 1);
+    std::fill(edge_evaluators.begin(), edge_evaluators.end(), edge_eval.front());
+  }
+  else
+  {
+    edge_evaluators = edge_eval;
+  }
+
+  std::vector<typename StateEvaluator<FloatType>::ConstPtr> state_evaluators;
+  if (state_eval.size() == 1)
+  {
+    state_evaluators.resize(trajectory.size());
+    std::fill(state_evaluators.begin(), state_evaluators.end(), state_eval.front());
+  }
+  else
+  {
+    state_evaluators = state_eval;
+  }
 
   // Build Vertices
   long num_waypoints = static_cast<long>(trajectory.size());
@@ -90,11 +114,13 @@ void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
     std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> vertex_data = trajectory[static_cast<size_t>(i)]->sample();
     if (!vertex_data.empty())
     {
-      Rung<FloatType>& r = graph_.getRung(static_cast<size_t>(i));
-      r.nodes.reserve(vertex_data.size());
+      auto& r = graph_.getRung(static_cast<size_t>(i));
+      //      r.nodes.reserve(vertex_data.size());
       for (const auto& v : vertex_data)
       {
-        r.nodes.push_back(Node<FloatType>(v));
+        std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(v);
+        if (results.first)
+          r.nodes.push_back(Node<FloatType, ContainerType>(v, results.second));
       }
     }
     else
@@ -132,12 +158,14 @@ void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
       for (std::size_t k = 0; k < to.nodes.size(); ++k)
       {
         // Consider the edge:
+        auto& from_node = *std::next(from.nodes.begin(), static_cast<long>(j));
+        const auto& to_node = *std::next(to.nodes.begin(), static_cast<long>(k));
         std::pair<bool, FloatType> results =
-            edge_eval[static_cast<size_t>(i - 1)]->evaluate(from.nodes[j].state, to.nodes[k].state);
+            edge_eval[static_cast<size_t>(i - 1)]->evaluate(from_node.state, to_node.state);
         if (results.first)
         {
           found = true;
-          from.nodes[j].edges.emplace_back(results.second, k);
+          from_node.edges.emplace_back(results.second, k);
         }
       }
     }
@@ -171,22 +199,18 @@ void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatTy
   reportFailedEdges(failed_edges_);
 
   if (!failed_edges_.empty() || !failed_vertices_.empty())
-    throw std::runtime_error("Failed to build graph.");
+  {
+    CONSOLE_BRIDGE_logError("Failed to build graph.");
+    return false;
+  }
+
+  return true;
 }
 
-template <typename FloatType>
-void Solver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                              typename EdgeEvaluator<FloatType>::ConstPtr edge_eval,
-                              int num_threads)
+template <typename FloatType, template <typename, typename...> class ContainerType>
+std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> LadderGraphSolver<FloatType, ContainerType>::search()
 {
-  std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> evaluators(trajectory.size() - 1, edge_eval);
-  build(trajectory, evaluators, num_threads);
-}
-
-template <typename FloatType>
-std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> Solver<FloatType>::search()
-{
-  DAGSearch<FloatType> s(graph_);
+  DAGSearch<FloatType, ContainerType> s(graph_);
   const auto cost = s.run();
 
   std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> solution;
@@ -197,7 +221,7 @@ std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> Solver<FloatType>::sear
   std::chrono::time_point<Clock> start_time = Clock::now();
   const auto indices = s.shortestPath();
   for (std::size_t i = 0; i < indices.size(); ++i)
-    solution.push_back(graph_.getRung(i).nodes[indices[i]].state);
+    solution.push_back(std::next(graph_.getRung(i).nodes.begin(), static_cast<long>(indices[i]))->state);
 
   double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to search graph for solution with cost %0.4f.", duration, cost);
@@ -206,4 +230,4 @@ std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> Solver<FloatType>::sear
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_LIGHT_IMPL_DESCARTES_LIGHT_HPP
+#endif  // DESCARTES_LIGHT_IMPL_LADDER_GRAPH_SOLVER_HPP

@@ -15,12 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <descartes_light/impl/ladder_graph_dag_search.hpp>
+#include <descartes_light/impl/ladder_graph_solver.hpp>
+#include <vector>
+#include <list>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DAGSearch<float>;
-template class DAGSearch<double>;
+template class LadderGraphSolver<float, std::vector>;
+template class LadderGraphSolver<double, std::vector>;
+template class LadderGraphSolver<float, std::list>;
+template class LadderGraphSolver<double, std::list>;
 
 }  // namespace descartes_light

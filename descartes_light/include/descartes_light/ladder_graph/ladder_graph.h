@@ -49,46 +49,43 @@ struct Edge
 using EdgeF = Edge<float>;
 using EdgeD = Edge<double>;
 
-template <typename FloatT>
+template <typename FloatT, template <typename, typename...> class ContainerT>
 struct Node
 {
   Node() noexcept = default;
-  Node(const Eigen::Matrix<FloatT, Eigen::Dynamic, 1>& state) noexcept : state{ state } {}
+  Node(const Eigen::Matrix<FloatT, Eigen::Dynamic, 1>& state, FloatT cost) noexcept : state{ state }, cost{ cost } {}
 
   /** @brief state */
   Eigen::Matrix<FloatT, Eigen::Dynamic, 1> state;
 
+  /** @brief The state cost */
+  FloatT cost{ 0 };
+
   /** @brief These are connects to other nodes */
-  std::vector<Edge<FloatT>> edges;
+  ContainerT<Edge<FloatT>> edges;
 };
 
-using NodeF = Node<float>;
-using NodeD = Node<double>;
-
-template <typename FloatType>
+template <typename FloatType, template <typename, typename...> class ContainerT>
 struct Rung
 {
   /** @brief corresponds to user's input ID */
   descartes_core::TrajectoryID id;
 
   /** @brief A vector of joint solutions */
-  std::vector<Node<FloatType>> nodes;
+  ContainerT<Node<FloatType, ContainerT>> nodes;
 };
-
-using RungF = Rung<float>;
-using RungD = Rung<double>;
 
 /**
  * @brief LadderGraph is an adjacency list based, directed graph structure with vertices
  *        arranged into "rungs" which have connections only to vertices in the adjacent
  *        rungs. Assumes a fixed DOF.
  */
-template <typename FloatType>
+template <typename FloatType, template <typename, typename...> class ContainerT>
 class LadderGraph
 {
 public:
-  using EdgeList = std::vector<Edge<FloatType>>;
-  using NodeList = std::vector<Node<FloatType>>;
+  using EdgeList = ContainerT<Edge<FloatType>>;
+  using NodeList = ContainerT<Node<FloatType, ContainerT>>;
 
   /**
    * @brief LadderGraph
@@ -102,11 +99,11 @@ public:
    */
   void resize(std::size_t n_rungs);
 
-  std::vector<Rung<FloatType>>& getRungs() noexcept;
-  const std::vector<Rung<FloatType>>& getRungs() const noexcept;
+  ContainerT<Rung<FloatType, ContainerT>>& getRungs() noexcept;
+  const ContainerT<Rung<FloatType, ContainerT>>& getRungs() const noexcept;
 
-  Rung<FloatType>& getRung(std::size_t rung_index) noexcept;
-  const Rung<FloatType>& getRung(std::size_t rung_index) const noexcept;
+  Rung<FloatType, ContainerT>& getRung(std::size_t rung_index) noexcept;
+  const Rung<FloatType, ContainerT>& getRung(std::size_t rung_index) const noexcept;
 
   std::size_t rungSize(std::size_t rung_index) const noexcept;
 
@@ -162,11 +159,8 @@ public:
 
 private:
   const std::size_t dof_;
-  std::vector<Rung<FloatType>> rungs_;
+  ContainerT<Rung<FloatType, ContainerT>> rungs_;
 };
-
-using LadderGraphF = LadderGraph<float>;
-using LadderGraphD = LadderGraph<double>;
 
 }  // namespace descartes_light
 

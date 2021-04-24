@@ -19,25 +19,25 @@
 #ifndef DESCARTES_LIGHT_LADDER_GRAPH_DAG_SEARCH_H
 #define DESCARTES_LIGHT_LADDER_GRAPH_DAG_SEARCH_H
 
-#include <descartes_light/ladder_graph.h>
+#include <descartes_light/ladder_graph/ladder_graph.h>
 
 namespace descartes_light
 {
-template <typename FloatType>
+template <typename FloatType, template <typename, typename...> class ContainerType>
 class DAGSearch
 {
 public:
   using predecessor_t = unsigned;
   using size_type = std::size_t;
 
-  explicit DAGSearch(const LadderGraph<FloatType>& graph);
+  explicit DAGSearch(const LadderGraph<FloatType, ContainerType>& graph);
 
   FloatType run();
 
   std::vector<predecessor_t> shortestPath() const;
 
 private:
-  const LadderGraph<FloatType>& graph_;
+  const LadderGraph<FloatType, ContainerType>& graph_;
 
   struct SolutionRung
   {
@@ -59,9 +59,6 @@ private:
 
   std::vector<SolutionRung> solution_;
 };
-
-using DAGSearchF = DAGSearch<float>;
-using DAGSearchD = DAGSearch<double>;
 
 }  // namespace descartes_light
 

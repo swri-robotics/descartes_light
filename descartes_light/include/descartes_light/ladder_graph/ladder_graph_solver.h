@@ -24,41 +24,32 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <vector>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/ladder_graph.h>
-#include <descartes_light/interface/waypoint_sampler.h>
-#include <descartes_light/interface/edge_evaluator.h>
+#include <descartes_light/ladder_graph/ladder_graph.h>
+#include <descartes_light/interface/solver.h>
 
 namespace descartes_light
 {
-template <typename FloatType>
-class Solver
+template <typename FloatType, template <typename, typename...> class ContainerType>
+class LadderGraphSolver : public Solver<FloatType>
 {
 public:
-  Solver(const std::size_t dof);
+  LadderGraphSolver(const std::size_t dof);
 
-  void build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+  bool build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
              const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-             int num_threads = getMaxThreads());
+             const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval,
+             int num_threads = omp_get_max_threads()) override;
 
-  void build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-             typename EdgeEvaluator<FloatType>::ConstPtr edge_eval,
-             int num_threads = getMaxThreads());
+  const std::vector<std::size_t>& getFailedVertices() const override { return failed_vertices_; }
+  const std::vector<std::size_t>& getFailedEdges() const override { return failed_edges_; }
 
-  const std::vector<std::size_t>& getFailedVertices() const { return failed_vertices_; }
-  const std::vector<std::size_t>& getFailedEdges() const { return failed_edges_; }
-
-  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> search();
-
-  static int getMaxThreads() { return omp_get_max_threads(); }
+  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> search() override;
 
 private:
-  LadderGraph<FloatType> graph_;
+  LadderGraph<FloatType, ContainerType> graph_;
   std::vector<std::size_t> failed_vertices_;
   std::vector<std::size_t> failed_edges_;
 };
-
-using SolverF = Solver<float>;
-using SolverD = Solver<double>;
 
 }  // namespace descartes_light
 
