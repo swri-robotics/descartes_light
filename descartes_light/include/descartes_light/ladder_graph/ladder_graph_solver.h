@@ -35,20 +35,15 @@ class LadderGraphSolver : public Solver<FloatType>
 public:
   LadderGraphSolver(const std::size_t dof, int num_threads = std::thread::hardware_concurrency());
 
-  bool build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-             const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-             const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
-
-  const std::vector<std::size_t>& getFailedVertices() const override { return failed_vertices_; }
-  const std::vector<std::size_t>& getFailedEdges() const override { return failed_edges_; }
+  BuildStatus build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+                    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
 
   std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> search() override;
 
 private:
   LadderGraph<FloatType> graph_;
   int num_threads_;
-  std::vector<std::size_t> failed_vertices_;
-  std::vector<std::size_t> failed_edges_;
 };
 
 using LadderGraphSolverF = LadderGraphSolver<float>;

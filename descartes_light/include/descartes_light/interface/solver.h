@@ -31,6 +31,17 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
+struct BuildStatus
+{
+  /** @brief A vector of vertice indices in provided trajectory which failed */
+  std::vector<std::size_t> failed_vertices;
+
+  /** @brief A vector of edge indices in provided trajectory wich failed */
+  std::vector<std::size_t> failed_edges;
+
+  operator bool() const { return (failed_vertices.empty() && failed_edges.empty()); }
+};
+
 template <typename FloatType>
 class Solver
 {
@@ -50,23 +61,11 @@ public:
    *        If empty it should be ignored.
    *        If size of one it should be used for each waypoint.
    * @param num_threads
-   * @return True if successfully built graph, otherwise false
+   * @return BuildStatus is true if successfully built graph, otherwise false
    */
-  virtual bool build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                     const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) = 0;
-
-  /**
-   * @brief Get a vector of vertice indices in provided trajectory which failed
-   * @return The failed vertices
-   */
-  virtual const std::vector<std::size_t>& getFailedVertices() const = 0;
-
-  /**
-   * @brief Get a vector of edge indices in provided trajectory wich failed
-   * @return The failed edges
-   */
-  virtual const std::vector<std::size_t>& getFailedEdges() const = 0;
+  virtual BuildStatus build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                            const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+                            const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) = 0;
 
   /**
    * @brief Search the graph

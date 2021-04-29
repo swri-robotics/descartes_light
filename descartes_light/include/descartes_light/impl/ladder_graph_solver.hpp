@@ -72,13 +72,13 @@ LadderGraphSolver<FloatType>::LadderGraphSolver(const std::size_t dof, int num_t
 }
 
 template <typename FloatType>
-bool LadderGraphSolver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                                         const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval)
+BuildStatus
+LadderGraphSolver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                                    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+                                    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval)
 {
+  BuildStatus status;
   graph_.resize(trajectory.size());
-  failed_vertices_.clear();
-  failed_edges_.clear();
 
   std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> edge_evaluators;
   if (edge_eval.size() == 1)
@@ -127,7 +127,7 @@ bool LadderGraphSolver<FloatType>::build(const std::vector<typename WaypointSamp
     {
 #pragma omp critical
       {
-        failed_vertices_.push_back(static_cast<size_t>(i));
+        status.failed_vertices.push_back(static_cast<size_t>(i));
       }
     }
 #ifndef NDEBUG
@@ -155,10 +155,10 @@ bool LadderGraphSolver<FloatType>::build(const std::vector<typename WaypointSamp
     bool found = false;
     for (std::size_t j = 0; j < from.nodes.size(); ++j)
     {
+      auto& from_node = from.nodes[j];
       for (std::size_t k = 0; k < to.nodes.size(); ++k)
       {
         // Consider the edge:
-        auto& from_node = from.nodes[j];
         const auto& to_node = to.nodes[k];
         std::pair<bool, FloatType> results =
             edge_eval[static_cast<size_t>(i - 1)]->evaluate(from_node.state, to_node.state);
@@ -168,13 +168,19 @@ bool LadderGraphSolver<FloatType>::build(const std::vector<typename WaypointSamp
           from_node.edges.emplace_back(results.second, k);
         }
       }
+
+      // Since we are using emplace_back (or push_back) it doubles the capacity everytime the
+      // capacity is reached so this could be huge when solving large ladder graph problems.
+      // So shrink the capacity to fit
+      // @todo Should max possible size be reserved first
+      from_node.edges.shrink_to_fit();
     }
 
     if (!found)
     {
 #pragma omp critical
       {
-        failed_edges_.push_back(static_cast<size_t>(i) - static_cast<size_t>(1));
+        status.failed_edges.push_back(static_cast<size_t>(i) - static_cast<size_t>(1));
       }
     }
 #ifndef NDEBUG
@@ -192,19 +198,18 @@ bool LadderGraphSolver<FloatType>::build(const std::vector<typename WaypointSamp
   duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build edges.", duration);
 
-  std::sort(failed_vertices_.begin(), failed_vertices_.end());
-  std::sort(failed_edges_.begin(), failed_edges_.end());
+  std::sort(status.failed_vertices.begin(), status.failed_vertices.end());
+  std::sort(status.failed_edges.begin(), status.failed_edges.end());
 
-  reportFailedVertices(failed_vertices_);
-  reportFailedEdges(failed_edges_);
+  reportFailedVertices(status.failed_vertices);
+  reportFailedEdges(status.failed_edges);
 
-  if (!failed_edges_.empty() || !failed_vertices_.empty())
+  if (!status)
   {
-    CONSOLE_BRIDGE_logError("Failed to build graph.");
-    return false;
+    CONSOLE_BRIDGE_logError("LadderGraphSolver failed to build graph.");
   }
 
-  return true;
+  return status;
 }
 
 template <typename FloatType>
