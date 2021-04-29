@@ -22,9 +22,7 @@
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DAGSearch<float, std::vector>;
-template class DAGSearch<double, std::vector>;
-template class DAGSearch<float, std::list>;
-template class DAGSearch<double, std::list>;
+template class DAGSearch<float>;
+template class DAGSearch<double>;
 
 }  // namespace descartes_light

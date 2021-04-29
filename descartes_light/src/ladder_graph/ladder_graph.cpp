@@ -5,9 +5,7 @@
 namespace descartes_light
 {
 // Explicit template specialization
-template class LadderGraph<float, std::vector>;
-template class LadderGraph<double, std::vector>;
-template class LadderGraph<float, std::list>;
-template class LadderGraph<double, std::list>;
+template class LadderGraph<float>;
+template class LadderGraph<double>;
 
 }  // namespace descartes_light

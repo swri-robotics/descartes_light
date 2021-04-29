@@ -23,21 +23,21 @@
 
 namespace descartes_light
 {
-template <typename FloatType, template <typename, typename...> class ContainerType>
+template <typename FloatType>
 class DAGSearch
 {
 public:
   using predecessor_t = unsigned;
   using size_type = std::size_t;
 
-  explicit DAGSearch(const LadderGraph<FloatType, ContainerType>& graph);
+  explicit DAGSearch(const LadderGraph<FloatType>& graph);
 
   FloatType run();
 
   std::vector<predecessor_t> shortestPath() const;
 
 private:
-  const LadderGraph<FloatType, ContainerType>& graph_;
+  const LadderGraph<FloatType>& graph_;
 
   struct SolutionRung
   {
@@ -59,6 +59,9 @@ private:
 
   std::vector<SolutionRung> solution_;
 };
+
+using DAGSearchF = DAGSearch<float>;
+using DAGSearchD = DAGSearch<double>;
 
 }  // namespace descartes_light
 

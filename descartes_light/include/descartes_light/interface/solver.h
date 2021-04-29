@@ -54,8 +54,7 @@ public:
    */
   virtual bool build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
                      const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval,
-                     int num_threads = omp_get_max_threads()) = 0;
+                     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) = 0;
 
   /**
    * @brief Get a vector of vertice indices in provided trajectory which failed

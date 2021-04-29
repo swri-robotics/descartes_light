@@ -22,8 +22,8 @@
 
 namespace descartes_light
 {
-template <typename FloatType, template <typename, typename...> class ContainerType>
-DAGSearch<FloatType, ContainerType>::DAGSearch(const LadderGraph<FloatType, ContainerType>& graph) : graph_(graph)
+template <typename FloatType>
+DAGSearch<FloatType>::DAGSearch(const LadderGraph<FloatType>& graph) : graph_(graph)
 {
   // On creating an object, let's allocate everything we need
   solution_.resize(graph.size());
@@ -36,8 +36,8 @@ DAGSearch<FloatType, ContainerType>::DAGSearch(const LadderGraph<FloatType, Cont
   }
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
-FloatType DAGSearch<FloatType, ContainerType>::run()
+template <typename FloatType>
+FloatType DAGSearch<FloatType>::run()
 {
   // Cost to the first rung should be set to zero
   std::fill(solution_.front().distance.begin(), solution_.front().distance.end(), 0.0);
@@ -58,7 +58,7 @@ FloatType DAGSearch<FloatType, ContainerType>::run()
     // For each vertex in the out edge list
     for (size_t v = 0; v < rung.nodes.size(); ++v)
     {
-      const auto& node = *std::next(rung.nodes.begin(), static_cast<long>(v));
+      const auto& node = rung.nodes[v];
 
       // If first rung then the cost is the node cost else lookup cost
       const FloatType u_cost = (r == 0) ? node.cost : distance(r, v);
@@ -66,9 +66,8 @@ FloatType DAGSearch<FloatType, ContainerType>::run()
       // for each out edge
       for (const auto& edge : node.edges)
       {
-        auto dv = u_cost + edge.cost +
-                  std::next(next_rung.nodes.begin(), static_cast<long>(edge.idx))->cost;  // new cost = edge cost +
-                                                                                          // vertex cost
+        // new cost = edge cost + vertex cost
+        auto dv = u_cost + edge.cost + next_rung.nodes[edge.idx].cost;
         if (dv < distance(next_r, edge.idx))
         {
           distance(next_r, edge.idx) = dv;
@@ -82,9 +81,8 @@ FloatType DAGSearch<FloatType, ContainerType>::run()
   return *std::min_element(solution_.back().distance.begin(), solution_.back().distance.end());
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
-std::vector<typename DAGSearch<FloatType, ContainerType>::predecessor_t>
-DAGSearch<FloatType, ContainerType>::shortestPath() const
+template <typename FloatType>
+std::vector<typename DAGSearch<FloatType>::predecessor_t> DAGSearch<FloatType>::shortestPath() const
 {
   auto min_it = std::min_element(solution_.back().distance.begin(), solution_.back().distance.end());
   auto min_idx = std::distance(solution_.back().distance.begin(), min_it);

@@ -21,8 +21,8 @@ Eigen::Matrix<FloatType, Eigen::Dynamic, 1> generateRandomState(Eigen::Index dof
   return sol;
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
-void addRandomVertices(descartes_light::LadderGraph<FloatType, ContainerType>& graph, const int max_vertices_per_rung)
+template <typename FloatType>
+void addRandomVertices(descartes_light::LadderGraph<FloatType>& graph, const int max_vertices_per_rung)
 {
   // Create a random number generator for determining how many vertices are in each rung
   const int min_vertices_per_rung = std::max(1, max_vertices_per_rung / 2);
@@ -38,13 +38,13 @@ void addRandomVertices(descartes_light::LadderGraph<FloatType, ContainerType>& g
     std::vector<Eigen::VectorXd> sols(n_vertices);
     auto& rung = graph.getRung(rung_idx);
     for (std::size_t i = 0; i < n_vertices; ++i)
-      rung.nodes.push_back(descartes_light::Node<FloatType, ContainerType>(
-          generateRandomState<FloatType>(static_cast<Eigen::Index>(graph.dof())), 0));
+      rung.nodes.push_back(
+          descartes_light::Node<FloatType>(generateRandomState<FloatType>(static_cast<Eigen::Index>(graph.dof())), 0));
   }
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
-void addRandomEdges(descartes_light::LadderGraph<FloatType, ContainerType>& graph)
+template <typename FloatType>
+void addRandomEdges(descartes_light::LadderGraph<FloatType>& graph)
 {
   // Create random edges
   for (std::size_t rung_idx = 0; rung_idx < graph.size() - 1; ++rung_idx)
@@ -55,10 +55,10 @@ void addRandomEdges(descartes_light::LadderGraph<FloatType, ContainerType>& grap
     std::normal_distribution<FloatType> cost_dist(10.0);
 
     auto& rung = graph.getRung(rung_idx);
-    std::vector<typename descartes_light::LadderGraph<FloatType, ContainerType>::EdgeList> edges_list;
+    std::vector<typename descartes_light::LadderGraph<FloatType>::EdgeList> edges_list;
     for (std::size_t vertex_idx = 0; vertex_idx < rung.nodes.size(); ++vertex_idx)
     {
-      auto& node = *std::next(rung.nodes.begin(), static_cast<long>(vertex_idx));
+      auto& node = rung.nodes[vertex_idx];
 
       // Number of connections for this vertex
       const std::size_t n_edges = edge_count_dist(RAND_GEN);
@@ -72,7 +72,7 @@ void addRandomEdges(descartes_light::LadderGraph<FloatType, ContainerType>& grap
       node.edges.resize(n_edges);
       for (std::size_t i = 0; i < n_edges; ++i)
       {
-        auto& edge = *std::next(node.edges.begin(), static_cast<long>(i));
+        auto& edge = node.edges[i];
         edge.cost = cost_dist(RAND_GEN);
         edge.idx = next_rung_vertex_idx[i];
       }
@@ -80,12 +80,12 @@ void addRandomEdges(descartes_light::LadderGraph<FloatType, ContainerType>& grap
   }
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
-descartes_light::LadderGraph<FloatType, ContainerType> generateRandomGraph(const std::size_t dof,
-                                                                           const std::size_t n_rungs,
-                                                                           const int max_vertices_per_rung)
+template <typename FloatType>
+descartes_light::LadderGraph<FloatType> generateRandomGraph(const std::size_t dof,
+                                                            const std::size_t n_rungs,
+                                                            const int max_vertices_per_rung)
 {
-  descartes_light::LadderGraph<FloatType, ContainerType> graph(dof);
+  descartes_light::LadderGraph<FloatType> graph(dof);
   graph.resize(n_rungs);
 
   addRandomVertices(graph, max_vertices_per_rung);
@@ -94,36 +94,35 @@ descartes_light::LadderGraph<FloatType, ContainerType> generateRandomGraph(const
   return graph;
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
+template <typename FloatType>
 void runNoEdgesTest()
 {
-  descartes_light::LadderGraph<FloatType, ContainerType> graph(6);
+  descartes_light::LadderGraph<FloatType> graph(6);
   graph.resize(10);
-  addRandomVertices<FloatType, ContainerType>(graph, 10);
+  addRandomVertices<FloatType>(graph, 10);
 
-  descartes_light::DAGSearch<FloatType, ContainerType> search(graph);
+  descartes_light::DAGSearch<FloatType> search(graph);
 
   FloatType total_cost = search.run();
   ASSERT_NEAR(total_cost, std::numeric_limits<FloatType>::max(), 1.0e-6);
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
+template <typename FloatType>
 void runCorrectGraphTest()
 {
   const std::size_t dof = 6;
   const std::size_t n_rungs = 10;
   const int max_vertices_per_rung = 10;
 
-  descartes_light::LadderGraph<FloatType, ContainerType> graph =
-      generateRandomGraph<FloatType, ContainerType>(dof, n_rungs, max_vertices_per_rung);
-  descartes_light::DAGSearch<FloatType, ContainerType> search(graph);
+  descartes_light::LadderGraph<FloatType> graph = generateRandomGraph<FloatType>(dof, n_rungs, max_vertices_per_rung);
+  descartes_light::DAGSearch<FloatType> search(graph);
   FloatType total_cost;
   ASSERT_NO_THROW(total_cost = search.run());
   EXPECT_GT(total_cost, 0.0);
 
   std::cout << "Total cost: " << total_cost << std::endl;
 
-  std::vector<typename descartes_light::DAGSearch<FloatType, ContainerType>::predecessor_t> path;
+  std::vector<typename descartes_light::DAGSearch<FloatType>::predecessor_t> path;
   ASSERT_NO_THROW(path = search.shortestPath());
   EXPECT_EQ(path.size(), n_rungs);
 
@@ -138,7 +137,7 @@ void runCorrectGraphTest()
     if (i < path.size() - 1)
     {
       const auto next_idx = path[i + 1];
-      const auto& edge_list = std::next(graph.getRung(i).nodes.begin(), static_cast<long>(vertex_idx))->edges;
+      const auto& edge_list = graph.getRung(i).nodes[vertex_idx].edges;
       auto it = std::find_if(edge_list.begin(),
                              edge_list.end(),
                              [next_idx](const descartes_light::Edge<FloatType>& edge) { return edge.idx == next_idx; });
@@ -151,15 +150,14 @@ void runCorrectGraphTest()
   ASSERT_TRUE(std::abs(total_cost - reconstructed_cost) < std::numeric_limits<FloatType>::epsilon());
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
+template <typename FloatType>
 void runKnownPathTest()
 {
   const std::size_t dof = 6;
   const std::size_t n_rungs = 10;
   const int max_vertices_per_rung = 10;
 
-  descartes_light::LadderGraph<FloatType, ContainerType> graph =
-      generateRandomGraph<FloatType, ContainerType>(dof, n_rungs, max_vertices_per_rung);
+  descartes_light::LadderGraph<FloatType> graph = generateRandomGraph<FloatType>(dof, n_rungs, max_vertices_per_rung);
 
   std::vector<std::size_t> known_path;
   known_path.reserve(graph.size());
@@ -177,17 +175,17 @@ void runKnownPathTest()
     auto& rung = graph.getRung(i);
 
     // Choose a random edge from the selected vertex and set its cost to 0 so the search should choose it
-    auto& edges = std::next(rung.nodes.begin(), static_cast<long>(known_path[i]))->edges;
+    auto& edges = rung.nodes[known_path[i]].edges;
     std::uniform_int_distribution<std::size_t> edge_idx_dist(0, edges.size() - 1);
     std::size_t edge_idx = edge_idx_dist(RAND_GEN);
-    auto& edge = *std::next(edges.begin(), static_cast<long>(edge_idx));
+    auto& edge = edges[edge_idx];
     edge.cost = 0.0;
 
     // Add the vertex associated with this edge to the path
     known_path.push_back(edge.idx);
   }
 
-  descartes_light::DAGSearch<FloatType, ContainerType> search(graph);
+  descartes_light::DAGSearch<FloatType> search(graph);
   FloatType total_cost = search.run();
   EXPECT_NEAR(total_cost, 0.0, std::numeric_limits<FloatType>::epsilon());
 
@@ -200,26 +198,20 @@ void runKnownPathTest()
 
 TEST(DAGSearch, NoEdges)
 {
-  runNoEdgesTest<double, std::vector>();
-  runNoEdgesTest<float, std::vector>();
-  runNoEdgesTest<double, std::list>();
-  runNoEdgesTest<float, std::list>();
+  runNoEdgesTest<double>();
+  runNoEdgesTest<float>();
 }
 
 TEST(DAGSearch, CorrectGraph)
 {
-  runCorrectGraphTest<double, std::vector>();
-  runCorrectGraphTest<float, std::vector>();
-  runCorrectGraphTest<double, std::list>();
-  runCorrectGraphTest<float, std::list>();
+  runCorrectGraphTest<double>();
+  runCorrectGraphTest<float>();
 }
 
 TEST(DAGSearch, KnownPathTest)
 {
-  runKnownPathTest<double, std::vector>();
-  runKnownPathTest<float, std::vector>();
-  runKnownPathTest<double, std::list>();
-  runKnownPathTest<float, std::list>();
+  runKnownPathTest<double>();
+  runKnownPathTest<float>();
 }
 
 int main(int argc, char** argv)

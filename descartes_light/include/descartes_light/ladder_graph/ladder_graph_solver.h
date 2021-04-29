@@ -20,7 +20,7 @@
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
-#include <omp.h>
+#include <thread>
 #include <vector>
 DESCARTES_IGNORE_WARNINGS_POP
 
@@ -29,16 +29,15 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
-template <typename FloatType, template <typename, typename...> class ContainerType>
+template <typename FloatType>
 class LadderGraphSolver : public Solver<FloatType>
 {
 public:
-  LadderGraphSolver(const std::size_t dof);
+  LadderGraphSolver(const std::size_t dof, int num_threads = std::thread::hardware_concurrency());
 
   bool build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
              const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-             const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval,
-             int num_threads = omp_get_max_threads()) override;
+             const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
 
   const std::vector<std::size_t>& getFailedVertices() const override { return failed_vertices_; }
   const std::vector<std::size_t>& getFailedEdges() const override { return failed_edges_; }
@@ -46,10 +45,14 @@ public:
   std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> search() override;
 
 private:
-  LadderGraph<FloatType, ContainerType> graph_;
+  LadderGraph<FloatType> graph_;
+  int num_threads_;
   std::vector<std::size_t> failed_vertices_;
   std::vector<std::size_t> failed_edges_;
 };
+
+using LadderGraphSolverF = LadderGraphSolver<float>;
+using LadderGraphSolverD = LadderGraphSolver<double>;
 
 }  // namespace descartes_light
 

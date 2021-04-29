@@ -22,9 +22,7 @@
 namespace descartes_light
 {
 // Explicit template instantiation
-template class LadderGraphSolver<float, std::vector>;
-template class LadderGraphSolver<double, std::vector>;
-template class LadderGraphSolver<float, std::list>;
-template class LadderGraphSolver<double, std::list>;
+template class LadderGraphSolver<float>;
+template class LadderGraphSolver<double>;
 
 }  // namespace descartes_light

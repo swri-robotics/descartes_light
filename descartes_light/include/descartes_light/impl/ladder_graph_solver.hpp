@@ -20,6 +20,7 @@
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
+#include <omp.h>
 #include <console_bridge/console.h>
 #include <sstream>
 #include <algorithm>
@@ -64,17 +65,16 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 
 namespace descartes_light
 {
-template <typename FloatType, template <typename, typename...> class ContainerType>
-LadderGraphSolver<FloatType, ContainerType>::LadderGraphSolver(const std::size_t dof) : graph_{ dof }
+template <typename FloatType>
+LadderGraphSolver<FloatType>::LadderGraphSolver(const std::size_t dof, int num_threads)
+  : graph_{ dof }, num_threads_{ num_threads }
 {
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
-bool LadderGraphSolver<FloatType, ContainerType>::build(
-    const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval,
-    int num_threads)
+template <typename FloatType>
+bool LadderGraphSolver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+                                         const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval)
 {
   graph_.resize(trajectory.size());
   failed_vertices_.clear();
@@ -108,19 +108,19 @@ bool LadderGraphSolver<FloatType, ContainerType>::build(
 
   using Clock = std::chrono::high_resolution_clock;
   std::chrono::time_point<Clock> start_time = Clock::now();
-#pragma omp parallel for num_threads(num_threads)
+#pragma omp parallel for num_threads(num_threads_)
   for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
     std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> vertex_data = trajectory[static_cast<size_t>(i)]->sample();
     if (!vertex_data.empty())
     {
       auto& r = graph_.getRung(static_cast<size_t>(i));
-      //      r.nodes.reserve(vertex_data.size());
+      r.nodes.reserve(vertex_data.size());
       for (const auto& v : vertex_data)
       {
         std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(v);
         if (results.first)
-          r.nodes.push_back(Node<FloatType, ContainerType>(v, results.second));
+          r.nodes.push_back(Node<FloatType>(v, results.second));
       }
     }
     else
@@ -146,7 +146,7 @@ bool LadderGraphSolver<FloatType, ContainerType>::build(
   // Build Edges
   cnt = 0;
   start_time = Clock::now();
-#pragma omp parallel for num_threads(num_threads)
+#pragma omp parallel for num_threads(num_threads_)
   for (long i = 1; i < static_cast<long>(trajectory.size()); ++i)
   {
     auto& from = graph_.getRung(static_cast<size_t>(i) - static_cast<size_t>(1));
@@ -158,8 +158,8 @@ bool LadderGraphSolver<FloatType, ContainerType>::build(
       for (std::size_t k = 0; k < to.nodes.size(); ++k)
       {
         // Consider the edge:
-        auto& from_node = *std::next(from.nodes.begin(), static_cast<long>(j));
-        const auto& to_node = *std::next(to.nodes.begin(), static_cast<long>(k));
+        auto& from_node = from.nodes[j];
+        const auto& to_node = to.nodes[k];
         std::pair<bool, FloatType> results =
             edge_eval[static_cast<size_t>(i - 1)]->evaluate(from_node.state, to_node.state);
         if (results.first)
@@ -207,10 +207,10 @@ bool LadderGraphSolver<FloatType, ContainerType>::build(
   return true;
 }
 
-template <typename FloatType, template <typename, typename...> class ContainerType>
-std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> LadderGraphSolver<FloatType, ContainerType>::search()
+template <typename FloatType>
+std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> LadderGraphSolver<FloatType>::search()
 {
-  DAGSearch<FloatType, ContainerType> s(graph_);
+  DAGSearch<FloatType> s(graph_);
   const auto cost = s.run();
 
   std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> solution;
@@ -221,7 +221,7 @@ std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> LadderGraphSolver<Float
   std::chrono::time_point<Clock> start_time = Clock::now();
   const auto indices = s.shortestPath();
   for (std::size_t i = 0; i < indices.size(); ++i)
-    solution.push_back(std::next(graph_.getRung(i).nodes.begin(), static_cast<long>(indices[i]))->state);
+    solution.push_back(graph_.getRung(i).nodes[indices[i]].state);
 
   double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to search graph for solution with cost %0.4f.", duration, cost);
