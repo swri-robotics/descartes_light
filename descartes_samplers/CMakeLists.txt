@@ -8,6 +8,13 @@ project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
 find_package(descartes_light REQUIRED)
 find_package(Eigen3 REQUIRED)
 
+if(NOT TARGET Eigen3::Eigen)
+  find_package(Threads REQUIRED)
+  add_library(Eigen3::Eigen IMPORTED INTERFACE)
+  set_property(TARGET Eigen3::Eigen PROPERTY INTERFACE_COMPILE_DEFINITIONS ${EIGEN3_DEFINITIONS})
+  set_property(TARGET Eigen3::Eigen PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${EIGEN3_INCLUDE_DIRS})
+endif()
+
 descartes_variables()
 initialize_code_coverage(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
