@@ -7,8 +7,13 @@ project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
 
 include(cmake/descartes_light_macros.cmake)
 
+# Find dependency packages
 find_package(OpenMP REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(ros_industrial_cmake_boilerplate REQUIRED)
+find_package(console_bridge)
 
+# Create targets if necessary
 if(NOT TARGET OpenMP::OpenMP_CXX)
     find_package(Threads REQUIRED)
     add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
@@ -20,9 +25,12 @@ if(NOT TARGET OpenMP::OpenMP_CXX)
 
 endif()
 
-find_package(Eigen3 REQUIRED)
-find_package(ros_industrial_cmake_boilerplate REQUIRED)
-find_package(console_bridge)
+if(NOT TARGET Eigen3::Eigen)
+  find_package(Threads REQUIRED)
+  add_library(Eigen3::Eigen IMPORTED INTERFACE)
+  set_property(TARGET Eigen3::Eigen PROPERTY INTERFACE_COMPILE_DEFINITIONS ${EIGEN3_DEFINITIONS})
+  set_property(TARGET Eigen3::Eigen PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${EIGEN3_INCLUDE_DIRS})
+endif()
 
 if(NOT TARGET console_bridge::console_bridge)
   add_library(console_bridge::console_bridge INTERFACE IMPORTED)
