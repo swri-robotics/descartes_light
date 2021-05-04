@@ -22,9 +22,8 @@
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
 #include <vector>
+#include <Eigen/Geometry>
 DESCARTES_IGNORE_WARNINGS_POP
-
-#include "descartes_light/ladder_graph.h"
 
 namespace descartes_light
 {

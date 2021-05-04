@@ -18,7 +18,7 @@
 #ifndef DESCARTES_LIGHT_IMPL_LADDER_GRAPH_HPP
 #define DESCARTES_LIGHT_IMPL_LADDER_GRAPH_HPP
 
-#include <descartes_light/ladder_graph.h>
+#include <descartes_light/ladder_graph/ladder_graph.h>
 
 namespace descartes_light
 {
@@ -68,7 +68,7 @@ template <typename FloatType>
 const Rung<FloatType>& LadderGraph<FloatType>::getRung(std::size_t rung_index) const noexcept
 {
   assert(rung_index < rungs_.size());
-  return rungs_[rung_index];
+  return (rungs_[rung_index]);
 }
 
 template <typename FloatType>

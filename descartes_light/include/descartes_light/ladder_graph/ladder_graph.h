@@ -53,10 +53,13 @@ template <typename FloatT>
 struct Node
 {
   Node() noexcept = default;
-  Node(const Eigen::Matrix<FloatT, Eigen::Dynamic, 1>& state) noexcept : state{ state } {}
+  Node(const Eigen::Matrix<FloatT, Eigen::Dynamic, 1>& state, FloatT cost) noexcept : state{ state }, cost{ cost } {}
 
   /** @brief state */
   Eigen::Matrix<FloatT, Eigen::Dynamic, 1> state;
+
+  /** @brief The state cost */
+  FloatT cost{ 0 };
 
   /** @brief These are connects to other nodes */
   std::vector<Edge<FloatT>> edges;

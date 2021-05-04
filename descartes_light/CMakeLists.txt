@@ -7,12 +7,13 @@ project(${pkg_extracted_name} VERSION ${pkg_extracted_version} LANGUAGES CXX)
 
 include(cmake/descartes_light_macros.cmake)
 
-if(WIN32)
-  set(CMAKE_WINDOWS_EXPORT_ALL_SYMBOLS ON)
-endif()
-
+# Find dependency packages
 find_package(OpenMP REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(ros_industrial_cmake_boilerplate REQUIRED)
+find_package(console_bridge)
 
+# Create targets if necessary
 if(NOT TARGET OpenMP::OpenMP_CXX)
     find_package(Threads REQUIRED)
     add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)
@@ -24,9 +25,12 @@ if(NOT TARGET OpenMP::OpenMP_CXX)
 
 endif()
 
-find_package(Eigen3 REQUIRED)
-find_package(ros_industrial_cmake_boilerplate REQUIRED)
-find_package(console_bridge)
+if(NOT TARGET Eigen3::Eigen)
+  find_package(Threads REQUIRED)
+  add_library(Eigen3::Eigen IMPORTED INTERFACE)
+  set_property(TARGET Eigen3::Eigen PROPERTY INTERFACE_COMPILE_DEFINITIONS ${EIGEN3_DEFINITIONS})
+  set_property(TARGET Eigen3::Eigen PROPERTY INTERFACE_INCLUDE_DIRECTORIES ${EIGEN3_INCLUDE_DIRS})
+endif()
 
 if(NOT TARGET console_bridge::console_bridge)
   add_library(console_bridge::console_bridge INTERFACE IMPORTED)
@@ -40,45 +44,35 @@ else()
 endif()
 
 descartes_variables()
-
-if(NOT MSVC)
-  initialize_code_coverage(ENABLE ${DESCARTES_ENABLE_TESTING})
-  add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_TESTING})
-endif()
+initialize_code_coverage(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
+add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 
 # Interface Library
 add_library(${PROJECT_NAME}_core INTERFACE)
-target_link_libraries(${PROJECT_NAME}_core INTERFACE console_bridge::console_bridge)
+target_link_libraries(${PROJECT_NAME}_core INTERFACE Eigen3::Eigen console_bridge::console_bridge)
 target_cxx_version(${PROJECT_NAME}_core INTERFACE VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME}_core INTERFACE ${DESCARTES_COMPILE_OPTIONS})
 target_compile_definitions(${PROJECT_NAME}_core INTERFACE ${DESCARTES_COMPILE_DEFINITIONS})
-if(NOT MSVC)
-  target_clang_tidy(${PROJECT_NAME}_core ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
-  target_code_coverage(${PROJECT_NAME}_core INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
-endif()
+target_clang_tidy(${PROJECT_NAME}_core ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
+target_code_coverage(${PROJECT_NAME}_core INTERFACE ALL ENABLE ${DESCARTES_ENABLE_TESTING})
 target_include_directories(${PROJECT_NAME}_core INTERFACE
     "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
     "$<INSTALL_INTERFACE:include>")
-target_include_directories(${PROJECT_NAME}_core SYSTEM INTERFACE
-    ${EIGEN3_INCLUDE_DIRS})
 
 # Core Library
-add_library(${PROJECT_NAME}
-  src/descartes_light.cpp
-  src/ladder_graph.cpp
-  src/ladder_graph_dag_search.cpp
+add_library(${PROJECT_NAME}_ladder_graph
+  src/ladder_graph/ladder_graph_solver.cpp
+  src/ladder_graph/ladder_graph.cpp
+  src/ladder_graph/ladder_graph_dag_search.cpp
 )
-target_link_libraries(${PROJECT_NAME} PUBLIC console_bridge::console_bridge OpenMP::OpenMP_CXX)
-target_cxx_version(${PROJECT_NAME} PUBLIC VERSION ${DESCARTES_CXX_VERSION})
-target_compile_options(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_OPTIONS})
-target_compile_definitions(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
-if(NOT MSVC)
-  target_clang_tidy(${PROJECT_NAME} ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
-  target_code_coverage(${PROJECT_NAME} ALL ENABLE ${DESCARTES_ENABLE_TESTING})
-endif()
-target_link_libraries(${PROJECT_NAME} PUBLIC ${PROJECT_NAME}_core)
+target_link_libraries(${PROJECT_NAME}_ladder_graph PUBLIC ${PROJECT_NAME}_core console_bridge::console_bridge OpenMP::OpenMP_CXX)
+target_cxx_version(${PROJECT_NAME}_ladder_graph PUBLIC VERSION ${DESCARTES_CXX_VERSION})
+target_compile_options(${PROJECT_NAME}_ladder_graph PUBLIC ${DESCARTES_COMPILE_OPTIONS})
+target_compile_definitions(${PROJECT_NAME}_ladder_graph PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
+target_clang_tidy(${PROJECT_NAME}_ladder_graph ENABLE ${DESCARTES_ENABLE_CLANG_TIDY} ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
+target_code_coverage(${PROJECT_NAME}_ladder_graph ALL ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 
-configure_package(NAMESPACE descartes TARGETS ${PROJECT_NAME}_core ${PROJECT_NAME})
+configure_package(NAMESPACE descartes TARGETS ${PROJECT_NAME}_core ${PROJECT_NAME}_ladder_graph)
 
 # Mark cpp header files for installation
 install(DIRECTORY include/${PROJECT_NAME}

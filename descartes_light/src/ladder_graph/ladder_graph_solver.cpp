@@ -15,12 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <descartes_light/impl/descartes_light.hpp>
+#include <descartes_light/impl/ladder_graph_solver.hpp>
+#include <vector>
+#include <list>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class Solver<float>;
-template class Solver<double>;
+template class LadderGraphSolver<float>;
+template class LadderGraphSolver<double>;
 
 }  // namespace descartes_light

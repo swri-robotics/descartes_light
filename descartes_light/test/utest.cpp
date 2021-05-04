@@ -1,27 +1,28 @@
 #include <gtest/gtest.h>
-#include <descartes_light/ladder_graph_dag_search.h>
-#include <descartes_light/ladder_graph.h>
+#include <descartes_light/ladder_graph/ladder_graph_dag_search.h>
+#include <descartes_light/ladder_graph/ladder_graph.h>
 #include <functional>
 #include <iostream>
 #include <random>
 #include <numeric>
-
-extern template class descartes_light::LadderGraph<double>;
-extern template class descartes_light::DAGSearch<double>;
+#include <vector>
+#include <list>
 
 static std::mt19937 RAND_GEN(0);
 
-Eigen::VectorXd generateRandomState(Eigen::Index dof)
+template <typename FloatType>
+Eigen::Matrix<FloatType, Eigen::Dynamic, 1> generateRandomState(Eigen::Index dof)
 {
-  static std::normal_distribution<double> dist;
-  Eigen::VectorXd sol(dof);
+  static std::normal_distribution<FloatType> dist;
+  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> sol(dof);
   for (Eigen::Index i = 0; i < dof; ++i)
     sol(i) = dist(RAND_GEN);
 
   return sol;
 }
 
-void addRandomVertices(descartes_light::LadderGraphD& graph, const int max_vertices_per_rung)
+template <typename FloatType>
+void addRandomVertices(descartes_light::LadderGraph<FloatType>& graph, const int max_vertices_per_rung)
 {
   // Create a random number generator for determining how many vertices are in each rung
   const int min_vertices_per_rung = std::max(1, max_vertices_per_rung / 2);
@@ -35,13 +36,15 @@ void addRandomVertices(descartes_light::LadderGraphD& graph, const int max_verti
 
     // Create random joint states for each vertex
     std::vector<Eigen::VectorXd> sols(n_vertices);
-    descartes_light::RungD& rung = graph.getRung(rung_idx);
+    auto& rung = graph.getRung(rung_idx);
     for (std::size_t i = 0; i < n_vertices; ++i)
-      rung.nodes.push_back(descartes_light::NodeD(generateRandomState(static_cast<Eigen::Index>(graph.dof()))));
+      rung.nodes.push_back(
+          descartes_light::Node<FloatType>(generateRandomState<FloatType>(static_cast<Eigen::Index>(graph.dof())), 0));
   }
 }
 
-void addRandomEdges(descartes_light::LadderGraphD& graph)
+template <typename FloatType>
+void addRandomEdges(descartes_light::LadderGraph<FloatType>& graph)
 {
   // Create random edges
   for (std::size_t rung_idx = 0; rung_idx < graph.size() - 1; ++rung_idx)
@@ -49,13 +52,13 @@ void addRandomEdges(descartes_light::LadderGraphD& graph)
     // Choose a random subset of vertices in the next rung to connect to
     const std::size_t next_rung_size = graph.rungSize(rung_idx + 1);
     std::uniform_int_distribution<std::size_t> edge_count_dist(1, next_rung_size);
-    std::normal_distribution<double> cost_dist(10.0);
+    std::normal_distribution<FloatType> cost_dist(10.0);
 
-    descartes_light::RungD& rung = graph.getRung(rung_idx);
-    std::vector<descartes_light::LadderGraphD::EdgeList> edges_list;
+    auto& rung = graph.getRung(rung_idx);
+    std::vector<typename descartes_light::LadderGraph<FloatType>::EdgeList> edges_list;
     for (std::size_t vertex_idx = 0; vertex_idx < rung.nodes.size(); ++vertex_idx)
     {
-      descartes_light::NodeD& node = rung.nodes[vertex_idx];
+      auto& node = rung.nodes[vertex_idx];
 
       // Number of connections for this vertex
       const std::size_t n_edges = edge_count_dist(RAND_GEN);
@@ -77,11 +80,12 @@ void addRandomEdges(descartes_light::LadderGraphD& graph)
   }
 }
 
-descartes_light::LadderGraphD generateRandomGraph(const std::size_t dof,
-                                                  const std::size_t n_rungs,
-                                                  const int max_vertices_per_rung)
+template <typename FloatType>
+descartes_light::LadderGraph<FloatType> generateRandomGraph(const std::size_t dof,
+                                                            const std::size_t n_rungs,
+                                                            const int max_vertices_per_rung)
 {
-  descartes_light::LadderGraphD graph(dof);
+  descartes_light::LadderGraph<FloatType> graph(dof);
   graph.resize(n_rungs);
 
   addRandomVertices(graph, max_vertices_per_rung);
@@ -90,39 +94,41 @@ descartes_light::LadderGraphD generateRandomGraph(const std::size_t dof,
   return graph;
 }
 
-TEST(DAGSearch, NoEdges)
+template <typename FloatType>
+void runNoEdgesTest()
 {
-  descartes_light::LadderGraphD graph(6);
+  descartes_light::LadderGraph<FloatType> graph(6);
   graph.resize(10);
-  addRandomVertices(graph, 10);
+  addRandomVertices<FloatType>(graph, 10);
 
-  descartes_light::DAGSearchD search(graph);
+  descartes_light::DAGSearch<FloatType> search(graph);
 
-  double total_cost = search.run();
-  ASSERT_NEAR(total_cost, std::numeric_limits<double>::max(), 1.0e-6);
+  FloatType total_cost = search.run();
+  ASSERT_NEAR(total_cost, std::numeric_limits<FloatType>::max(), 1.0e-6);
 }
 
-TEST(DAGSearch, CorrectGraph)
+template <typename FloatType>
+void runCorrectGraphTest()
 {
   const std::size_t dof = 6;
   const std::size_t n_rungs = 10;
   const int max_vertices_per_rung = 10;
 
-  descartes_light::LadderGraphD graph = generateRandomGraph(dof, n_rungs, max_vertices_per_rung);
-  descartes_light::DAGSearchD search(graph);
-  double total_cost;
+  descartes_light::LadderGraph<FloatType> graph = generateRandomGraph<FloatType>(dof, n_rungs, max_vertices_per_rung);
+  descartes_light::DAGSearch<FloatType> search(graph);
+  FloatType total_cost;
   ASSERT_NO_THROW(total_cost = search.run());
   EXPECT_GT(total_cost, 0.0);
 
   std::cout << "Total cost: " << total_cost << std::endl;
 
-  std::vector<descartes_light::DAGSearchD::predecessor_t> path;
+  std::vector<typename descartes_light::DAGSearch<FloatType>::predecessor_t> path;
   ASSERT_NO_THROW(path = search.shortestPath());
   EXPECT_EQ(path.size(), n_rungs);
 
   std::cout << "Path:\n";
   // Reconstruct the path cost
-  double reconstructed_cost = 0.0;
+  FloatType reconstructed_cost = 0.0;
   for (std::size_t i = 0; i < path.size(); ++i)
   {
     const auto vertex_idx = path[i];
@@ -132,25 +138,26 @@ TEST(DAGSearch, CorrectGraph)
     {
       const auto next_idx = path[i + 1];
       const auto& edge_list = graph.getRung(i).nodes[vertex_idx].edges;
-      auto it = std::find_if(edge_list.begin(), edge_list.end(), [next_idx](const descartes_light::EdgeD& edge) {
-        return edge.idx == next_idx;
-      });
+      auto it = std::find_if(edge_list.begin(),
+                             edge_list.end(),
+                             [next_idx](const descartes_light::Edge<FloatType>& edge) { return edge.idx == next_idx; });
 
       reconstructed_cost += it->cost;
     }
   }
   std::cout << std::endl;
 
-  ASSERT_TRUE(std::abs(total_cost - reconstructed_cost) < std::numeric_limits<double>::epsilon());
+  ASSERT_TRUE(std::abs(total_cost - reconstructed_cost) < std::numeric_limits<FloatType>::epsilon());
 }
 
-TEST(DAGSearch, KnownPathTest)
+template <typename FloatType>
+void runKnownPathTest()
 {
   const std::size_t dof = 6;
   const std::size_t n_rungs = 10;
   const int max_vertices_per_rung = 10;
 
-  descartes_light::LadderGraphD graph = generateRandomGraph(dof, n_rungs, max_vertices_per_rung);
+  descartes_light::LadderGraph<FloatType> graph = generateRandomGraph<FloatType>(dof, n_rungs, max_vertices_per_rung);
 
   std::vector<std::size_t> known_path;
   known_path.reserve(graph.size());
@@ -165,28 +172,46 @@ TEST(DAGSearch, KnownPathTest)
   for (std::size_t i = 0; i < graph.size() - 1; ++i)
   {
     // Get the current rung
-    descartes_light::RungD& rung = graph.getRung(i);
+    auto& rung = graph.getRung(i);
 
     // Choose a random edge from the selected vertex and set its cost to 0 so the search should choose it
-    descartes_light::LadderGraphD::EdgeList& edges = rung.nodes[known_path.at(i)].edges;
+    auto& edges = rung.nodes[known_path[i]].edges;
     std::uniform_int_distribution<std::size_t> edge_idx_dist(0, edges.size() - 1);
     std::size_t edge_idx = edge_idx_dist(RAND_GEN);
-    descartes_light::EdgeD& edge = edges.at(edge_idx);
+    auto& edge = edges[edge_idx];
     edge.cost = 0.0;
 
     // Add the vertex associated with this edge to the path
     known_path.push_back(edge.idx);
   }
 
-  descartes_light::DAGSearchD search(graph);
-  double total_cost = search.run();
-  EXPECT_NEAR(total_cost, 0.0, std::numeric_limits<double>::epsilon());
+  descartes_light::DAGSearch<FloatType> search(graph);
+  FloatType total_cost = search.run();
+  EXPECT_NEAR(total_cost, 0.0, std::numeric_limits<FloatType>::epsilon());
 
   auto path = search.shortestPath();
   for (std::size_t i = 0; i < path.size(); ++i)
   {
     EXPECT_EQ(path.at(i), known_path.at(i));
   }
+}
+
+TEST(DAGSearch, NoEdges)
+{
+  runNoEdgesTest<double>();
+  runNoEdgesTest<float>();
+}
+
+TEST(DAGSearch, CorrectGraph)
+{
+  runCorrectGraphTest<double>();
+  runCorrectGraphTest<float>();
+}
+
+TEST(DAGSearch, KnownPathTest)
+{
+  runKnownPathTest<double>();
+  runKnownPathTest<float>();
 }
 
 int main(int argc, char** argv)

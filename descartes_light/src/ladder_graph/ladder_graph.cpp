@@ -1,4 +1,6 @@
 #include <descartes_light/impl/ladder_graph.hpp>
+#include <vector>
+#include <list>
 
 namespace descartes_light
 {

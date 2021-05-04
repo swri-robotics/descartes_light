@@ -16,6 +16,8 @@
  * limitations under the License.
  */
 #include <descartes_light/impl/ladder_graph_dag_search.hpp>
+#include <vector>
+#include <list>
 
 namespace descartes_light
 {

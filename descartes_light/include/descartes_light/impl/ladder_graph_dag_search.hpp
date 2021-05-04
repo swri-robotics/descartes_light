@@ -18,7 +18,7 @@
 #ifndef DESCARTES_LIGHT_IMPL_LADDER_GRAPH_DAG_SEARCH_HPP
 #define DESCARTES_LIGHT_IMPL_LADDER_GRAPH_DAG_SEARCH_HPP
 
-#include <descartes_light/ladder_graph_dag_search.h>
+#include <descartes_light/ladder_graph/ladder_graph_dag_search.h>
 
 namespace descartes_light
 {
@@ -42,7 +42,7 @@ FloatType DAGSearch<FloatType>::run()
   // Cost to the first rung should be set to zero
   std::fill(solution_.front().distance.begin(), solution_.front().distance.end(), 0.0);
 
-  // Other rows initialize to zero
+  // Other rows initialize to numeric limits max
   for (size_type i = 1; i < solution_.size(); ++i)
   {
     std::fill(solution_[i].distance.begin(), solution_[i].distance.end(), std::numeric_limits<FloatType>::max());
@@ -52,16 +52,22 @@ FloatType DAGSearch<FloatType>::run()
   for (size_type r = 0; r < solution_.size() - 1; ++r)
   {
     const auto next_r = r + 1;
-    const Rung<FloatType>& rung = graph_.getRung(r);
+    const auto& rung = graph_.getRung(r);
+    const auto& next_rung = graph_.getRung(next_r);
 
     // For each vertex in the out edge list
     for (size_t v = 0; v < rung.nodes.size(); ++v)
     {
-      const auto u_cost = distance(r, v);
+      const auto& node = rung.nodes[v];
+
+      // If first rung then the cost is the node cost else lookup cost
+      const FloatType u_cost = (r == 0) ? node.cost : distance(r, v);
+
       // for each out edge
-      for (const auto& edge : rung.nodes[v].edges)
+      for (const auto& edge : node.edges)
       {
-        auto dv = u_cost + edge.cost;  // new cost
+        // new cost = edge cost + vertex cost
+        auto dv = u_cost + edge.cost + next_rung.nodes[edge.idx].cost;
         if (dv < distance(next_r, edge.idx))
         {
           distance(next_r, edge.idx) = dv;
