@@ -46,6 +46,7 @@ template <typename FloatType>
 class Solver
 {
 public:
+  using FloatT = FloatType;
   using Ptr = std::shared_ptr<Solver<FloatType>>;
   using ConstPtr = std::shared_ptr<const Solver<FloatType>>;
 
