@@ -22,14 +22,23 @@
 
 namespace descartes_light
 {
+/**
+ * @brief Computes the cost of an edge between two waypoints as the squared Euclidean distance between them.
+ * This distance can also be multiplied by an input scale factor in the case of varying units within the elements of the
+ * states (such as linear and revolute joints of a robot)
+ */
 template <typename FloatType>
 class EuclideanDistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
   EuclideanDistanceEdgeEvaluator() = default;
+  EuclideanDistanceEdgeEvaluator(const Eigen::Array<FloatType, Eigen::Dynamic, 1>& scale);
 
   std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
                                       const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) const override;
+
+private:
+  const Eigen::Array<FloatType, Eigen::Dynamic, 1> scale_;
 };
 
 using EuclideanDistanceEdgeEvaluatorF = EuclideanDistanceEdgeEvaluator<float>;
