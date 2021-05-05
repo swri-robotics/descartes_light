@@ -43,6 +43,15 @@ struct BuildStatus
 };
 
 template <typename FloatType>
+struct SearchResult
+{
+  /** @brief Lowest cost path through the graph */
+  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> trajectory;
+  /** @brief Path cost */
+  FloatType cost;
+};
+
+template <typename FloatType>
 class Solver
 {
 public:
@@ -93,7 +102,7 @@ public:
    * @throws This should throw an exception if it failed to find a solution.
    * @return The joint trajectory found
    */
-  virtual std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> search() = 0;
+  virtual SearchResult<FloatType> search() = 0;
 
 protected:
   /**
