@@ -161,7 +161,7 @@ LadderGraphSolver<FloatType>::build(const std::vector<typename WaypointSampler<F
         // Consider the edge:
         const auto& to_node = to.nodes[k];
         std::pair<bool, FloatType> results =
-            edge_eval[static_cast<size_t>(i - 1)]->evaluate(from_node.state, to_node.state);
+            edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(from_node.state, to_node.state);
         if (results.first)
         {
           found = true;
