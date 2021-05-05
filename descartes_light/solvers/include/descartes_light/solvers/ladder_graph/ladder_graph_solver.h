@@ -39,7 +39,7 @@ public:
                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
                         const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
 
-  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> search() override;
+  SearchResult<FloatType> search() override;
 
 private:
   LadderGraph<FloatType> graph_;

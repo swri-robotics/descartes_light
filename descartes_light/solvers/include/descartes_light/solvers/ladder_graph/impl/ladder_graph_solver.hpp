@@ -191,24 +191,29 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
 }
 
 template <typename FloatType>
-std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> LadderGraphSolver<FloatType>::search()
+SearchResult<FloatType> LadderGraphSolver<FloatType>::search()
 {
+  using Clock = std::chrono::high_resolution_clock;
+  std::chrono::time_point<Clock> start_time = Clock::now();
+
   DAGSearch<FloatType> s(graph_);
   const auto cost = s.run();
 
-  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> solution;
-  if (cost == std::numeric_limits<FloatType>::max())
-    return solution;
-
-  using Clock = std::chrono::high_resolution_clock;
-  std::chrono::time_point<Clock> start_time = Clock::now();
-  const auto indices = s.shortestPath();
-  for (std::size_t i = 0; i < indices.size(); ++i)
-    solution.push_back(graph_.getRung(i).nodes[indices[i]].state);
-
   double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to search graph for solution with cost %0.4f.", duration, cost);
-  return solution;
+
+  if (std::abs(cost - std::numeric_limits<FloatType>::max()) < std::numeric_limits<FloatType>::epsilon())
+    throw std::runtime_error("Failed to find path through the graph");
+
+  SearchResult<FloatType> result;
+  result.cost = cost;
+
+  const auto indices = s.shortestPath();
+  result.trajectory.reserve(indices.size());
+  for (std::size_t i = 0; i < indices.size(); ++i)
+    result.trajectory.push_back(graph_.getRung(i).nodes[indices[i]].state);
+
+  return result;
 }
 
 }  // namespace descartes_light
