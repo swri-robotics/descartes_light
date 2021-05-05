@@ -55,25 +55,57 @@ public:
   /**
    * @brief Build the ladder graph
    * @param trajectory The waypoint samplers
-   * @param edge_eval The edge evaluator.
-   *        If empty it should be ignored.
-   *        If size of one it should be used for each waypoint.
-   * @param state_eval
-   *        If empty it should be ignored.
-   *        If size of one it should be used for each waypoint.
-   * @param num_threads
+   * @param edge_eval The edge evaluator; must either be size of one (used for each edge) or equal to one less than the
+   * size of the trajectory (one per edge)
+   * @param state_eval; The state evaluator; must either be size of one (used for each waypoint) or equal to the size of
+   * the trajectory (one per waypoint)
    * @return BuildStatus is true if successfully built graph, otherwise false
    */
-  virtual BuildStatus build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                            const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                            const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) = 0;
+  BuildStatus build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                    std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> edge_evaluators,
+                    std::vector<typename StateEvaluator<FloatType>::ConstPtr> state_evaluators)
+  {
+    if (edge_evaluators.size() == 1)
+    {
+      edge_evaluators.reserve(trajectory.size() - 1);
+      std::fill_n(std::back_inserter(edge_evaluators), trajectory.size() - 2, edge_evaluators.front());
+    }
+    else if (edge_evaluators.size() != trajectory.size() - 1)
+    {
+      throw std::runtime_error("Invalid number of edge evaluators; size must equal 1 or trajectory size - 1");
+    }
+
+    if (state_evaluators.size() == 1)
+    {
+      state_evaluators.reserve(trajectory.size());
+      std::fill_n(std::back_inserter(state_evaluators), trajectory.size() - 1, state_evaluators.front());
+    }
+    else if (state_evaluators.size() != trajectory.size())
+    {
+      throw std::runtime_error("Invalid number of state evaluators; size must equal 1 or trajectory size");
+    }
+
+    return buildImpl(trajectory, edge_evaluators, state_evaluators);
+  }
 
   /**
-   * @brief Search the graph
+   * @brief Searches the graph
    * @throws This should throw an exception if it failed to find a solution.
    * @return The joint trajectory found
    */
   virtual std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> search() = 0;
+
+protected:
+  /**
+   * @brief Implementation of the graph build function
+   * @param trajectory Waypoint samplers
+   * @param edge_eval Edge evaluators, size one less than the size of the trajectory
+   * @param state_eval State evaluators, size equal to the size of the trajectory
+   * @return
+   */
+  virtual BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                                const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+                                const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) = 0;
 };
 
 using SolverF = Solver<float>;
