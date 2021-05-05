@@ -1,12 +1,13 @@
+#include <descartes_light/core/solver.h>
+#include <descartes_light/solvers/ladder_graph/ladder_graph_dag_search.h>
+#include <descartes_light/solvers/ladder_graph/ladder_graph.h>
+
 #include <gtest/gtest.h>
-#include <descartes_light/ladder_graph/ladder_graph_dag_search.h>
-#include <descartes_light/ladder_graph/ladder_graph.h>
 #include <functional>
 #include <iostream>
 #include <random>
 #include <numeric>
 #include <vector>
-#include <list>
 
 static std::mt19937 RAND_GEN(0);
 
