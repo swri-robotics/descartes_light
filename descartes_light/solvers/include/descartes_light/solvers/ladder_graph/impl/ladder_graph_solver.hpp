@@ -72,35 +72,13 @@ LadderGraphSolver<FloatType>::LadderGraphSolver(const std::size_t dof, int num_t
 }
 
 template <typename FloatType>
-BuildStatus
-LadderGraphSolver<FloatType>::build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                                    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                                    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval)
+BuildStatus LadderGraphSolver<FloatType>::buildImpl(
+    const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_evaluators,
+    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
 {
   BuildStatus status;
   graph_.resize(trajectory.size());
-
-  std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> edge_evaluators;
-  if (edge_eval.size() == 1)
-  {
-    edge_evaluators.resize(trajectory.size() - 1);
-    std::fill(edge_evaluators.begin(), edge_evaluators.end(), edge_eval.front());
-  }
-  else
-  {
-    edge_evaluators = edge_eval;
-  }
-
-  std::vector<typename StateEvaluator<FloatType>::ConstPtr> state_evaluators;
-  if (state_eval.size() == 1)
-  {
-    state_evaluators.resize(trajectory.size());
-    std::fill(state_evaluators.begin(), state_evaluators.end(), state_eval.front());
-  }
-  else
-  {
-    state_evaluators = state_eval;
-  }
 
   // Build Vertices
   long num_waypoints = static_cast<long>(trajectory.size());

@@ -35,9 +35,9 @@ class LadderGraphSolver : public Solver<FloatType>
 public:
   LadderGraphSolver(const std::size_t dof, int num_threads = std::thread::hardware_concurrency());
 
-  BuildStatus build(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
+  BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                        const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+                        const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
 
   std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> search() override;
 
