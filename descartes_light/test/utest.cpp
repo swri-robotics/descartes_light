@@ -169,8 +169,7 @@ TYPED_TEST(SolverFixture, NoEdges)
   ASSERT_TRUE(std::equal(status.failed_edges.begin(), status.failed_edges.end(), expected_failed_edges.begin()));
   ASSERT_EQ(status.failed_vertices.size(), 0);
 
-  auto path = solver->search();
-  ASSERT_EQ(path.size(), 0);
+  ASSERT_THROW(solver->search(), std::runtime_error);
 }
 
 TYPED_TEST(SolverFixture, KnownPathTest)
@@ -188,10 +187,11 @@ TYPED_TEST(SolverFixture, KnownPathTest)
   ASSERT_EQ(status.failed_vertices.size(), 0);
   ASSERT_EQ(status.failed_edges.size(), 0);
 
-  auto path = solver->search();
-  ASSERT_EQ(path.size(), this->n_waypoints);
+  SearchResult<FloatType> result = solver->search();
+  ASSERT_EQ(result.trajectory.size(), this->n_waypoints);
+  ASSERT_TRUE(std::abs(result.cost) < std::numeric_limits<FloatType>::epsilon());
 
-  for (const auto& state : path)
+  for (const auto& state : result.trajectory)
   {
     ASSERT_TRUE(state.isApprox(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof)));
   }
