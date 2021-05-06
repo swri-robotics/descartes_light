@@ -15,6 +15,7 @@ add_subdirectory(core)
 add_subdirectory(edge_evaluators)
 add_subdirectory(samplers)
 add_subdirectory(solvers)
+add_subdirectory(state_evaluators)
 
 if(DESCARTES_ENABLE_TESTING)
   enable_testing()
