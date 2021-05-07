@@ -19,7 +19,6 @@
 #define DESCARTES_LIGHT_CORE_WAYPOINT_SAMPLER_H
 
 #include <descartes_light/types.h>
-
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
@@ -30,7 +29,7 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 /**
- * @brief Returns a vector of state solutions for a given waypoint
+ * @brief Produces a set of states for which a waypoint is valid
  */
 template <typename FloatType>
 class WaypointSampler
@@ -41,6 +40,19 @@ public:
 
   virtual ~WaypointSampler() = default;
 
+  /**
+   * @brief Samples a waypoint to produce a list of states for which the waypoint is valid along with an initial cost
+   * @details This function allows an initial cost to be assigned to each state sample. This cost is functionally the
+   * same as the cost provided by the StateEvaluator, but in some cases it can be more efficient to calculate certain
+   * costs during the sample step.
+   *
+   * Consider calculating a cost based on the distance from nearest collision for a robot with redundant joint
+   * states. Collision checking is computationally expensive and, as such, should only be evaluated for the fewest
+   * number of states possible. Evaluating distance from nearest collision as a StateEvalutor would result in a
+   * significant amount of repeat work since all redundant states would produce the same cost. Therefore it is
+   * preferable to generate this cost once for the nominal state and apply it to all redundant states produced in the
+   * sampling step
+   */
   virtual std::vector<StateSample<FloatType>> sample() const = 0;
 };
 
