@@ -18,6 +18,7 @@
 #ifndef DESCARTES_LIGHT_CORE_EDGE_EVALUATOR_H
 #define DESCARTES_LIGHT_CORE_EDGE_EVALUATOR_H
 
+#include <descartes_light/types.h>
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
@@ -43,8 +44,7 @@ public:
    * @return A pair <True/False, Cost>, True if edge is valid, false otherwise. Cost to move from the first vertex to
    * the next
    */
-  virtual std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
-                                              const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) const = 0;
+  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>& start, const State<FloatType>& end) const = 0;
 };
 
 using EdgeEvaluatorF = EdgeEvaluator<float>;

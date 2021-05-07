@@ -18,6 +18,7 @@
 #ifndef DESCARTES_LIGHT_LADDER_GRAPH_H
 #define DESCARTES_LIGHT_LADDER_GRAPH_H
 
+#include <descartes_light/types.h>
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <algorithm>
@@ -53,10 +54,10 @@ template <typename FloatT>
 struct Node
 {
   Node() noexcept = default;
-  Node(const Eigen::Matrix<FloatT, Eigen::Dynamic, 1>& state, FloatT cost) noexcept : state{ state }, cost{ cost } {}
+  Node(const State<FloatT>& state, FloatT cost) noexcept : state{ state }, cost{ cost } {}
 
   /** @brief state */
-  Eigen::Matrix<FloatT, Eigen::Dynamic, 1> state;
+  State<FloatT> state;
 
   /** @brief The state cost */
   FloatT cost{ 0 };

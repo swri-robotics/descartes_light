@@ -18,6 +18,8 @@
 #ifndef DESCARTES_LIGHT_CORE_WAYPOINT_SAMPLER_H
 #define DESCARTES_LIGHT_CORE_WAYPOINT_SAMPLER_H
 
+#include <descartes_light/types.h>
+
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
@@ -28,8 +30,7 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 /**
- * @brief For a given waypoint this should return a vector of solutions
- * @details Example for joint space planning
+ * @brief Returns a vector of state solutions for a given waypoint
  */
 template <typename FloatType>
 class WaypointSampler
@@ -40,7 +41,7 @@ public:
 
   virtual ~WaypointSampler() = default;
 
-  virtual std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() const = 0;
+  virtual std::vector<State<FloatType>> sample() const = 0;
 };
 
 using WaypointSamplerF = WaypointSampler<float>;

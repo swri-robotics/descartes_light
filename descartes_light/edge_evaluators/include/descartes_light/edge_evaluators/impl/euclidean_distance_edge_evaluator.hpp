@@ -35,9 +35,8 @@ EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType>
-EuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
-                                                    const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) const
+std::pair<bool, FloatType> EuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const State<FloatType>& start,
+                                                                               const State<FloatType>& end) const
 {
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> diff = end - start;
   if (scale_.size() == diff.size())

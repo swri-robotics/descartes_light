@@ -28,8 +28,7 @@ class CompoundEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   CompoundEdgeEvaluator() = default;
 
-  std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
-                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) const override;
+  std::pair<bool, FloatType> evaluate(const State<FloatType>& start, const State<FloatType>& end) const override;
 
   std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> evaluators;
 };

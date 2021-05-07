@@ -14,7 +14,7 @@ using namespace descartes_light;
 static std::mt19937 RAND_GEN(0);
 
 template <typename FloatType>
-Eigen::Matrix<FloatType, Eigen::Dynamic, 1> generateRandomState(Eigen::Index dof)
+State<FloatType> generateRandomState(Eigen::Index dof)
 {
   std::normal_distribution<FloatType> dist;
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> sol(dof);
@@ -36,10 +36,10 @@ public:
   {
   }
 
-  virtual std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() const override
+  virtual std::vector<State<FloatType>> sample() const override
   {
     // Generate some random joint states
-    std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> waypoints;
+    std::vector<State<FloatType>> waypoints;
     waypoints.reserve(n_samples_);
     std::generate_n(
         std::back_inserter(waypoints), n_samples_, [this]() { return generateRandomState<FloatType>(dof_); });
@@ -66,8 +66,7 @@ class NaiveEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   NaiveEdgeEvaluator(const bool valid) : valid_(valid) {}
 
-  virtual std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>&,
-                                              const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>&) const override
+  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>&, const State<FloatType>&) const override
   {
     return std::make_pair(valid_, 0.0);
   }
@@ -86,7 +85,7 @@ class NaiveStateEvaluator : public StateEvaluator<FloatType>
 public:
   NaiveStateEvaluator(const bool valid) : valid_(valid) {}
 
-  virtual std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>&) const override
+  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>&) const override
   {
     return std::make_pair(valid_, 0.0);
   }
