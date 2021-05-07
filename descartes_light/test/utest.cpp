@@ -36,16 +36,18 @@ public:
   {
   }
 
-  virtual std::vector<State<FloatType>> sample() const override
+  virtual std::vector<StateSample<FloatType>> sample() const override
   {
     // Generate some random joint states
-    std::vector<State<FloatType>> waypoints;
+    std::vector<StateSample<FloatType>> waypoints;
     waypoints.reserve(n_samples_);
-    std::generate_n(
-        std::back_inserter(waypoints), n_samples_, [this]() { return generateRandomState<FloatType>(dof_); });
+    std::generate_n(std::back_inserter(waypoints), n_samples_, [this]() {
+      return StateSample<FloatType>{ generateRandomState<FloatType>(dof_), static_cast<FloatType>(0.0) };
+    });
 
     // Set one of the joint states to all zeros
-    waypoints.at(zero_state_idx_) = Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof_);
+    waypoints.at(zero_state_idx_) =
+        StateSample<FloatType>{ State<FloatType>::Zero(this->dof_), static_cast<FloatType>(0.0) };
 
     return waypoints;
   }
@@ -130,7 +132,7 @@ public:
 
     std::uniform_int_distribution<std::size_t> dist(0, samples_per_waypoint - 1);
 
-    // Create waypoint samplers with ra
+    // Create waypoint samplers
     for (std::size_t i = 0; i < n_waypoints; ++i)
     {
       auto zero_state_idx = dist(RAND_GEN);
@@ -139,10 +141,10 @@ public:
     }
   }
 
-  SolverConfiguratorT configurator;
   const Eigen::Index dof;
   const std::size_t n_waypoints;
   const std::size_t samples_per_waypoint;
+  SolverConfiguratorT configurator;
   std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
   std::vector<std::size_t> zero_state_indices_;
 };
