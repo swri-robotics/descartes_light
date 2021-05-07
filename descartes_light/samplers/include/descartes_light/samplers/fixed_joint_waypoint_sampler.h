@@ -28,7 +28,7 @@ class FixedJointWaypointSampler : public WaypointSampler<FloatType>
 public:
   FixedJointWaypointSampler(const State<FloatType>& fixed_joint_position);
 
-  std::vector<State<FloatType>> sample() const override;
+  std::vector<StateSample<FloatType>> sample() const override;
 
 private:
   const State<FloatType> fixed_joint_position_;

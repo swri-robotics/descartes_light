@@ -29,9 +29,9 @@ FixedJointWaypointSampler<FloatType>::FixedJointWaypointSampler(const State<Floa
 }
 
 template <typename FloatType>
-std::vector<State<FloatType>> FixedJointWaypointSampler<FloatType>::sample() const
+std::vector<StateSample<FloatType>> FixedJointWaypointSampler<FloatType>::sample() const
 {
-  return { fixed_joint_position_ };
+  return { StateSample<FloatType>{ fixed_joint_position_, static_cast<FloatType>(0.0) } };
 }
 
 }  // namespace descartes_light
