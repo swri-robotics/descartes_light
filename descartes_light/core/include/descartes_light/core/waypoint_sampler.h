@@ -41,7 +41,7 @@ public:
 
   virtual ~WaypointSampler() = default;
 
-  virtual std::vector<State<FloatType>> sample() const = 0;
+  virtual std::vector<StateSample<FloatType>> sample() const = 0;
 };
 
 using WaypointSamplerF = WaypointSampler<float>;
