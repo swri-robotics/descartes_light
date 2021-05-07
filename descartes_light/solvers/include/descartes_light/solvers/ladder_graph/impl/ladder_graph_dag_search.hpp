@@ -55,27 +55,27 @@ FloatType DAGSearch<FloatType>::run()
     const auto& rung = graph_.getRung(r);
     const auto& next_rung = graph_.getRung(next_r);
 
-    // For each vertex in the out edge list
-    for (size_t v = 0; v < rung.nodes.size(); ++v)
+    // For each node in the out edge list
+    for (size_t n = 0; n < rung.nodes.size(); ++n)
     {
-      const auto& node = rung.nodes[v];
+      const auto& node = rung.nodes[n];
 
       // If first rung then the cost is the node cost else lookup cost
-      const FloatType u_cost = (r == 0) ? node.cost : distance(r, v);
+      const FloatType u_cost = (r == 0) ? node.sample.cost : distance(r, n);
 
       // for each out edge
       for (const auto& edge : node.edges)
       {
-        // new cost = edge cost + vertex cost
-        auto dv = u_cost + edge.cost + next_rung.nodes[edge.idx].cost;
+        // new cost = edge cost + node cost
+        auto dv = u_cost + edge.cost + next_rung.nodes[edge.idx].sample.cost;
         if (dv < distance(next_r, edge.idx))
         {
           distance(next_r, edge.idx) = dv;
           // the predecessor's rung is implied to be the current rung
-          predecessor(next_r, edge.idx) = static_cast<unsigned>(v);
+          predecessor(next_r, edge.idx) = static_cast<unsigned>(n);
         }
       }
-    }  // vertex for loop
+    }  // node for loop
   }    // rung for loop
 
   return *std::min_element(solution_.back().distance.begin(), solution_.back().distance.end());

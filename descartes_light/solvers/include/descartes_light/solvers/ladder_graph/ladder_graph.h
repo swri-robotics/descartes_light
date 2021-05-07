@@ -54,13 +54,9 @@ template <typename FloatT>
 struct Node
 {
   Node() noexcept = default;
-  Node(const State<FloatT>& state, FloatT cost) noexcept : state{ state }, cost{ cost } {}
+  Node(const StateSample<FloatT>& sample_) noexcept : sample{ sample_ } {}
 
-  /** @brief state */
-  State<FloatT> state;
-
-  /** @brief The state cost */
-  FloatT cost{ 0 };
+  StateSample<FloatT> sample;
 
   /** @brief These are connects to other nodes */
   std::vector<Edge<FloatT>> edges;
