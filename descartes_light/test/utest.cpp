@@ -14,7 +14,7 @@ using namespace descartes_light;
 static std::mt19937 RAND_GEN(0);
 
 template <typename FloatType>
-Eigen::Matrix<FloatType, Eigen::Dynamic, 1> generateRandomState(Eigen::Index dof)
+State<FloatType> generateRandomState(Eigen::Index dof)
 {
   std::normal_distribution<FloatType> dist;
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> sol(dof);
@@ -31,21 +31,25 @@ template <typename FloatType>
 class RandomStateSampler : public WaypointSampler<FloatType>
 {
 public:
-  RandomStateSampler(const Eigen::Index dof, const std::size_t n_samples, const std::size_t zero_state_idx)
-    : dof_(dof), n_samples_(n_samples), zero_state_idx_(zero_state_idx)
+  RandomStateSampler(const Eigen::Index dof,
+                     const std::size_t n_samples,
+                     const std::size_t zero_state_idx,
+                     const FloatType state_cost)
+    : dof_(dof), n_samples_(n_samples), zero_state_idx_(zero_state_idx), state_cost_(state_cost)
   {
   }
 
-  virtual std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> sample() const override
+  virtual std::vector<StateSample<FloatType>> sample() const override
   {
     // Generate some random joint states
-    std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> waypoints;
+    std::vector<StateSample<FloatType>> waypoints;
     waypoints.reserve(n_samples_);
-    std::generate_n(
-        std::back_inserter(waypoints), n_samples_, [this]() { return generateRandomState<FloatType>(dof_); });
+    std::generate_n(std::back_inserter(waypoints), n_samples_, [this]() {
+      return StateSample<FloatType>{ generateRandomState<FloatType>(dof_), state_cost_ };
+    });
 
     // Set one of the joint states to all zeros
-    waypoints.at(zero_state_idx_) = Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof_);
+    waypoints.at(zero_state_idx_) = StateSample<FloatType>{ State<FloatType>::Zero(this->dof_), state_cost_ };
 
     return waypoints;
   }
@@ -54,6 +58,7 @@ private:
   const Eigen::Index dof_;
   const std::size_t n_samples_;
   const std::size_t zero_state_idx_;
+  const FloatType state_cost_;
 };
 
 /**
@@ -66,8 +71,7 @@ class NaiveEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   NaiveEdgeEvaluator(const bool valid) : valid_(valid) {}
 
-  virtual std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>&,
-                                              const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>&) const override
+  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>&, const State<FloatType>&) const override
   {
     return std::make_pair(valid_, 0.0);
   }
@@ -84,15 +88,16 @@ template <typename FloatType>
 class NaiveStateEvaluator : public StateEvaluator<FloatType>
 {
 public:
-  NaiveStateEvaluator(const bool valid) : valid_(valid) {}
+  NaiveStateEvaluator(const bool valid, const FloatType cost) : valid_(valid), cost_(cost) {}
 
-  virtual std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>&) const override
+  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>&) const override
   {
-    return std::make_pair(valid_, 0.0);
+    return std::make_pair(valid_, cost_);
   }
 
 private:
   const bool valid_;
+  const FloatType cost_;
 };
 
 /**
@@ -124,26 +129,28 @@ class SolverFixture : public ::testing::Test
 public:
   using FloatType = typename SolverConfiguratorT::FloatType;
 
-  SolverFixture() : dof(6), n_waypoints(10), samples_per_waypoint(4)
+  SolverFixture() : dof(6), n_waypoints(10), samples_per_waypoint(4), state_cost(static_cast<FloatType>(1.0))
   {
     samplers.reserve(n_waypoints);
     zero_state_indices_.reserve(n_waypoints);
 
     std::uniform_int_distribution<std::size_t> dist(0, samples_per_waypoint - 1);
 
-    // Create waypoint samplers with ra
+    // Create waypoint samplers
     for (std::size_t i = 0; i < n_waypoints; ++i)
     {
       auto zero_state_idx = dist(RAND_GEN);
       zero_state_indices_.push_back(zero_state_idx);
-      samplers.push_back(std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, dist(RAND_GEN)));
+      samplers.push_back(
+          std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, dist(RAND_GEN), state_cost));
     }
   }
 
-  SolverConfiguratorT configurator;
   const Eigen::Index dof;
   const std::size_t n_waypoints;
   const std::size_t samples_per_waypoint;
+  const FloatType state_cost;
+  SolverConfiguratorT configurator;
   std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
   std::vector<std::size_t> zero_state_indices_;
 };
@@ -158,9 +165,10 @@ TYPED_TEST(SolverFixture, NoEdges)
   using FloatType = typename TypeParam::FloatType;
   typename Solver<FloatType>::Ptr solver = this->configurator.create();
 
-  BuildStatus status = solver->build(this->samplers,
-                                     { std::make_shared<const NaiveEdgeEvaluator<FloatType>>(false) },
-                                     { std::make_shared<const NaiveStateEvaluator<FloatType>>(true) });
+  auto edge_eval = std::make_shared<const NaiveEdgeEvaluator<FloatType>>(false);
+  auto state_eval = std::make_shared<const NaiveStateEvaluator<FloatType>>(true, this->state_cost);
+
+  BuildStatus status = solver->build(this->samplers, { edge_eval }, { state_eval });
   ASSERT_FALSE(status);
 
   std::vector<std::size_t> expected_failed_edges(this->n_waypoints - 1);
@@ -178,18 +186,22 @@ TYPED_TEST(SolverFixture, KnownPathTest)
   typename Solver<FloatType>::Ptr solver = this->configurator.create();
 
   // Build a graph where one sample for each waypoint is an all zero state; evaluate edges using the Euclidean distance
-  // metric Since each waypoint has an all-zero state, the shortest path should be through these samples with a total
-  // cost of zero
-  BuildStatus status = solver->build(this->samplers,
-                                     { std::make_shared<const EuclideanDistanceEdgeEvaluator<FloatType>>() },
-                                     { std::make_shared<const NaiveStateEvaluator<FloatType>>(true) });
+  // metric Since each waypoint has an all-zero state, the shortest path should be through these samples
+  auto edge_eval = std::make_shared<const EuclideanDistanceEdgeEvaluator<FloatType>>();
+  auto state_eval = std::make_shared<const NaiveStateEvaluator<FloatType>>(true, this->state_cost);
+
+  BuildStatus status = solver->build(this->samplers, { edge_eval }, { state_eval });
   ASSERT_TRUE(status);
   ASSERT_EQ(status.failed_vertices.size(), 0);
   ASSERT_EQ(status.failed_edges.size(), 0);
 
   SearchResult<FloatType> result = solver->search();
   ASSERT_EQ(result.trajectory.size(), this->n_waypoints);
-  ASSERT_TRUE(std::abs(result.cost) < std::numeric_limits<FloatType>::epsilon());
+
+  // Total path cost should be zero for edge costs and 2 * state_cost (one from sampling, one from state evaluation) for
+  // state costs
+  FloatType total_cost = static_cast<FloatType>(this->n_waypoints) * this->state_cost * 2;
+  ASSERT_TRUE(std::abs(result.cost - total_cost) < std::numeric_limits<FloatType>::epsilon());
 
   for (const auto& state : result.trajectory)
   {

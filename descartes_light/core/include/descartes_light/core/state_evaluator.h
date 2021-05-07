@@ -18,6 +18,7 @@
 #ifndef DESCARTES_LIGHT_CORE_STATE_EVALUATOR_H
 #define DESCARTES_LIGHT_CORE_STATE_EVALUATOR_H
 
+#include <descartes_light/types.h>
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <memory>
@@ -36,7 +37,7 @@ public:
 
   virtual ~StateEvaluator() = default;
 
-  virtual std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& solution) const = 0;
+  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>& solution) const = 0;
 };
 
 using StateEvaluatorF = StateEvaluator<float>;

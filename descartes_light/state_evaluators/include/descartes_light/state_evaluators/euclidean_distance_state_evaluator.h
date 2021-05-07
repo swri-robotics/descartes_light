@@ -30,14 +30,14 @@ template <typename FloatType>
 class EuclideanDistanceStateEvaluator : public StateEvaluator<FloatType>
 {
 public:
-  EuclideanDistanceStateEvaluator(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& reference,
+  EuclideanDistanceStateEvaluator(const State<FloatType>& reference,
                                   const Eigen::Array<FloatType, Eigen::Dynamic, 1>& scale);
-  EuclideanDistanceStateEvaluator(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& reference);
+  EuclideanDistanceStateEvaluator(const State<FloatType>& reference);
 
-  virtual std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& state) const override;
+  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>& state) const override;
 
 private:
-  const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& reference_;
+  const State<FloatType>& reference_;
   const Eigen::Array<FloatType, Eigen::Dynamic, 1>& scale_;
 };
 

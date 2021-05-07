@@ -89,16 +89,19 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
 #pragma omp parallel for num_threads(num_threads_)
   for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
-    std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> vertex_data = trajectory[static_cast<size_t>(i)]->sample();
-    if (!vertex_data.empty())
+    std::vector<StateSample<FloatType>> samples = trajectory[static_cast<size_t>(i)]->sample();
+    if (!samples.empty())
     {
       auto& r = graph_.getRung(static_cast<size_t>(i));
-      r.nodes.reserve(vertex_data.size());
-      for (const auto& v : vertex_data)
+      r.nodes.reserve(samples.size());
+      for (auto& sample : samples)
       {
-        std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(v);
+        std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(sample.state);
         if (results.first)
-          r.nodes.push_back(Node<FloatType>(v, results.second));
+        {
+          sample.cost += results.second;
+          r.nodes.push_back(Node<FloatType>(sample));
+        }
       }
     }
     else
@@ -139,7 +142,7 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
         // Consider the edge:
         const auto& to_node = to.nodes[k];
         std::pair<bool, FloatType> results =
-            edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(from_node.state, to_node.state);
+            edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(from_node.sample.state, to_node.sample.state);
         if (results.first)
         {
           found = true;
@@ -211,7 +214,7 @@ SearchResult<FloatType> LadderGraphSolver<FloatType>::search()
   const auto indices = s.shortestPath();
   result.trajectory.reserve(indices.size());
   for (std::size_t i = 0; i < indices.size(); ++i)
-    result.trajectory.push_back(graph_.getRung(i).nodes[indices[i]].state);
+    result.trajectory.push_back(graph_.getRung(i).nodes[indices[i]].sample.state);
 
   return result;
 }

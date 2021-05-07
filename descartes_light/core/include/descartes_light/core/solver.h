@@ -46,7 +46,7 @@ template <typename FloatType>
 struct SearchResult
 {
   /** @brief Lowest cost path through the graph */
-  std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> trajectory;
+  std::vector<State<FloatType>> trajectory;
   /** @brief Path cost */
   FloatType cost;
 };

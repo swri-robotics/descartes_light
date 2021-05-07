@@ -34,8 +34,7 @@ public:
   EuclideanDistanceEdgeEvaluator() = default;
   EuclideanDistanceEdgeEvaluator(const Eigen::Array<FloatType, Eigen::Dynamic, 1>& scale);
 
-  std::pair<bool, FloatType> evaluate(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& start,
-                                      const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& end) const override;
+  std::pair<bool, FloatType> evaluate(const State<FloatType>& start, const State<FloatType>& end) const override;
 
 private:
   const Eigen::Array<FloatType, Eigen::Dynamic, 1> scale_;

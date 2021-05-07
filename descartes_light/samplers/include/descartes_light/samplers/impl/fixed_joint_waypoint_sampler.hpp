@@ -23,16 +23,15 @@
 namespace descartes_light
 {
 template <typename FloatType>
-FixedJointWaypointSampler<FloatType>::FixedJointWaypointSampler(
-    const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& fixed_joint_position)
+FixedJointWaypointSampler<FloatType>::FixedJointWaypointSampler(const State<FloatType>& fixed_joint_position)
   : fixed_joint_position_(fixed_joint_position)
 {
 }
 
 template <typename FloatType>
-std::vector<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>> FixedJointWaypointSampler<FloatType>::sample() const
+std::vector<StateSample<FloatType>> FixedJointWaypointSampler<FloatType>::sample() const
 {
-  return { fixed_joint_position_ };
+  return { StateSample<FloatType>{ fixed_joint_position_, static_cast<FloatType>(0.0) } };
 }
 
 }  // namespace descartes_light
