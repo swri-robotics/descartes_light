@@ -37,8 +37,8 @@ public:
   virtual std::pair<bool, FloatType> evaluate(const State<FloatType>& state) const override;
 
 private:
-  const State<FloatType>& reference_;
-  const Eigen::Array<FloatType, Eigen::Dynamic, 1>& scale_;
+  const State<FloatType> reference_;
+  const Eigen::Array<FloatType, Eigen::Dynamic, 1> scale_;
 };
 
 using EuclideanDistanceStateEvaluatorD = EuclideanDistanceStateEvaluator<double>;
