@@ -84,7 +84,11 @@ public:
       throw std::runtime_error("Invalid number of edge evaluators; size must equal 1 or trajectory size - 1");
     }
 
-    if (state_evaluators.size() == 1)
+    if (state_evaluators.size() == 0)
+    {
+      // State evaluators are not strictly necessary
+    }
+    else if (state_evaluators.size() == 1)
     {
       state_evaluators.reserve(trajectory.size());
       std::fill_n(std::back_inserter(state_evaluators), trajectory.size() - 1, state_evaluators.front());
