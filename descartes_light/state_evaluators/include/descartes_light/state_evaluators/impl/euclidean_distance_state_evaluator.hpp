@@ -27,7 +27,7 @@ EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(
     const Eigen::Array<FloatType, Eigen::Dynamic, 1>& scale)
   : reference_(reference), scale_(scale)
 {
-  if (reference.size() != scale.size())
+  if (reference_.size() != scale_.size())
     throw std::runtime_error("Reference state and scale must be the same size");
 }
 

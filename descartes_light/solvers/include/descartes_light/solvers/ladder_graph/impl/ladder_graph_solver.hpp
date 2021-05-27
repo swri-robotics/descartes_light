@@ -96,11 +96,18 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
       r.nodes.reserve(samples.size());
       for (auto& sample : samples)
       {
-        std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(sample.state);
-        if (results.first)
+        if (state_evaluators.empty())
         {
-          sample.cost += results.second;
           r.nodes.push_back(Node<FloatType>(sample));
+        }
+        else
+        {
+          std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(sample.state);
+          if (results.first)
+          {
+            sample.cost += results.second;
+            r.nodes.push_back(Node<FloatType>(sample));
+          }
         }
       }
     }
