@@ -1,6 +1,7 @@
 #pragma once
 
 #include <descartes_light/state_evaluators/normalized_state_evaluator.h>
+#include <iomanip>
 
 namespace descartes_light
 {
@@ -18,6 +19,16 @@ template <typename FloatType>
 std::pair<bool, FloatType> NormalizedStateEvaluator<FloatType>::evaluate(const State<FloatType>& solution) const
 {
   std::pair<bool, FloatType> result = evaluator_->evaluate(solution);
+
+  // Handle the case when the cost is outside the bounds
+  if (result.second < min_ || result.second > max_)
+  {
+    std::stringstream ss;
+    ss << std::setprecision(4) << "State cost (" << result.second << ") does not lie within bounds [" << min_ << ", "
+       << max_ << "]";
+    throw std::runtime_error(ss.str());
+  }
+
   result.second = (result.second - min_) / (max_ - min_);
   return result;
 }
