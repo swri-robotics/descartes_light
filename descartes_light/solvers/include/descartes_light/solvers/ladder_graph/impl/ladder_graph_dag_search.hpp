@@ -31,6 +31,9 @@ DAGSearch<FloatType>::DAGSearch(const LadderGraph<FloatType>& graph) : graph_(gr
   for (size_t i = 0; i < graph.size(); ++i)
   {
     const auto n_vertices = graph.rungSize(i);
+    if (n_vertices == 0)
+      throw std::runtime_error("Ladder graph rung " + std::to_string(i) + " has no vertices");
+
     solution_[i].distance.resize(n_vertices);
     solution_[i].predecessor.resize(n_vertices);
   }
@@ -78,7 +81,11 @@ FloatType DAGSearch<FloatType>::run()
     }  // node for loop
   }    // rung for loop
 
-  return *std::min_element(solution_.back().distance.begin(), solution_.back().distance.end());
+  auto it = std::min_element(solution_.back().distance.begin(), solution_.back().distance.end());
+  if (it != solution_.back().distance.end())
+    return *it;
+
+  throw std::runtime_error("Failed to get minimum cost from the last rung of the ladder graph");
 }
 
 template <typename FloatType>
