@@ -18,6 +18,7 @@ jobs:
       OS_CODE_NAME: focal
       ROS_DISTRO: noetic
       ROS_REPO: main
+      ADDITIONAL_DEBS: 'clang-tidy'
       UPSTREAM_WORKSPACE: 'dependencies.rosinstall'
       ROSDEP_SKIP_KEYS: "iwyu ros_industrial_cmake_boilerplate"
       CCACHE_DIR: "/home/runner/work/descartes_light/descartes_light/Focal-Build/.ccache"

@@ -23,9 +23,9 @@ namespace descartes_light
 {
 template <typename FloatType>
 EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(
-    const State<FloatType>& reference,
-    const Eigen::Array<FloatType, Eigen::Dynamic, 1>& scale)
-  : reference_(reference), scale_(scale)
+    State<FloatType> reference,
+    Eigen::Array<FloatType, Eigen::Dynamic, 1> scale)
+  : reference_(std::move(reference)), scale_(std::move(scale))
 {
   if (reference_.size() != scale_.size())
     throw std::runtime_error("Reference state and scale must be the same size");

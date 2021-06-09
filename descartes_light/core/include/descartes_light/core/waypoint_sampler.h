@@ -38,7 +38,12 @@ public:
   using Ptr = std::shared_ptr<WaypointSampler<FloatType>>;
   using ConstPtr = std::shared_ptr<const WaypointSampler<FloatType>>;
 
+  WaypointSampler() = default;
   virtual ~WaypointSampler() = default;
+  WaypointSampler(const WaypointSampler&) = default;
+  WaypointSampler& operator=(const WaypointSampler&) = default;
+  WaypointSampler(WaypointSampler&&) noexcept = default;
+  WaypointSampler& operator=(WaypointSampler&&) noexcept = default;
 
   /**
    * @brief Samples a waypoint to produce a list of states for which the waypoint is valid along with an initial cost

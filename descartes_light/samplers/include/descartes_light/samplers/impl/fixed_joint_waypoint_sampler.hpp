@@ -23,8 +23,8 @@
 namespace descartes_light
 {
 template <typename FloatType>
-FixedJointWaypointSampler<FloatType>::FixedJointWaypointSampler(const State<FloatType>& fixed_joint_position)
-  : fixed_joint_position_(fixed_joint_position)
+FixedJointWaypointSampler<FloatType>::FixedJointWaypointSampler(State<FloatType> fixed_joint_position)
+  : fixed_joint_position_(std::move(fixed_joint_position))
 {
 }
 

@@ -35,7 +35,12 @@ public:
   using Ptr = typename std::shared_ptr<EdgeEvaluator<FloatType>>;
   using ConstPtr = typename std::shared_ptr<const EdgeEvaluator<FloatType>>;
 
+  EdgeEvaluator() = default;
   virtual ~EdgeEvaluator() = default;
+  EdgeEvaluator(const EdgeEvaluator&) = default;
+  EdgeEvaluator& operator=(const EdgeEvaluator&) = default;
+  EdgeEvaluator(EdgeEvaluator&&) noexcept = default;
+  EdgeEvaluator& operator=(EdgeEvaluator&&) noexcept = default;
 
   /**
    * @brief Determines whether the edge between two vertices is valid and, if so, its cost.
