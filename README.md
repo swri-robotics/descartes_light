@@ -17,6 +17,7 @@ Linux (Xenial)       | [![Build Status](https://github.com/swri-robotics/descart
 Linux (Bionic)       | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Bionic-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
 Linux (Focal)        | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Focal-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
 Windows              | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Windows-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
+Lint  (Clang-Tidy)   | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Focal-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
 Lint  (Clang-Format) | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Clang-Format/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
 Lint  (CodeCov)      | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/CodeCov/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
 

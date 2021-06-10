@@ -92,8 +92,8 @@ std::pair<std::size_t, bool> LadderGraph<FloatType>::indexOf(descartes_core::Tra
   auto it = std::find_if(rungs_.cbegin(), rungs_.cend(), [id](const Rung<FloatType>& r) { return id == r.id; });
   if (it == rungs_.cend())
     return { 0u, false };
-  else
-    return { static_cast<std::size_t>(std::distance(rungs_.cbegin(), it)), true };
+
+  return { static_cast<std::size_t>(std::distance(rungs_.cbegin(), it)), true };
 }
 
 template <typename FloatType>

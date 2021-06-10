@@ -18,11 +18,12 @@ jobs:
       OS_CODE_NAME: focal
       ROS_DISTRO: noetic
       ROS_REPO: main
+      ADDITIONAL_DEBS: 'clang-tidy'
       UPSTREAM_WORKSPACE: 'dependencies.rosinstall'
       ROSDEP_SKIP_KEYS: "iwyu ros_industrial_cmake_boilerplate"
       CCACHE_DIR: "/home/runner/work/descartes_light/descartes_light/Focal-Build/.ccache"
       BEFORE_RUN_TARGET_TEST_EMBED: "ici_with_unset_variables source /root/target_ws/install/setup.bash"
-      TARGET_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON"
+      TARGET_CMAKE_ARGS: "-DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON -DDESCARTES_ENABLE_CLANG_TIDY=ON"
     steps:
       - uses: actions/checkout@v1
 

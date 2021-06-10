@@ -26,6 +26,7 @@ template <typename FloatType>
 class FixedJointWaypointSampler : public WaypointSampler<FloatType>
 {
 public:
+  // NOLINTNEXTLINE(modernize-pass-by-value)
   FixedJointWaypointSampler(const State<FloatType>& fixed_joint_position);
 
   std::vector<StateSample<FloatType>> sample() const override;

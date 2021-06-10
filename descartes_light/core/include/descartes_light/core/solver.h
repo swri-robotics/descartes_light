@@ -59,7 +59,12 @@ public:
   using Ptr = std::shared_ptr<Solver<FloatType>>;
   using ConstPtr = std::shared_ptr<const Solver<FloatType>>;
 
+  Solver() = default;
   virtual ~Solver() = default;
+  Solver(const Solver&) = default;
+  Solver& operator=(const Solver&) = default;
+  Solver(Solver&&) noexcept = default;
+  Solver& operator=(Solver&&) noexcept = default;
 
   /**
    * @brief Build the ladder graph
@@ -84,7 +89,7 @@ public:
       throw std::runtime_error("Invalid number of edge evaluators; size must equal 1 or trajectory size - 1");
     }
 
-    if (state_evaluators.size() == 0)
+    if (state_evaluators.empty())
     {
       // State evaluators are not strictly necessary
     }

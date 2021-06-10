@@ -18,8 +18,12 @@
 #ifndef DESCARTES_SAMPLERS_EVALUATORS_TIMING_EDGE_EVALUATOR_H
 #define DESCARTES_SAMPLERS_EVALUATORS_TIMING_EDGE_EVALUATOR_H
 
-#include <descartes_light/core/edge_evaluator.h>
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <Eigen/Geometry>
+DESCARTES_IGNORE_WARNINGS_POP
+
+#include <descartes_light/core/edge_evaluator.h>
 
 namespace descartes_light
 {
@@ -28,12 +32,13 @@ class TimingEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
+  // NOLINTNEXTLINE(modernize-pass-by-value)
   TimingEdgeEvaluator(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& velocity_limits,
                       FloatType dt,
                       FloatType safety_factor);
 
-  std::pair<bool, FloatType> evaluate(const State<FloatType>& start, const State<FloatType>& end) const override;
+  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>& start,
+                                      const Eigen::Ref<const State<FloatType>>& end) const override;
 
 protected:
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> velocity_limits_;

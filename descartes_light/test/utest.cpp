@@ -2,12 +2,15 @@
 #include <descartes_light/edge_evaluators/euclidean_distance_edge_evaluator.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
 
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <gtest/gtest.h>
 #include <functional>
 #include <iostream>
 #include <random>
 #include <numeric>
 #include <vector>
+DESCARTES_IGNORE_WARNINGS_POP
 
 using namespace descartes_light;
 
@@ -39,7 +42,7 @@ public:
   {
   }
 
-  virtual std::vector<StateSample<FloatType>> sample() const override
+  std::vector<StateSample<FloatType>> sample() const override
   {
     // Generate some random joint states
     std::vector<StateSample<FloatType>> waypoints;
@@ -71,7 +74,8 @@ class NaiveEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   NaiveEdgeEvaluator(const bool valid) : valid_(valid) {}
 
-  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>&, const State<FloatType>&) const override
+  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>&,
+                                      const Eigen::Ref<const State<FloatType>>&) const override
   {
     return std::make_pair(valid_, 0.0);
   }
@@ -90,7 +94,7 @@ class NaiveStateEvaluator : public StateEvaluator<FloatType>
 public:
   NaiveStateEvaluator(const bool valid, const FloatType cost) : valid_(valid), cost_(cost) {}
 
-  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>&) const override
+  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>&) const override
   {
     return std::make_pair(valid_, cost_);
   }
@@ -129,7 +133,7 @@ class SolverFixture : public ::testing::Test
 public:
   using FloatType = typename SolverConfiguratorT::FloatType;
 
-  SolverFixture() : dof(6), n_waypoints(10), samples_per_waypoint(4), state_cost(static_cast<FloatType>(1.0))
+  SolverFixture() : state_cost(static_cast<FloatType>(1.0))
   {
     samplers.reserve(n_waypoints);
     zero_state_indices_.reserve(n_waypoints);
@@ -146,9 +150,9 @@ public:
     }
   }
 
-  const Eigen::Index dof;
-  const std::size_t n_waypoints;
-  const std::size_t samples_per_waypoint;
+  const Eigen::Index dof{ 6 };
+  const std::size_t n_waypoints{ 10 };
+  const std::size_t samples_per_waypoint{ 4 };
   const FloatType state_cost;
   SolverConfiguratorT configurator;
   std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
@@ -177,7 +181,7 @@ TYPED_TEST(SolverFixture, NoEdges)
   ASSERT_TRUE(std::equal(status.failed_edges.begin(), status.failed_edges.end(), expected_failed_edges.begin()));
   ASSERT_EQ(status.failed_vertices.size(), 0);
 
-  ASSERT_THROW(solver->search(), std::runtime_error);
+  ASSERT_THROW(solver->search(), std::runtime_error);  // NOLINT
 }
 
 TYPED_TEST(SolverFixture, KnownPathTest)

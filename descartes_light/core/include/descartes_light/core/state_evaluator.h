@@ -35,9 +35,14 @@ public:
   using Ptr = std::shared_ptr<StateEvaluator<FloatType>>;
   using ConstPtr = std::shared_ptr<const StateEvaluator<FloatType>>;
 
+  StateEvaluator() = default;
   virtual ~StateEvaluator() = default;
+  StateEvaluator(const StateEvaluator&) = default;
+  StateEvaluator& operator=(const StateEvaluator&) = default;
+  StateEvaluator(StateEvaluator&&) noexcept = default;
+  StateEvaluator& operator=(StateEvaluator&&) noexcept = default;
 
-  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>& solution) const = 0;
+  virtual std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>& solution) const = 0;
 };
 
 using StateEvaluatorF = StateEvaluator<float>;

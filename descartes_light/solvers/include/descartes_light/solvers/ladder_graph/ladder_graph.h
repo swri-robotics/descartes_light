@@ -54,7 +54,7 @@ template <typename FloatT>
 struct Node
 {
   Node() noexcept = default;
-  Node(const StateSample<FloatT>& sample_) noexcept : sample{ sample_ } {}
+  Node(const StateSample<FloatT>& sample_) noexcept : sample{ sample_ } {}  // NOLINT
 
   StateSample<FloatT> sample;
 

@@ -15,9 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 #include <descartes_light/solvers/ladder_graph/impl/ladder_graph_solver.hpp>
-#include <vector>
-#include <list>
 
 namespace descartes_light
 {

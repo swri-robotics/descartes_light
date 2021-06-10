@@ -98,7 +98,7 @@ std::vector<typename DAGSearch<FloatType>::predecessor_t> DAGSearch<FloatType>::
   std::vector<predecessor_t> path(solution_.size());
 
   size_type current_rung = path.size() - 1;
-  size_type current_index = static_cast<size_type>(min_idx);
+  auto current_index = static_cast<size_type>(min_idx);
 
   for (unsigned i = 0; i < path.size(); ++i)
   {

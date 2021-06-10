@@ -66,7 +66,7 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 namespace descartes_light
 {
 template <typename FloatType>
-LadderGraphSolver<FloatType>::LadderGraphSolver(const std::size_t dof, int num_threads)
+LadderGraphSolver<FloatType>::LadderGraphSolver(std::size_t dof, int num_threads)
   : graph_{ dof }, num_threads_{ num_threads }
 {
 }

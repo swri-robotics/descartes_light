@@ -33,7 +33,7 @@ template <typename FloatType>
 class LadderGraphSolver : public Solver<FloatType>
 {
 public:
-  LadderGraphSolver(const std::size_t dof, int num_threads = std::thread::hardware_concurrency());
+  LadderGraphSolver(std::size_t dof, int num_threads = static_cast<int>(std::thread::hardware_concurrency()));
 
   BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
