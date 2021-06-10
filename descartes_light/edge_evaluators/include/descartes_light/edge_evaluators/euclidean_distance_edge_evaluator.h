@@ -32,13 +32,14 @@ class EuclideanDistanceEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
   EuclideanDistanceEdgeEvaluator() = default;
-  EuclideanDistanceEdgeEvaluator(const Eigen::Ref<const Eigen::Array<FloatType, Eigen::Dynamic, 1>>& scale);
+  // NOLINTNEXTLINE(modernize-pass-by-value)
+  EuclideanDistanceEdgeEvaluator(const Array<FloatType>& scale);
 
   std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>& start,
                                       const Eigen::Ref<const State<FloatType>>& end) const override;
 
 private:
-  const Eigen::Array<FloatType, Eigen::Dynamic, 1> scale_;
+  const Array<FloatType> scale_;
 };
 
 using EuclideanDistanceEdgeEvaluatorF = EuclideanDistanceEdgeEvaluator<float>;

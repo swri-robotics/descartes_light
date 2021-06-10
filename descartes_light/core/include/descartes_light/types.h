@@ -13,10 +13,15 @@ template <typename FloatType>
 using State = Eigen::Matrix<FloatType, Eigen::Dynamic, 1>;
 
 template <typename FloatType>
+using Array = Eigen::Array<FloatType, Eigen::Dynamic, 1>;
+
+template <typename FloatType>
 struct StateSample
 {
-  StateSample(const Eigen::Ref<const State<FloatType>>& state_, FloatType cost_) : state(state_), cost(cost_) {}
-  StateSample(const Eigen::Ref<const State<FloatType>>& state_) : StateSample(state_, static_cast<FloatType>(0.0)) {}
+  // NOLINTNEXTLINE(modernize-pass-by-value)
+  StateSample(const State<FloatType>& state_, FloatType cost_) : state(state_), cost(cost_) {}
+  // NOLINTNEXTLINE(modernize-pass-by-value)
+  StateSample(const State<FloatType>& state_) : StateSample(state_, static_cast<FloatType>(0.0)) {}
 
   /** @brief State values */
   State<FloatType> state;

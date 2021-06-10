@@ -52,8 +52,7 @@ public:
     });
 
     // Set one of the joint states to all zeros
-    waypoints.at(zero_state_idx_) =
-        StateSample<FloatType>{ State<FloatType>::Zero(this->dof_), state_cost_ };  // NOLINT
+    waypoints.at(zero_state_idx_) = StateSample<FloatType>{ State<FloatType>::Zero(this->dof_), state_cost_ };
 
     return waypoints;
   }

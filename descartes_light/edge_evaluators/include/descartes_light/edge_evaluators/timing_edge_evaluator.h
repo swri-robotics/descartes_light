@@ -32,8 +32,8 @@ class TimingEdgeEvaluator : public EdgeEvaluator<FloatType>
 {
 public:
   EIGEN_MAKE_ALIGNED_OPERATOR_NEW
-
-  TimingEdgeEvaluator(const Eigen::Ref<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>>& velocity_limits,
+  // NOLINTNEXTLINE(modernize-pass-by-value)
+  TimingEdgeEvaluator(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& velocity_limits,
                       FloatType dt,
                       FloatType safety_factor);
 

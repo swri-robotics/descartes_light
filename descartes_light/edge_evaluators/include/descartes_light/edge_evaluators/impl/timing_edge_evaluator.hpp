@@ -28,10 +28,9 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 template <typename FloatType>
-TimingEdgeEvaluator<FloatType>::TimingEdgeEvaluator(
-    const Eigen::Ref<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>>& velocity_limits,
-    FloatType dt,
-    FloatType safety_factor)
+TimingEdgeEvaluator<FloatType>::TimingEdgeEvaluator(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& velocity_limits,
+                                                    FloatType dt,
+                                                    FloatType safety_factor)
   : velocity_limits_(velocity_limits), dt_(dt), safety_factor_(safety_factor)
 {
 }

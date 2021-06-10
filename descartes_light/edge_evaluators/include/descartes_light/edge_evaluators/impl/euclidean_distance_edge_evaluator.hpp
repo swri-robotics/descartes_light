@@ -28,9 +28,7 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 template <typename FloatType>
-EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(
-    const Eigen::Ref<const Eigen::Array<FloatType, Eigen::Dynamic, 1>>& scale)
-  : scale_(scale)
+EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(const Array<FloatType>& scale) : scale_(scale)
 {
 }
 

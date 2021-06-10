@@ -22,9 +22,8 @@
 namespace descartes_light
 {
 template <typename FloatType>
-EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(
-    const Eigen::Ref<const State<FloatType>>& reference,
-    const Eigen::Ref<const Eigen::Array<FloatType, Eigen::Dynamic, 1>>& scale)
+EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(const State<FloatType>& reference,
+                                                                            const Array<FloatType>& scale)
   : reference_(reference), scale_(scale)
 {
   if (reference_.size() != scale_.size())
@@ -32,9 +31,8 @@ EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(
 }
 
 template <typename FloatType>
-EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(
-    const Eigen::Ref<const State<FloatType>>& reference)
-  : EuclideanDistanceStateEvaluator(reference, Eigen::Array<FloatType, Eigen::Dynamic, 1>::Ones(reference.size()))
+EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(const State<FloatType>& reference)
+  : EuclideanDistanceStateEvaluator(reference, Array<FloatType>::Ones(reference.size()))
 {
 }
 
