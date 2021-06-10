@@ -15,8 +15,8 @@ using State = Eigen::Matrix<FloatType, Eigen::Dynamic, 1>;
 template <typename FloatType>
 struct StateSample
 {
-  StateSample(State<FloatType> state_, FloatType cost_) : state(std::move(state_)), cost(cost_) {}
-  StateSample(State<FloatType> state_) : StateSample(std::move(state_), static_cast<FloatType>(0.0)) {}
+  StateSample(const Eigen::Ref<const State<FloatType>>& state_, FloatType cost_) : state(state_), cost(cost_) {}
+  StateSample(const Eigen::Ref<const State<FloatType>>& state_) : StateSample(state_, static_cast<FloatType>(0.0)) {}
 
   /** @brief State values */
   State<FloatType> state;

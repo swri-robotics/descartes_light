@@ -52,7 +52,8 @@ public:
     });
 
     // Set one of the joint states to all zeros
-    waypoints.at(zero_state_idx_) = StateSample<FloatType>{ State<FloatType>::Zero(this->dof_), state_cost_ };
+    waypoints.at(zero_state_idx_) =
+        StateSample<FloatType>{ State<FloatType>::Zero(this->dof_), state_cost_ };  // NOLINT
 
     return waypoints;
   }
@@ -74,7 +75,8 @@ class NaiveEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   NaiveEdgeEvaluator(const bool valid) : valid_(valid) {}
 
-  std::pair<bool, FloatType> evaluate(const State<FloatType>&, const State<FloatType>&) const override
+  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>&,
+                                      const Eigen::Ref<const State<FloatType>>&) const override
   {
     return std::make_pair(valid_, 0.0);
   }
@@ -93,7 +95,10 @@ class NaiveStateEvaluator : public StateEvaluator<FloatType>
 public:
   NaiveStateEvaluator(const bool valid, const FloatType cost) : valid_(valid), cost_(cost) {}
 
-  std::pair<bool, FloatType> evaluate(const State<FloatType>&) const override { return std::make_pair(valid_, cost_); }
+  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>&) const override
+  {
+    return std::make_pair(valid_, cost_);
+  }
 
 private:
   const bool valid_;

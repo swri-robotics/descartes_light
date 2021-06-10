@@ -23,22 +23,24 @@ namespace descartes_light
 {
 template <typename FloatType>
 EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(
-    State<FloatType> reference,
-    Eigen::Array<FloatType, Eigen::Dynamic, 1> scale)
-  : reference_(std::move(reference)), scale_(std::move(scale))
+    const Eigen::Ref<const State<FloatType>>& reference,
+    const Eigen::Ref<const Eigen::Array<FloatType, Eigen::Dynamic, 1>>& scale)
+  : reference_(reference), scale_(scale)
 {
   if (reference_.size() != scale_.size())
     throw std::runtime_error("Reference state and scale must be the same size");
 }
 
 template <typename FloatType>
-EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(const State<FloatType>& reference)
+EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(
+    const Eigen::Ref<const State<FloatType>>& reference)
   : EuclideanDistanceStateEvaluator(reference, Eigen::Array<FloatType, Eigen::Dynamic, 1>::Ones(reference.size()))
 {
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> EuclideanDistanceStateEvaluator<FloatType>::evaluate(const State<FloatType>& state) const
+std::pair<bool, FloatType>
+EuclideanDistanceStateEvaluator<FloatType>::evaluate(const Eigen::Ref<const State<FloatType>>& state) const
 {
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> diff = (reference_ - state).array() * scale_;
   return std::make_pair(true, diff.squaredNorm());

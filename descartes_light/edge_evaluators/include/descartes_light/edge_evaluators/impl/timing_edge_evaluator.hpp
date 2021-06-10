@@ -28,16 +28,17 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 template <typename FloatType>
-TimingEdgeEvaluator<FloatType>::TimingEdgeEvaluator(Eigen::Matrix<FloatType, Eigen::Dynamic, 1> velocity_limits,
-                                                    FloatType dt,
-                                                    FloatType safety_factor)
-  : velocity_limits_(std::move(velocity_limits)), dt_(dt), safety_factor_(safety_factor)
+TimingEdgeEvaluator<FloatType>::TimingEdgeEvaluator(
+    const Eigen::Ref<const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>>& velocity_limits,
+    FloatType dt,
+    FloatType safety_factor)
+  : velocity_limits_(velocity_limits), dt_(dt), safety_factor_(safety_factor)
 {
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> TimingEdgeEvaluator<FloatType>::evaluate(const State<FloatType>& start,
-                                                                    const State<FloatType>& end) const
+std::pair<bool, FloatType> TimingEdgeEvaluator<FloatType>::evaluate(const Eigen::Ref<const State<FloatType>>& start,
+                                                                    const Eigen::Ref<const State<FloatType>>& end) const
 {
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> delta = end - start;
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> joint_times = delta.cwiseQuotient(velocity_limits_).cwiseAbs();

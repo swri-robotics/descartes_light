@@ -26,7 +26,7 @@ template <typename FloatType>
 class FixedJointWaypointSampler : public WaypointSampler<FloatType>
 {
 public:
-  FixedJointWaypointSampler(State<FloatType> fixed_joint_position);
+  FixedJointWaypointSampler(const Eigen::Ref<const State<FloatType>>& fixed_joint_position);
 
   std::vector<StateSample<FloatType>> sample() const override;
 

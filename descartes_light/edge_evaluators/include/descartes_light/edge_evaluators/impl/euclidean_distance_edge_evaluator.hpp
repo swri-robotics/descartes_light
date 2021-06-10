@@ -29,14 +29,15 @@ namespace descartes_light
 {
 template <typename FloatType>
 EuclideanDistanceEdgeEvaluator<FloatType>::EuclideanDistanceEdgeEvaluator(
-    Eigen::Array<FloatType, Eigen::Dynamic, 1> scale)
-  : scale_(std::move(scale))
+    const Eigen::Ref<const Eigen::Array<FloatType, Eigen::Dynamic, 1>>& scale)
+  : scale_(scale)
 {
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> EuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const State<FloatType>& start,
-                                                                               const State<FloatType>& end) const
+std::pair<bool, FloatType>
+EuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const Eigen::Ref<const State<FloatType>>& start,
+                                                    const Eigen::Ref<const State<FloatType>>& end) const
 {
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> diff = end - start;
   if (scale_.size() == diff.size())
