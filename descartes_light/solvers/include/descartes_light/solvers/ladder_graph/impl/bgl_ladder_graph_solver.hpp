@@ -25,10 +25,10 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <console_bridge/console.h>
 
 //Boost::Graph will be used instead of ladder_graph.hpp
-#include <boost/graph/graph_traits.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/visitors.hpp>
-#include <boost/graph/dijkstra_shortest_paths.hpp>
+//#include <boost/graph/graph_traits.hpp>
+//#include <boost/graph/adjacency_list.hpp>
+//#include <boost/graph/visitors.hpp>
+//#include <boost/graph/dijkstra_shortest_paths.hpp>
 
 //probably included elsewhere
 #include <descartes_light/solvers/ladder_graph/bgl_ladder_graph_solver.h>
@@ -66,9 +66,9 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
   }
 }
 
+
 namespace descartes_light
 {
-//ToDo: Remove dof from here since it is unused? Or use it? Seems useful to know the len of a sample
 template <typename FloatType>
 BGLLadderGraphSolver<FloatType>::BGLLadderGraphSolver(const std::size_t dof, int num_threads)
   : num_threads_{ num_threads }
@@ -82,7 +82,6 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
 {
   BuildStatus status;
-  //rough estimate of preallocation based on nodes/rung
 
   // Build Vertices
   long num_waypoints = static_cast<long>(trajectory.size());
@@ -91,7 +90,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
 
   using Clock = std::chrono::high_resolution_clock;
   std::chrono::time_point<Clock> start_time = Clock::now();
-#pragma omp parallel for num_threads(num_threads_)
+  #pragma omp parallel for num_threads(num_threads_)
   for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
     std::vector<StateSample<FloatType>> samples = trajectory[static_cast<size_t>(i)]->sample();
@@ -149,11 +148,11 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
     bool found = false;
     for (std::size_t j = 0; j < from.size(); ++j)
     {
-       StateSample<FloatType> from_sample = graph_[from[j]];
+      StateSample<FloatType> from_sample = graph_[from[j]];
       for (std::size_t k = 0; k < to.size(); ++k)
       {
         // Consider the edge:
-         StateSample<FloatType> to_sample = graph_[to[k]];
+        StateSample<FloatType> to_sample = graph_[to[k]];
         std::pair<bool, FloatType> results =
             edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(from_sample.state, to_sample.state);
         if (results.first)
@@ -162,11 +161,11 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
           if (i == 0)
           {
             //first edge captures first rung weights
-            boost::add_edge (from[j] ,to[k], from_sample.cost + results.second + to_sample.cost, graph_);
+            boost::add_edge(from[j], to[k], from_sample.cost + results.second + to_sample.cost, graph_);
           }
           else
           {
-            boost::add_edge (from[j] ,to[k], results.second + to_sample.cost, graph_);
+            boost::add_edge(from[j], to[k], results.second + to_sample.cost, graph_);
           }
         }
       }
@@ -207,6 +206,81 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
   }
 
   return status;
+}
+
+
+template <typename FloatType>
+std::vector<State<FloatType>> BGLLadderGraphSolver<FloatType>::reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
+                                        const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map)
+{
+  // Reconstruct the path from predecessors
+  std::vector<State<FloatType>> path;
+  VertexDesc<FloatType> v = target;
+  for (VertexDesc<FloatType> u = predecessor_map.at(v); u != v; v = u, u = predecessor_map.at(v))
+  {
+    //we need to access the sample
+    //boost::get(boost::vertex_attribute, graph_)[v][FILLCOLOR_ATTR] = "green";
+    path.push_back(graph_[v].state);
+  }
+  //path.push_back(v);
+  std::reverse(path.begin(), path.end());
+
+  // Check that the last traversed vertex is in fact the source vertex
+//  if (v != source)
+//    // todo: handle this
+
+  return path;
+}
+
+
+template <typename FloatType>
+SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
+{
+  SearchResult<FloatType> result;
+  // Internal properties
+  auto index_prop_map = boost::get(boost::vertex_index, graph_);
+  auto weight_prop_map = boost::get(boost::edge_weight, graph_);
+
+  //so we're gong to pick an arbitrary sample to be the first & last point, becuase death comes for us all
+  VertIterator<FloatType> source_it; // = ladder_rungs[0][0];
+  VertIterator<FloatType> target_it; // = ladder_rungs[ladder_rungs.size()][0];
+
+
+  // External Properties (these will needs to be translated out to match other descartes types
+  std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;
+  boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(predecessor_map);
+
+  //this may not be necessary, since 'distance' s an abstract concept here. Should that double be <FloatType>?
+  std::map<VertexDesc<FloatType>, double> distance_map;
+  boost::associative_property_map<std::map<VertexDesc<FloatType>, double>> distance_prop_map(distance_map);
+
+  boost::dijkstra_shortest_paths(graph_, *source_it, predecessor_prop_map, distance_prop_map, weight_prop_map,
+                                 index_prop_map, std::less<>(), std::plus<>(), std::numeric_limits<double>::max(), 0.0,
+                                 boost::default_dijkstra_visitor());
+
+  // Find the best path
+  std::vector<State<FloatType>> best_path, path;
+  double best_path_cost = std::numeric_limits<double>::max();
+
+  path = reconstructPath(*source_it, *target_it, predecessor_map);
+
+  double cost = distance_map.at(*target_it);
+//  if (cost < best_path_cost)
+//  {
+//    best_path = path;
+//    best_path_cost = cost;
+//  }
+  //todo: Do we need these intermediate variables? -> May not want to assign 'max' into return struct
+  std::vector<State<FloatType>> trajectory;
+//  for (std::size_t i =0; i < best_path.size(); ++i)
+//  {
+//    //trajectory.push_back(path);
+
+//  }
+  result.trajectory = path;
+  result.cost = cost;
+
+  return result;
 }
 }
 #endif //DESCARTES_LIGHT_BGL_LADDER_GRAPH_SOLVER_HPP

@@ -24,6 +24,12 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <vector>
 DESCARTES_IGNORE_WARNINGS_POP
 
+#include <boost/graph/graph_traits.hpp>
+#include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/visitors.hpp>
+#include <boost/graph/dijkstra_shortest_paths.hpp>
+
+
 #include <descartes_light/core/solver.h>
 
 
@@ -34,17 +40,18 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
-
 template <typename FloatType>
 using  EdgeProperty = boost::property<boost::edge_weight_t, FloatType>;
 
-//using listS because there is not currently any preallocation
 template <typename FloatType>
-using bglgraph = boost::adjacency_list<boost::listS, boost::listS, boost::directedS, StateSample<FloatType>, EdgeProperty<FloatType>>;
+using bglgraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, StateSample<FloatType>, EdgeProperty<FloatType>>;
 
- // ToDo: Clean up this templating
 template <typename FloatType>
 using VertexDesc = typename bglgraph<FloatType>::vertex_descriptor;
+
+template <typename FloatType>
+using VertIterator = typename bglgraph<FloatType>::vertex_iterator;
+
 
 template <typename FloatType>
 class BGLLadderGraphSolver : public Solver<FloatType>
@@ -57,6 +64,9 @@ public:
                         const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
 
   SearchResult<FloatType> search() override;
+
+  std::vector<State<FloatType>> reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
+                                          const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map);
 
   std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs;
 private:

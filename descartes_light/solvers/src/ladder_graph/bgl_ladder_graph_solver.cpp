@@ -22,7 +22,7 @@
 namespace descartes_light
 {
 // Explicit template instantiation
-template class BGLLadderGraphSolver<float>;
 template class BGLLadderGraphSolver<double>;
+template class BGLLadderGraphSolver<float>;
 
 }  // namespace descartes_light
