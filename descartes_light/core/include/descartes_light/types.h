@@ -153,12 +153,16 @@ public:
 template <typename FloatType>
 struct StateSample
 {
-  // NOLINTNEXTLINE(modernize-pass-by-value)
-  StateSample(typename State<FloatType>::ConstPtr state_, FloatType cost_) : state(std::move(state_)), cost(cost_) {}
-  // NOLINTNEXTLINE(modernize-pass-by-value)
-  StateSample(typename State<FloatType>::ConstPtr state_) : StateSample(std::move(state_), static_cast<FloatType>(0.0))
+  StateSample()
   {
+    // The state matrix may need to be default constructed
+    cost = static_cast<FloatType>(0.0);
+
   }
+  // NOLINTNEXTLINE(modernize-pass-by-value)
+  StateSample(const State<FloatType>& state_, FloatType cost_) : state(state_), cost(cost_) {}
+  // NOLINTNEXTLINE(modernize-pass-by-value)
+  StateSample(const State<FloatType>& state_) : StateSample(state_, static_cast<FloatType>(0.0)) {}
 
   /** @brief State values */
   typename State<FloatType>::ConstPtr state;
