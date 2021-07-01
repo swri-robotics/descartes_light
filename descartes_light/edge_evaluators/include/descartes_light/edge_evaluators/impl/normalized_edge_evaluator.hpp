@@ -16,8 +16,9 @@ NormalizedEdgeEvaluator<FloatType>::NormalizedEdgeEvaluator(typename EdgeEvaluat
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> NormalizedEdgeEvaluator<FloatType>::evaluate(const State<FloatType>& start,
-                                                                        const State<FloatType>& end) const
+std::pair<bool, FloatType>
+NormalizedEdgeEvaluator<FloatType>::evaluate(const Eigen::Ref<const State<FloatType>>& start,
+                                             const Eigen::Ref<const State<FloatType>>& end) const
 {
   std::pair<bool, FloatType> result = evaluator_->evaluate(start, end);
 

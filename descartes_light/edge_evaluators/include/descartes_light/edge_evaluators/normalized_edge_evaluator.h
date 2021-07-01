@@ -13,8 +13,8 @@ class NormalizedEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   NormalizedEdgeEvaluator(typename EdgeEvaluator<FloatType>::ConstPtr evaluator, FloatType min, FloatType max);
 
-  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>& start,
-                                              const State<FloatType>& end) const override;
+  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>& start,
+                                      const Eigen::Ref<const State<FloatType>>& end) const override;
 
 private:
   typename EdgeEvaluator<FloatType>::ConstPtr evaluator_;
