@@ -25,9 +25,7 @@ endif()
 
 # Package configuration
 install(EXPORT ${PROJECT_NAME}-targets NAMESPACE "descartes::" DESTINATION lib/cmake/${PROJECT_NAME})
-export(EXPORT ${PROJECT_NAME}-targets NAMESPACE "descartes::" FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)
-install(FILES
-  "${CMAKE_CURRENT_LIST_DIR}/cmake/descartes_light_macros.cmake"
-  DESTINATION lib/cmake/${PROJECT_NAME}
-)
+export(EXPORT ${PROJECT_NAME}-targets NAMESPACE "descartes::"
+       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)
+install(FILES "${CMAKE_CURRENT_LIST_DIR}/cmake/descartes_light_macros.cmake" DESTINATION lib/cmake/${PROJECT_NAME})
 configure_package()
