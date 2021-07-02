@@ -11,6 +11,12 @@ with section("parse"):
       'kwargs': {
         'ARGUMENTS': '*',
         'ENABLE': 1,
+        'WARNINGS_AS_ERRORS': 1,
+        'HEADER_FILTER': 1,
+        'LINE_FILTER': 1,
+        'CHECKS': 1,
+        'CONFIG': 1,
+        'ERROR_CHECKS': 1,
       }
     },
     'target_include_what_you_use': {

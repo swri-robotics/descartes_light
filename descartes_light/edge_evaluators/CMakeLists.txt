@@ -8,8 +8,11 @@ target_link_libraries(${PROJECT_NAME}_edge_evaluators PUBLIC ${PROJECT_NAME}_cor
 target_cxx_version(${PROJECT_NAME}_edge_evaluators PUBLIC VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME}_edge_evaluators PUBLIC ${DESCARTES_COMPILE_OPTIONS})
 target_compile_definitions(${PROJECT_NAME}_edge_evaluators PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
-target_clang_tidy(${PROJECT_NAME}_edge_evaluators ENABLE ${DESCARTES_ENABLE_CLANG_TIDY}
-                  ARGUMENTS ${DESCARTES_CLANG_TIDY_ARGS})
+target_clang_tidy(
+  ${PROJECT_NAME}_edge_evaluators
+  ENABLE ${DESCARTES_ENABLE_CLANG_TIDY}
+  WARNINGS_AS_ERRORS ${DESCARTES_ENABLE_TESTING}
+  CHECKS ${DEFAULT_CLANG_TIDY_CHECKS})
 target_code_coverage(${PROJECT_NAME}_edge_evaluators ALL ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 target_include_directories(
   ${PROJECT_NAME}_edge_evaluators PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
