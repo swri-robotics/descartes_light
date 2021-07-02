@@ -10,7 +10,7 @@ class NormalizedStateEvaluator : public StateEvaluator<FloatType>
 public:
   NormalizedStateEvaluator(typename StateEvaluator<FloatType>::ConstPtr evaluator, FloatType min, FloatType max);
 
-  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>& solution) const override;
+  std::pair<bool, FloatType> evaluate(const State<FloatType>& solution) const override;
 
 private:
   typename StateEvaluator<FloatType>::ConstPtr evaluator_;

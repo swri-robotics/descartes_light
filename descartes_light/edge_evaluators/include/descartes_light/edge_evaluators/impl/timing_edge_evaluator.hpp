@@ -36,8 +36,8 @@ TimingEdgeEvaluator<FloatType>::TimingEdgeEvaluator(const Eigen::Matrix<FloatTyp
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType> TimingEdgeEvaluator<FloatType>::evaluate(const Eigen::Ref<const State<FloatType>>& start,
-                                                                    const Eigen::Ref<const State<FloatType>>& end) const
+std::pair<bool, FloatType> TimingEdgeEvaluator<FloatType>::evaluate(const State<FloatType>& start,
+                                                                    const State<FloatType>& end) const
 {
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> delta = end - start;
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> joint_times = delta.cwiseQuotient(velocity_limits_).cwiseAbs();

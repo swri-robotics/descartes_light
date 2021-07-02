@@ -17,14 +17,14 @@ using namespace descartes_light;
 static std::mt19937 RAND_GEN(0);
 
 template <typename FloatType>
-State<FloatType> generateRandomState(Eigen::Index dof)
+typename State<FloatType>::Ptr generateRandomState(Eigen::Index dof)
 {
   std::normal_distribution<FloatType> dist;
   Eigen::Matrix<FloatType, Eigen::Dynamic, 1> sol(dof);
   for (Eigen::Index i = 0; i < dof; ++i)
     sol(i) = dist(RAND_GEN);
 
-  return sol;
+  return std::make_shared<State<FloatType>>(sol);
 }
 
 /**
@@ -42,17 +42,19 @@ public:
   {
   }
 
-  std::vector<StateSample<FloatType>> sample() const override
+  typename std::vector<StateSample<FloatType>> sample() const override
   {
     // Generate some random joint states
-    std::vector<StateSample<FloatType>> waypoints;
+    typename std::vector<StateSample<FloatType>> waypoints;
     waypoints.reserve(n_samples_);
     std::generate_n(std::back_inserter(waypoints), n_samples_, [this]() {
       return StateSample<FloatType>{ generateRandomState<FloatType>(dof_), state_cost_ };
     });
 
     // Set one of the joint states to all zeros
-    waypoints.at(zero_state_idx_) = StateSample<FloatType>{ State<FloatType>::Zero(this->dof_), state_cost_ };
+    waypoints.at(zero_state_idx_) = StateSample<FloatType>{
+      std::make_shared<State<FloatType>>(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof_)), state_cost_
+    };
 
     return waypoints;
   }
@@ -74,8 +76,7 @@ class NaiveEdgeEvaluator : public EdgeEvaluator<FloatType>
 public:
   NaiveEdgeEvaluator(const bool valid) : valid_(valid) {}
 
-  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>&,
-                                      const Eigen::Ref<const State<FloatType>>&) const override
+  std::pair<bool, FloatType> evaluate(const State<FloatType>&, const State<FloatType>&) const override
   {
     return std::make_pair(valid_, 0.0);
   }
@@ -94,10 +95,7 @@ class NaiveStateEvaluator : public StateEvaluator<FloatType>
 public:
   NaiveStateEvaluator(const bool valid, const FloatType cost) : valid_(valid), cost_(cost) {}
 
-  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>&) const override
-  {
-    return std::make_pair(valid_, cost_);
-  }
+  std::pair<bool, FloatType> evaluate(const State<FloatType>&) const override { return std::make_pair(valid_, cost_); }
 
 private:
   const bool valid_;
@@ -209,7 +207,7 @@ TYPED_TEST(SolverFixture, KnownPathTest)
 
   for (const auto& state : result.trajectory)
   {
-    ASSERT_TRUE(state.isApprox(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof)));
+    ASSERT_TRUE(state->isApprox(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof)));
   }
 }
 

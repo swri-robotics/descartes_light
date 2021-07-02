@@ -16,8 +16,7 @@ NormalizedStateEvaluator<FloatType>::NormalizedStateEvaluator(typename StateEval
 }
 
 template <typename FloatType>
-std::pair<bool, FloatType>
-NormalizedStateEvaluator<FloatType>::evaluate(const Eigen::Ref<const State<FloatType>>& solution) const
+std::pair<bool, FloatType> NormalizedStateEvaluator<FloatType>::evaluate(const State<FloatType>& solution) const
 {
   std::pair<bool, FloatType> result = evaluator_->evaluate(solution);
 
