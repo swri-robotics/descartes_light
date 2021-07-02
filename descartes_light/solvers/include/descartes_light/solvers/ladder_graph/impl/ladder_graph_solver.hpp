@@ -102,7 +102,7 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
         }
         else
         {
-          std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(sample.state);
+          std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(*sample.state);
           if (results.first)
           {
             sample.cost += results.second;
@@ -149,7 +149,7 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
         // Consider the edge:
         const auto& to_node = to.nodes[k];
         std::pair<bool, FloatType> results =
-            edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(from_node.sample.state, to_node.sample.state);
+            edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(*from_node.sample.state, *to_node.sample.state);
         if (results.first)
         {
           found = true;

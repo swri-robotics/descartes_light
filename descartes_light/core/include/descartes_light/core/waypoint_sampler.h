@@ -58,7 +58,7 @@ public:
    * preferable to generate this cost once for the nominal state and apply it to all redundant states produced in the
    * sampling step
    */
-  virtual std::vector<StateSample<FloatType>> sample() const = 0;
+  virtual typename std::vector<StateSample<FloatType>> sample() const = 0;
 };
 
 using WaypointSamplerF = WaypointSampler<float>;

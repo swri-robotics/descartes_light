@@ -28,6 +28,7 @@ DESCARTES_IGNORE_WARNINGS_POP
 #include <descartes_light/core/waypoint_sampler.h>
 #include <descartes_light/core/edge_evaluator.h>
 #include <descartes_light/core/state_evaluator.h>
+#include <descartes_light/types.h>
 
 namespace descartes_light
 {
@@ -46,7 +47,7 @@ template <typename FloatType>
 struct SearchResult
 {
   /** @brief Lowest cost path through the graph */
-  std::vector<State<FloatType>> trajectory;
+  std::vector<typename State<FloatType>::ConstPtr> trajectory;
   /** @brief Path cost */
   FloatType cost;
 };

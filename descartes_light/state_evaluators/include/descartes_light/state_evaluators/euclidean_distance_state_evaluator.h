@@ -31,15 +31,15 @@ class EuclideanDistanceStateEvaluator : public StateEvaluator<FloatType>
 {
 public:
   // NOLINTNEXTLINE(modernize-pass-by-value)
-  EuclideanDistanceStateEvaluator(const State<FloatType>& reference, const Array<FloatType>& scale);
+  EuclideanDistanceStateEvaluator(typename State<FloatType>::ConstPtr reference, const Array<FloatType>& scale);
 
   // NOLINTNEXTLINE(modernize-pass-by-value)
-  EuclideanDistanceStateEvaluator(const State<FloatType>& reference);
+  EuclideanDistanceStateEvaluator(typename State<FloatType>::ConstPtr reference);
 
-  std::pair<bool, FloatType> evaluate(const Eigen::Ref<const State<FloatType>>& state) const override;
+  std::pair<bool, FloatType> evaluate(const State<FloatType>& state) const override;
 
 private:
-  const State<FloatType> reference_;
+  typename State<FloatType>::ConstPtr reference_;
   const Array<FloatType> scale_;
 };
 

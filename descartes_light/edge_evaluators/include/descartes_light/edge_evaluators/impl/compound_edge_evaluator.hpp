@@ -23,9 +23,8 @@
 namespace descartes_light
 {
 template <typename FloatType>
-std::pair<bool, FloatType>
-CompoundEdgeEvaluator<FloatType>::evaluate(const Eigen::Ref<const State<FloatType>>& start,
-                                           const Eigen::Ref<const State<FloatType>>& end) const
+std::pair<bool, FloatType> CompoundEdgeEvaluator<FloatType>::evaluate(const State<FloatType>& start,
+                                                                      const State<FloatType>& end) const
 {
   FloatType cost = 0.0;
   for (auto& evaluator : evaluators)

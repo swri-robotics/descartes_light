@@ -27,12 +27,12 @@ class FixedJointWaypointSampler : public WaypointSampler<FloatType>
 {
 public:
   // NOLINTNEXTLINE(modernize-pass-by-value)
-  FixedJointWaypointSampler(const State<FloatType>& fixed_joint_position);
+  FixedJointWaypointSampler(typename State<FloatType>::ConstPtr fixed_joint_position);
 
   std::vector<StateSample<FloatType>> sample() const override;
 
 private:
-  const State<FloatType> fixed_joint_position_;
+  typename State<FloatType>::ConstPtr fixed_joint_position_;
 };
 
 using FixedJointWaypointSamplerF = FixedJointWaypointSampler<float>;
