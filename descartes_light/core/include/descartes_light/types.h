@@ -47,25 +47,7 @@ public:
       values(i++) = v;
   }
 
-  ///////////////////
-  // Eigen Methods //
-  ///////////////////
-
-  /** @returns size of the joint state vector */
-  inline Eigen::Index size() const { return values.size(); }
-  /** @returns norm of vector */
-  inline double norm() const { return values.norm(); }
-  /** @returns true if two are approximate */
-  inline bool isApprox(const Eigen::Matrix<FloatType, Eigen::Dynamic, 1>& other,
-                       FloatType prec = FloatType(1e-12)) const
-  {
-    return values.isApprox(other, prec);
-  }
-  /** @returns the transpose of the joint positions */
-  inline typename Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::ConstTransposeReturnType transpose() const
-  {
-    return values.transpose();
-  }
+  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> values;
 
   /////////////////////
   // Eigen Operators //
@@ -166,9 +148,6 @@ public:
   {
     return Eigen::Ref<Eigen::Matrix<FloatType, Eigen::Dynamic, 1>>(values);
   }
-
-protected:
-  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> values;
 };
 
 template <typename FloatType>

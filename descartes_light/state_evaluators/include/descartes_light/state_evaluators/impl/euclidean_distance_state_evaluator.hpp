@@ -27,14 +27,14 @@ EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(
     const Array<FloatType>& scale)
   : reference_(std::move(reference)), scale_(scale)
 {
-  if (reference_->size() != scale_.size())
+  if (reference_->values.size() != scale_.size())
     throw std::runtime_error("Reference state and scale must be the same size");
 }
 
 template <typename FloatType>
 EuclideanDistanceStateEvaluator<FloatType>::EuclideanDistanceStateEvaluator(
     typename State<FloatType>::ConstPtr reference)
-  : EuclideanDistanceStateEvaluator(reference, Array<FloatType>::Ones(reference->size()))
+  : EuclideanDistanceStateEvaluator(reference, Array<FloatType>::Ones(reference->values.size()))
 {
 }
 

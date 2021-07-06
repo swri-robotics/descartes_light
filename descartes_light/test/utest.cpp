@@ -207,7 +207,7 @@ TYPED_TEST(SolverFixture, KnownPathTest)
 
   for (const auto& state : result.trajectory)
   {
-    ASSERT_TRUE(state->isApprox(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof)));
+    ASSERT_TRUE(state->values.isApprox(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof)));
   }
 }
 
