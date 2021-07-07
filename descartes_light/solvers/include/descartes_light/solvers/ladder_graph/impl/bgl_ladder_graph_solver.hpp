@@ -24,13 +24,6 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 
 #include <console_bridge/console.h>
 
-//Boost::Graph will be used instead of ladder_graph.hpp
-//#include <boost/graph/graph_traits.hpp>
-//#include <boost/graph/adjacency_list.hpp>
-//#include <boost/graph/visitors.hpp>
-//#include <boost/graph/dijkstra_shortest_paths.hpp>
-
-//probably included elsewhere
 #include <descartes_light/solvers/ladder_graph/bgl_ladder_graph_solver.h>
 #include <descartes_light/types.h>
 
@@ -218,16 +211,15 @@ std::vector<State<FloatType>> BGLLadderGraphSolver<FloatType>::reconstructPath(c
   VertexDesc<FloatType> v = target;
   for (VertexDesc<FloatType> u = predecessor_map.at(v); u != v; v = u, u = predecessor_map.at(v))
   {
-    //we need to access the sample
-    //boost::get(boost::vertex_attribute, graph_)[v][FILLCOLOR_ATTR] = "green";
     path.push_back(graph_[v].state);
   }
-  //path.push_back(v);
   std::reverse(path.begin(), path.end());
 
   // Check that the last traversed vertex is in fact the source vertex
-//  if (v != source)
-//    // todo: handle this
+  if (v != source)
+  {
+    //todo: exception
+  }
 
   return path;
 }
@@ -237,46 +229,32 @@ template <typename FloatType>
 SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
 {
   SearchResult<FloatType> result;
+
   // Internal properties
   auto index_prop_map = boost::get(boost::vertex_index, graph_);
   auto weight_prop_map = boost::get(boost::edge_weight, graph_);
 
-  //so we're gong to pick an arbitrary sample to be the first & last point, becuase death comes for us all
-  VertIterator<FloatType> source_it; // = ladder_rungs[0][0];
-  VertIterator<FloatType> target_it; // = ladder_rungs[ladder_rungs.size()][0];
+  VertexDesc<FloatType> d1 = ladder_rungs[0][0];
+  VertIterator<FloatType> source_it, target_it;
 
-
-  // External Properties (these will needs to be translated out to match other descartes types
   std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;
   boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(predecessor_map);
 
-  //this may not be necessary, since 'distance' s an abstract concept here. Should that double be <FloatType>?
   std::map<VertexDesc<FloatType>, double> distance_map;
   boost::associative_property_map<std::map<VertexDesc<FloatType>, double>> distance_prop_map(distance_map);
 
-  boost::dijkstra_shortest_paths(graph_, *source_it, predecessor_prop_map, distance_prop_map, weight_prop_map,
+
+  boost::dijkstra_shortest_paths(graph_, d1, predecessor_prop_map, distance_prop_map, weight_prop_map,
                                  index_prop_map, std::less<>(), std::plus<>(), std::numeric_limits<double>::max(), 0.0,
                                  boost::default_dijkstra_visitor());
 
-  // Find the best path
   std::vector<State<FloatType>> best_path, path;
   double best_path_cost = std::numeric_limits<double>::max();
 
   path = reconstructPath(*source_it, *target_it, predecessor_map);
 
   double cost = distance_map.at(*target_it);
-//  if (cost < best_path_cost)
-//  {
-//    best_path = path;
-//    best_path_cost = cost;
-//  }
-  //todo: Do we need these intermediate variables? -> May not want to assign 'max' into return struct
-  std::vector<State<FloatType>> trajectory;
-//  for (std::size_t i =0; i < best_path.size(); ++i)
-//  {
-//    //trajectory.push_back(path);
 
-//  }
   result.trajectory = path;
   result.cost = cost;
 
