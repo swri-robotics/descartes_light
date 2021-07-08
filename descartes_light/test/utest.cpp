@@ -128,7 +128,7 @@ template <typename FloatT>
 struct SolverConfigurator<BGLLadderGraphSolver<FloatT>>
 {
   using FloatType = FloatT;
-  typename Solver<FloatT>::Ptr create() { return std::make_unique<LadderGraphSolver<FloatT>>(6, 1); }
+  typename Solver<FloatT>::Ptr create() { return std::make_unique<BGLLadderGraphSolver<FloatT>>(6, 1); }
 };
 template struct SolverConfigurator<BGLLadderGraphSolverF>;
 template struct SolverConfigurator<BGLLadderGraphSolverD>;
