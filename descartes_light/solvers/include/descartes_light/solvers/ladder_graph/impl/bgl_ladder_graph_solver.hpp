@@ -89,12 +89,12 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
     std::vector<StateSample<FloatType>> samples = trajectory[static_cast<size_t>(i)]->sample();
     if (!samples.empty())
     {
-      for (std::size_t sample_i = 0; sample_i <samples.size(); ++sample_i)
+      for (StateSample<FloatType>& sample : samples)
       {
         VertexDesc<FloatType> vd;
         if (state_evaluators.empty())
         {
-          vd = add_vertex(samples[sample_i], graph_);
+          vd = add_vertex(sample, graph_);
           ladder_rungs[i].push_back(vd);
         }
         else
@@ -102,8 +102,8 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
           std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(samples[i].state);
           if (results.first)
           {
-            samples[i].cost += results.second;
-            vd = add_vertex(samples[sample_i], graph_);
+            sample.cost += results.second;
+            vd = add_vertex(sample, graph_);
             ladder_rungs[i].push_back(vd);
           }
         }
@@ -151,7 +151,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
         if (results.first)
         {
           found = true;
-          if (i == 0)
+          if (i == 1)
           {
             //first edge captures first rung weights
             boost::add_edge(from[j], to[k], from_sample.cost + results.second + to_sample.cost, graph_);
@@ -162,7 +162,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
           }
         }
       }
-    }
+    } // node loop
 
     if (!found)
     {
@@ -180,7 +180,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
       CONSOLE_BRIDGE_logInform(ss.str().c_str());
     }
 #endif
-  }
+  } // rung loop
   UNUSED(cnt);
   UNUSED(num_waypoints);
   duration = std::chrono::duration<double>(Clock::now() - start_time).count();
@@ -248,7 +248,7 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
     if (graph_[e].state[0] ==0.0 && graph_[e].state[1] == 0.0)
       target_d = e; // this coud be better; don't continue iterating after source is found
   }
-  // d comparisons mre like this
+  // comparisons more like this
   //(graph_[e].state[0] + graph_[e].state[1]) < std::numeric_limits<FloatType>::epsilon)
 
   std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;

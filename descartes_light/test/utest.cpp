@@ -155,7 +155,7 @@ public:
       auto zero_state_idx = dist(RAND_GEN);
       zero_state_indices_.push_back(zero_state_idx);
       samplers.push_back(
-          std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, dist(RAND_GEN), state_cost));
+          std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, zero_state_idx, state_cost));
     }
   }
 
