@@ -235,35 +235,36 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   auto index_prop_map = boost::get(boost::vertex_index, graph_);
   auto weight_prop_map = boost::get(boost::edge_weight, graph_);
 
-  VertexDesc<FloatType> source_d, target_d;
+  result.cost = std::numeric_limits<FloatType>::max();
+  result.trajectory = {};
 
-  for (VertexDesc<FloatType> s : ladder_rungs[0])
+  for (const VertexDesc<FloatType>& source_d : ladder_rungs[0])
   {
-    if (graph_[s].state[0]  == 0.0 &&  graph_[s].state[1] == 0.0) //don't compare to zero
-      source_d = s; // this coud be better; don't continue iterating after source is found
+    std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;
+    boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(predecessor_map);
+
+    std::map<VertexDesc<FloatType>, double> distance_map;
+    boost::associative_property_map<std::map<VertexDesc<FloatType>, double>> distance_prop_map(distance_map);
+
+
+    boost::dijkstra_shortest_paths(graph_, source_d, predecessor_prop_map, distance_prop_map, weight_prop_map,
+                                   index_prop_map, std::less<>(), std::plus<>(), std::numeric_limits<double>::max(), 0.0,
+                                   boost::default_dijkstra_visitor());
+
+    // Find lowest cost node in last rung
+    auto target_d = std::min_element(ladder_rungs.back().begin(), ladder_rungs.back().end(), [&distance_map](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b){
+      return distance_map.at(a) < distance_map.at(b);
+    });
+
+    if (distance_map.at(*target_d) < result.cost)
+    {
+      result.trajectory = reconstructPath(source_d, *target_d, predecessor_map);
+      result.cost = distance_map.at(*target_d);
+    }
   }
 
-  for (VertexDesc<FloatType> e : ladder_rungs[ladder_rungs.size() -1])
-  {
-    if (graph_[e].state[0] ==0.0 && graph_[e].state[1] == 0.0)
-      target_d = e; // this coud be better; don't continue iterating after source is found
-  }
-  // comparisons more like this
-  //(graph_[e].state[0] + graph_[e].state[1]) < std::numeric_limits<FloatType>::epsilon)
-
-  std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;
-  boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(predecessor_map);
-
-  std::map<VertexDesc<FloatType>, double> distance_map;
-  boost::associative_property_map<std::map<VertexDesc<FloatType>, double>> distance_prop_map(distance_map);
-
-
-  boost::dijkstra_shortest_paths(graph_, source_d, predecessor_prop_map, distance_prop_map, weight_prop_map,
-                                 index_prop_map, std::less<>(), std::plus<>(), std::numeric_limits<double>::max(), 0.0,
-                                 boost::default_dijkstra_visitor());
-
-  result.trajectory = reconstructPath(source_d, target_d, predecessor_map);
-  result.cost = distance_map.at(target_d);
+  if(result.trajectory.empty())
+    throw std::runtime_error("failed");
 
   return result;
 }
