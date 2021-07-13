@@ -155,7 +155,6 @@ struct StateSample
 {
   StateSample()
   {
-    // The state matrix may need to be default constructed
     cost = static_cast<FloatType>(0.0);
 
   }

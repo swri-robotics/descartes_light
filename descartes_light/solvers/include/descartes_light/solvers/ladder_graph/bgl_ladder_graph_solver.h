@@ -70,6 +70,7 @@ public:
 
   std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs;
 private:
+  std::size_t dof_;
   bglgraph<FloatType> graph_;
   int num_threads_;
 };
