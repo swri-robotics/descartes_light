@@ -24,34 +24,12 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <vector>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <boost/graph/graph_traits.hpp>
-#include <boost/graph/adjacency_list.hpp>
-#include <boost/graph/visitors.hpp>
 #include <boost/graph/dijkstra_shortest_paths.hpp>
-
-
+#include <descartes_light/solvers/ladder_graph/boost_ladder_types.h>
 #include <descartes_light/core/solver.h>
-
-
-// going to skip templating for the time being to get a build
-
-
-//using listS because waypoints are currently added individually. Once preallocating, use VecS
 
 namespace descartes_light
 {
-template <typename FloatType>
-using  EdgeProperty = boost::property<boost::edge_weight_t, FloatType>;
-
-template <typename FloatType>
-using bglgraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, StateSample<FloatType>, EdgeProperty<FloatType>>;
-
-template <typename FloatType>
-using VertexDesc = typename bglgraph<FloatType>::vertex_descriptor;
-
-template <typename FloatType>
-using VertIterator = typename bglgraph<FloatType>::vertex_iterator;
-
 
 template <typename FloatType>
 class BGLLadderGraphSolver : public Solver<FloatType>

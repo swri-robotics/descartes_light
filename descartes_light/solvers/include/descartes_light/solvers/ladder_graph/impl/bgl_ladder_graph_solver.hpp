@@ -238,7 +238,7 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   result.cost = std::numeric_limits<FloatType>::max();
   result.trajectory = {};
 
-  //create a zero value start sample
+  //create a zero value, zero cost start sample
   StateSample<FloatType> start_sample = StateSample<FloatType>{ State<FloatType>::Zero(this->dof_), 0.0 };
   VertexDesc<FloatType> sd = add_vertex(start_sample, graph_);
   for (const VertexDesc<FloatType>& source_d : ladder_rungs[0])
@@ -261,8 +261,10 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   });
 
   result.trajectory = reconstructPath(sd, *target_d, predecessor_map);
+
   // remove empty start state
   result.trajectory.erase(result.trajectory.begin());
+
   result.cost = distance_map.at(*target_d);
 
   if(result.trajectory.empty())
