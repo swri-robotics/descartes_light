@@ -44,7 +44,7 @@ public:
 
   SearchResult<FloatType> search() override;
 
-  std::vector<State<FloatType>> reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
+  std::vector<typename State<FloatType>::ConstPtr> reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
                                           const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map);
 
   std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs;
