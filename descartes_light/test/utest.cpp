@@ -44,7 +44,9 @@ using Implementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
                                          SolverFactory<BGLDijkstraSVSESolverF>,
                                          SolverFactory<BGLDijkstraSVSESolverD>,
                                          SolverFactory<BGLEfficientDijkstraSVSESolverF>,
-                                         SolverFactory<BGLEfficientDijkstraSVSESolverD>>;
+                                         SolverFactory<BGLEfficientDijkstraSVSESolverD>
+                                         SolverFactory<DFSSortLadderGraphSolverF>,
+                                         SolverFactory<DFSSortLadderGraphSolverD>>;
 
 TYPED_TEST_CASE(SolverFixture, Implementations);
 
