@@ -24,7 +24,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 
 #include <console_bridge/console.h>
 
-#include <descartes_light/solvers/ladder_graph/bgl_ladder_graph_solver.h>
+#include <descartes_light/solvers/bgl/bgl_ladder_graph_solver.h>
 #include <descartes_light/types.h>
 
 #define UNUSED(x) (void)(x)

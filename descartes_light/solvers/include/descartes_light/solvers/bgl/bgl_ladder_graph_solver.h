@@ -25,7 +25,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 DESCARTES_IGNORE_WARNINGS_POP
 
 #include <boost/graph/dijkstra_shortest_paths.hpp>
-#include <descartes_light/solvers/ladder_graph/boost_ladder_types.h>
+#include <descartes_light/solvers/bgl/boost_ladder_types.h>
 #include <descartes_light/core/solver.h>
 
 namespace descartes_light

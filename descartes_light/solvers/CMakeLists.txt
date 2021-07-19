@@ -24,7 +24,7 @@ else()
 endif()
 
 add_library(${PROJECT_NAME}_solvers
-  src/ladder_graph/bgl_ladder_graph_solver.cpp
+  src/bgl/bgl_ladder_graph_solver.cpp
   src/ladder_graph/ladder_graph_solver.cpp
   src/ladder_graph/ladder_graph.cpp
   src/ladder_graph/ladder_graph_dag_search.cpp
