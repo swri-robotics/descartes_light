@@ -42,7 +42,7 @@ public:
 
   SearchResult<FloatType> search() override;
 
-  std::vector<State<FloatType>>
+  std::vector<typename State<FloatType>::ConstPtr>
   reconstructPath(const VertexDesc<FloatType>& source,
                   const VertexDesc<FloatType>& target,
                   const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map);
