@@ -153,11 +153,7 @@ public:
 template <typename FloatType>
 struct StateSample
 {
-  StateSample()
-  {
-    cost = static_cast<FloatType>(0.0);
-
-  }
+  StateSample() { cost = static_cast<FloatType>(0.0); }
   // NOLINTNEXTLINE(modernize-pass-by-value)
   StateSample(const State<FloatType>& state_, FloatType cost_) : state(state_), cost(cost_) {}
   // NOLINTNEXTLINE(modernize-pass-by-value)

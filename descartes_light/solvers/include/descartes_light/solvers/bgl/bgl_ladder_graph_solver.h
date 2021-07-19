@@ -30,7 +30,6 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
-
 template <typename FloatType>
 class BGLLadderGraphSolver : public Solver<FloatType>
 {
@@ -43,10 +42,13 @@ public:
 
   SearchResult<FloatType> search() override;
 
-  std::vector<State<FloatType>> reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
-                                          const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map);
+  std::vector<State<FloatType>>
+  reconstructPath(const VertexDesc<FloatType>& source,
+                  const VertexDesc<FloatType>& target,
+                  const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map);
 
   std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs;
+
 private:
   std::size_t dof_;
   bglgraph<FloatType> graph_;

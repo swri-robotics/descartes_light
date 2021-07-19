@@ -59,14 +59,11 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
   }
 }
 
-
 namespace descartes_light
 {
 template <typename FloatType>
 BGLLadderGraphSolver<FloatType>::BGLLadderGraphSolver(const std::size_t dof, int num_threads)
-  : dof_{dof}, num_threads_{ num_threads }
-{
-};
+  : dof_{ dof }, num_threads_{ num_threads } {};
 
 template <typename FloatType>
 BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
@@ -83,7 +80,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
 
   using Clock = std::chrono::high_resolution_clock;
   std::chrono::time_point<Clock> start_time = Clock::now();
-  #pragma omp parallel for num_threads(num_threads_)
+#pragma omp parallel for num_threads(num_threads_)
   for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
     std::vector<StateSample<FloatType>> samples = trajectory[static_cast<size_t>(i)]->sample();
@@ -135,7 +132,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
 #pragma omp parallel for num_threads(num_threads_)
   for (long i = 1; i < static_cast<long>(trajectory.size()); ++i)
   {
-    auto& from = ladder_rungs[i-1];
+    auto& from = ladder_rungs[i - 1];
     const auto& to = ladder_rungs[i];
 
     bool found = false;
@@ -153,7 +150,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
           found = true;
           if (i == 1)
           {
-            //first edge captures first rung weights
+            // first edge captures first rung weights
             boost::add_edge(from[j], to[k], from_sample.cost + results.second + to_sample.cost, graph_);
           }
           else
@@ -162,7 +159,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
           }
         }
       }
-    } // node loop
+    }  // node loop
 
     if (!found)
     {
@@ -180,7 +177,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
       CONSOLE_BRIDGE_logInform(ss.str().c_str());
     }
 #endif
-  } // rung loop
+  }  // rung loop
   UNUSED(cnt);
   UNUSED(num_waypoints);
   duration = std::chrono::duration<double>(Clock::now() - start_time).count();
@@ -189,7 +186,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
   std::sort(status.failed_vertices.begin(), status.failed_vertices.end());
   std::sort(status.failed_edges.begin(), status.failed_edges.end());
 
-  //todo: move these to a utilites function
+  // todo: move these to a utilites function
   reportFailedVertices(status.failed_vertices);
   reportFailedEdges(status.failed_edges);
 
@@ -201,10 +198,11 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
   return status;
 }
 
-
 template <typename FloatType>
-std::vector<State<FloatType>> BGLLadderGraphSolver<FloatType>::reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
-                                        const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map)
+std::vector<State<FloatType>> BGLLadderGraphSolver<FloatType>::reconstructPath(
+    const VertexDesc<FloatType>& source,
+    const VertexDesc<FloatType>& target,
+    const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map)
 {
   // Reconstruct the path from predecessors
   std::vector<State<FloatType>> path;
@@ -225,7 +223,6 @@ std::vector<State<FloatType>> BGLLadderGraphSolver<FloatType>::reconstructPath(c
   return path;
 }
 
-
 template <typename FloatType>
 SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
 {
@@ -238,7 +235,7 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   result.cost = std::numeric_limits<FloatType>::max();
   result.trajectory = {};
 
-  //create a zero value, zero cost start sample
+  // create a zero value, zero cost start sample
   StateSample<FloatType> start_sample = StateSample<FloatType>{ State<FloatType>::Zero(this->dof_), 0.0 };
   VertexDesc<FloatType> sd = add_vertex(start_sample, graph_);
   for (const VertexDesc<FloatType>& source_d : ladder_rungs[0])
@@ -247,18 +244,29 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   }
 
   std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;
-  boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(predecessor_map);
+  boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(
+      predecessor_map);
 
   std::map<VertexDesc<FloatType>, double> distance_map;
   boost::associative_property_map<std::map<VertexDesc<FloatType>, double>> distance_prop_map(distance_map);
-  boost::dijkstra_shortest_paths(graph_, sd, predecessor_prop_map, distance_prop_map, weight_prop_map,
-                                 index_prop_map, std::less<>(), std::plus<>(), std::numeric_limits<double>::max(), 0.0,
+  boost::dijkstra_shortest_paths(graph_,
+                                 sd,
+                                 predecessor_prop_map,
+                                 distance_prop_map,
+                                 weight_prop_map,
+                                 index_prop_map,
+                                 std::less<>(),
+                                 std::plus<>(),
+                                 std::numeric_limits<double>::max(),
+                                 0.0,
                                  boost::default_dijkstra_visitor());
 
   // Find lowest cost node in last rung
-  auto target_d = std::min_element(ladder_rungs.back().begin(), ladder_rungs.back().end(), [&distance_map](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b){
-    return distance_map.at(a) < distance_map.at(b);
-  });
+  auto target_d = std::min_element(ladder_rungs.back().begin(),
+                                   ladder_rungs.back().end(),
+                                   [&distance_map](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
+                                     return distance_map.at(a) < distance_map.at(b);
+                                   });
 
   result.trajectory = reconstructPath(sd, *target_d, predecessor_map);
 
@@ -267,10 +275,10 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
 
   result.cost = distance_map.at(*target_d);
 
-  if(result.trajectory.empty())
+  if (result.trajectory.empty())
     throw std::runtime_error("failed");
 
   return result;
 }
-}
-#endif //DESCARTES_LIGHT_BGL_LADDER_GRAPH_SOLVER_HPP
+}  // namespace descartes_light
+#endif  // DESCARTES_LIGHT_BGL_LADDER_GRAPH_SOLVER_HPP

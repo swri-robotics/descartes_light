@@ -4,10 +4,11 @@
 namespace descartes_light
 {
 template <typename FloatType>
-using  EdgeProperty = boost::property<boost::edge_weight_t, FloatType>;
+using EdgeProperty = boost::property<boost::edge_weight_t, FloatType>;
 
 template <typename FloatType>
-using bglgraph = boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, StateSample<FloatType>, EdgeProperty<FloatType>>;
+using bglgraph =
+    boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, StateSample<FloatType>, EdgeProperty<FloatType>>;
 
 template <typename FloatType>
 using VertexDesc = typename bglgraph<FloatType>::vertex_descriptor;

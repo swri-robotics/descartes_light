@@ -169,9 +169,10 @@ public:
   std::vector<std::size_t> zero_state_indices_;
 };
 
-using Implementations =
-    ::testing::Types<SolverConfigurator<LadderGraphSolverF>, SolverConfigurator<LadderGraphSolverD>,
-    SolverConfigurator<BGLLadderGraphSolverF>, SolverConfigurator<BGLLadderGraphSolverD>>;
+using Implementations = ::testing::Types<SolverConfigurator<LadderGraphSolverF>,
+                                         SolverConfigurator<LadderGraphSolverD>,
+                                         SolverConfigurator<BGLLadderGraphSolverF>,
+                                         SolverConfigurator<BGLLadderGraphSolverD>>;
 
 TYPED_TEST_CASE(SolverFixture, Implementations);
 
