@@ -15,8 +15,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_DFS_SORT_SOLVER_H
-#define DESCARTES_LIGHT_DFS_SORT_SOLVER_H
+#ifndef DESCARTES_LIGHT_DFS_ALL_SOLVER_H
+#define DESCARTES_LIGHT_DFS_ALL_SOLVER_H
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
@@ -33,32 +33,32 @@ namespace descartes_light
 {
 
 template <typename FloatType>
-class DFSSortLadderGraphSolver : public Solver<FloatType>
+class DFSAddAllSolver : public Solver<FloatType>
 {
 public:
-  DFSSortLadderGraphSolver(const std::size_t dof, int num_threads = std::thread::hardware_concurrency());
+  DFSAddAllSolver(const std::size_t dof, int num_threads = std::thread::hardware_concurrency());
 
   BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
                         const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
 
-  SearchResult<FloatType> search() override;
-
   std::vector<typename State<FloatType>::ConstPtr> reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
                                           const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map);
 
+  SearchResult<FloatType> search() override;
+
   std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs;
 private:
-  //need to store edge evaluator for use in search method
+  //need to store edge evaluator for use in search method. todo: reference? -> scope concerns
   std::vector<EdgeEvaluator<FloatType>> edge_eval;
   std::size_t dof_;
   bglgraph<FloatType> graph_;
   int num_threads_;
 };
 
-using DFSSortLadderGraphSolverF = DFSSortLadderGraphSolver<float>;
-using DFSSortLadderGraphSolverD = DFSSortLadderGraphSolver<double>;
+using DFSAddAllSolverF = DFSAddAllSolver<float>;
+using DFSAddAllSolverD = DFSAddAllSolver<double>;
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_LIGHT_DFS_SORT_SOLVER_H
+#endif  // DESCARTES_LIGHT_DFS_ALL_SOLVER_H

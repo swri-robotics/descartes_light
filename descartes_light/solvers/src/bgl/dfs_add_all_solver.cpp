@@ -15,14 +15,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <descartes_light/solvers/bgl/impl/dfs_sort_ladder_graph_solver.hpp>
+#include <descartes_light/solvers/bgl/impl/dfs_add_all_solver.hpp>
 #include <vector>
 #include <list>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class DFSSortLadderGraphSolver<double>;
-template class DFSSortLadderGraphSolver<float>;
+template class DFSAddAllSolver<double>;
+template class DFSAddAllSolver<float>;
 
 }  // namespace descartes_light

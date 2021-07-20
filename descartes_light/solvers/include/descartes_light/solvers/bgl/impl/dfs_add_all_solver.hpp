@@ -21,29 +21,13 @@
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <console_bridge/console.h>
-//#include <iterator>
 #include <omp.h>
 
-#include <descartes_light/solvers/bgl/dfs_sort_ladder_graph_solver.h>
+#include <descartes_light/solvers/bgl/dfs_add_all_solver.h>
+#include <descartes_light/solvers/bgl/impl/bgl_visitors.hpp>
 #include <descartes_light/types.h>
 
 #define UNUSED(x) (void)(x)
-
-//these should be put into a utils file
-//static void reportFailedEdges(const std::vector<std::size_t>& indices)
-//{
-//  if (indices.empty())
-//    CONSOLE_BRIDGE_logInform("No failed edges");
-//  else
-//  {
-//    std::stringstream ss;
-//    ss << "Failed edges:\n";
-//    for (const auto& i : indices)
-//      ss << "\t" << i << "\n";
-
-//    CONSOLE_BRIDGE_logWarn(ss.str().c_str());
-//  }
-//}
 
 static void reportFailedVertices(const std::vector<std::size_t>& indices)
 {
@@ -63,13 +47,13 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 namespace descartes_light
 {
 template <typename FloatType>
-DFSSortLadderGraphSolver<FloatType>::DFSSortLadderGraphSolver(const std::size_t dof, int num_threads)
+DFSAddAllSolver<FloatType>::DFSAddAllSolver(const std::size_t dof, int num_threads)
   : dof_{dof}, num_threads_{ num_threads }
 {
 };
 
 template <typename FloatType>
-BuildStatus DFSSortLadderGraphSolver<FloatType>::buildImpl(
+BuildStatus DFSAddAllSolver<FloatType>::buildImpl(
     const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
     const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_evaluators,
     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
@@ -142,9 +126,10 @@ BuildStatus DFSSortLadderGraphSolver<FloatType>::buildImpl(
 
 
 template <typename FloatType>
-std::vector<typename State<FloatType>::ConstPtr> DFSSortLadderGraphSolver<FloatType>::reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
+std::vector<typename State<FloatType>::ConstPtr> DFSAddAllSolver<FloatType>::reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
                                         const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map)
 {
+  sleep(5.0);
   // Reconstruct the path from predecessors
   std::vector<typename State<FloatType>::ConstPtr> path;
 
@@ -166,77 +151,9 @@ std::vector<typename State<FloatType>::ConstPtr> DFSSortLadderGraphSolver<FloatT
 
 
 template <typename FloatType>
-SearchResult<FloatType> DFSSortLadderGraphSolver<FloatType>::search()
+SearchResult<FloatType> DFSAddAllSolver<FloatType>::search()
 {
   SearchResult<FloatType> result;
-
-  // use std::sample st there are no repeats whle trying add edges
-  // ^ This may require constructing a sampler for each rung
-  // we will want to store the ladder rung iterators for each rung to avoid repeats
-
-  //sorting lambda
-
-  auto sortRungSamples = [&] (const VertexDesc<FloatType> &v1, const VertexDesc<FloatType> &v2) -> bool
-     {
-        return graph_[v1].cost < graph_[v2].cost;
-     };
-
-  // while: time < time_constriant
-  //sort first rung outside the loop
-  std::sort(ladder_rungs[0].begin(), ladder_rungs[0].end(), sortRungSamples);
-
-  //Depth first search
-  for (std::size_t r = 1; r < ladder_rungs.size(); ++r)
-  {
-    std::sort(ladder_rungs[r].begin(), ladder_rungs[r].end(), sortRungSamples); //both rungs are now sorted
-
-    bool edge_generated = false;
-
-    std::size_t from_indx = 0;
-    std::size_t to_indx = 0;
-    FloatType cost;
-
-    while (!edge_generated && from_indx != ladder_rungs[r-1].size())
-    {
-      StateSample<FloatType> from_sample = graph_[ladder_rungs[r-1][from_indx]];
-      StateSample<FloatType> to_sample   = graph_[ladder_rungs[r][to_indx]];
-
-      std::pair<bool, FloatType> results =
-          edge_eval[static_cast<size_t>(r - 1)].evaluate(*from_sample.state, *to_sample.state);
-      if (results.first)
-      {
-        cost = results.second + to_sample.cost;
-        if (r-1 < 1)
-          cost += from_sample.cost;
-        boost::add_edge(ladder_rungs[r-1][from_indx], ladder_rungs[r][to_indx], cost, graph_);
-        edge_generated = true;
-      }
-      else
-      {
-        if (to_indx != ladder_rungs[r].size())
-        {
-           ++to_indx;
-        }
-        else
-        {
-          to_indx = 0;
-          ++from_indx;
-        }
-      } // end no edge else
-    } // end edge gen while
-    if (!edge_generated)
-    {
-      //throw std::runtime_error("Failed to find path through the graph");
-      throw std::runtime_error("No valid connections between two rungs");
-    }
-  }
-
-  // while time < time_limit && cost < cost limit
-  //continue random sampling
-
-  //end chrono while
-
-  // finish graph construction, run dijkstra? or custom visitor search?
 
   // Internal properties
   auto index_prop_map = boost::get(boost::vertex_index, graph_);
@@ -262,7 +179,7 @@ SearchResult<FloatType> DFSSortLadderGraphSolver<FloatType>::search()
 
   boost::dijkstra_shortest_paths(graph_, sd, predecessor_prop_map, distance_prop_map, weight_prop_map,
                                  index_prop_map, std::less<>(), std::plus<>(), std::numeric_limits<double>::max(), 0.0,
-                                 boost::default_dijkstra_visitor());
+                                 descartes_light::AddAllVisitor<FloatType>(edge_eval, predecessor_map, ladder_rungs));
 
 
   // Find lowest cost node in last rung
