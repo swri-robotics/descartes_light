@@ -59,11 +59,11 @@ BuildStatus DFSAddAllSolver<FloatType>::buildImpl(
     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
 {
   BuildStatus status;
-  auto edge_eval = std::move(edge_evaluators);
+  edge_eval = std::move(edge_evaluators);
 
   // Build Vertices
   long num_waypoints = static_cast<long>(trajectory.size());
-  ladder_rungs.resize(num_waypoints);
+  ladder_rungs_.resize(num_waypoints);
   long cnt = 0;
 
   using Clock = std::chrono::high_resolution_clock;
@@ -87,8 +87,10 @@ BuildStatus DFSAddAllSolver<FloatType>::buildImpl(
           if (results.first)
           {
             sample.cost += results.second;
-            vd = add_vertex(sample, graph_);
-            ladder_rungs[i].push_back(vd);
+            vd = add_vertex(graph_);
+            graph_[vd].sample = sample;
+            graph_[vd].rung_idx = static_cast<long>(i);
+            ladder_rungs_[static_cast<size_t>(i)].push_back(vd);
           }
         }
       }
@@ -113,6 +115,18 @@ BuildStatus DFSAddAllSolver<FloatType>::buildImpl(
   double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build vertices.", duration);
 
+  // Create a zero-value, zero-cost start node and connect it with a zero-cost edge to each node in the first rung
+  {
+    source_ = boost::add_vertex(graph_);
+    auto arr = std::make_shared<State<FloatType>>();
+    graph_[source_].sample = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
+    graph_[source_].rung_idx = -1;
+    for (const VertexDesc<FloatType>& target : ladder_rungs_[0])
+    {
+      boost::add_edge(source_, target, static_cast<FloatType>(0.0), graph_);
+    }
+  }
+
   std::sort(status.failed_vertices.begin(), status.failed_vertices.end());
   reportFailedVertices(status.failed_vertices);
 
@@ -126,19 +140,18 @@ BuildStatus DFSAddAllSolver<FloatType>::buildImpl(
 
 
 template <typename FloatType>
-std::vector<typename State<FloatType>::ConstPtr> DFSAddAllSolver<FloatType>::reconstructPath(const VertexDesc<FloatType>& source, const VertexDesc<FloatType>& target,
-                                        const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map)
+std::vector<VertexDesc<FloatType>> DFSAddAllSolver<FloatType>::reconstructPath(const VertexDesc<FloatType>& source,
+                                                                                             const VertexDesc<FloatType>& target) const
 {
-  sleep(5.0);
   // Reconstruct the path from predecessors
-  std::vector<typename State<FloatType>::ConstPtr> path;
+  std::vector<VertexDesc<FloatType>> path;
 
   VertexDesc<FloatType> v = target;
-  path.push_back(graph_[v].state);
+  path.push_back(v);
 
-  for (VertexDesc<FloatType> u = predecessor_map.at(v); u != v; v = u, u = predecessor_map.at(v))
+  for (VertexDesc<FloatType> u = predecessor_map_.at(v); u != v; v = u, u = predecessor_map_.at(v))
   {
-    path.push_back(graph_[u].state);
+    path.push_back(u);
   }
   std::reverse(path.begin(), path.end());
 
@@ -149,6 +162,19 @@ std::vector<typename State<FloatType>::ConstPtr> DFSAddAllSolver<FloatType>::rec
   return path;
 }
 
+template <typename FloatType>
+std::vector<typename State<FloatType>::ConstPtr>
+DFSAddAllSolver<FloatType>::toStates(const std::vector<VertexDesc<FloatType>>& path) const
+{
+  // Get the state information from the graph using the vertex descriptors
+  std::vector<typename State<FloatType>::ConstPtr> out;
+  out.reserve(path.size());
+  std::transform(path.begin(), path.end(), std::back_inserter(out), [this](const VertexDesc<FloatType>& vd) {
+    return graph_[vd].sample.state;
+  });
+
+  return out;
+}
 
 template <typename FloatType>
 SearchResult<FloatType> DFSAddAllSolver<FloatType>::search()
@@ -162,37 +188,27 @@ SearchResult<FloatType> DFSAddAllSolver<FloatType>::search()
   result.cost = std::numeric_limits<FloatType>::max();
   result.trajectory = {};
 
-  //create a zero value, zero cost start sample
-  auto arr = std::make_shared<State<FloatType>>(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof_));
-  StateSample<FloatType> start_sample = StateSample<FloatType>{ arr, 0.0 };
-  VertexDesc<FloatType> sd = add_vertex(start_sample, graph_);
-  for (const VertexDesc<FloatType>& source_d : ladder_rungs[0])
-  {
-    boost::add_edge(sd, source_d, 0.0, graph_);
-  }
-
-  std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;
-  boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(predecessor_map);
+  boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(predecessor_map_);
 
   std::map<VertexDesc<FloatType>, double> distance_map;
   boost::associative_property_map<std::map<VertexDesc<FloatType>, double>> distance_prop_map(distance_map);
 
-  boost::dijkstra_shortest_paths(graph_, sd, predecessor_prop_map, distance_prop_map, weight_prop_map,
+  boost::dijkstra_shortest_paths(graph_, source_, predecessor_prop_map, distance_prop_map, weight_prop_map,
                                  index_prop_map, std::less<>(), std::plus<>(), std::numeric_limits<double>::max(), 0.0,
-                                 descartes_light::AddAllVisitor<FloatType>(edge_eval, predecessor_map, ladder_rungs));
+                                 descartes_light::AddAllVisitor<FloatType>(edge_eval, predecessor_map_, ladder_rungs_, graph_));
 
 
   // Find lowest cost node in last rung
-  auto target_d = std::min_element(ladder_rungs.back().begin(), ladder_rungs.back().end(), [&distance_map](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b){
+  auto target = std::min_element(ladder_rungs_.back().begin(), ladder_rungs_.back().end(), [&distance_map](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b){
     return distance_map.at(a) < distance_map.at(b);
   });
 
-  result.trajectory = reconstructPath(sd, *target_d, predecessor_map);
+  result.trajectory = toStates(reconstructPath(source_, *target));
 
   // remove empty start state
   result.trajectory.erase(result.trajectory.begin());
 
-  result.cost = distance_map.at(*target_d);
+  result.cost = distance_map.at(*target);
 
   if(result.trajectory.empty())
     throw std::runtime_error("failed");

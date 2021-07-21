@@ -2,53 +2,55 @@
 #define DESCARTES_LIGHT_BOOST_VISITORS
 
 #include <boost/graph/dijkstra_shortest_paths.hpp>
-#include <descartes_light/solvers/bgl/boost_ladder_types.h>
+#include <descartes_light/solvers/bgl/boost_graph_types.h>
 #include <descartes_light/core/solver.h>
 #include <descartes_light/core/edge_evaluator.h>
-#include <descartes_light/solvers/bgl/boost_ladder_types.h>
+#include <descartes_light/solvers/bgl/boost_graph_types.h>
 
-//visitor will need access to edge evaluators, float type, ladder graph. Needs to be a member of the solver
 namespace descartes_light
 {
 template <typename FloatType>
 struct AddAllVisitor : boost::default_dijkstra_visitor
 {
-  AddAllVisitor(std::vector<EdgeEvaluator<FloatType>>& edge_eval,
+  AddAllVisitor(std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
           std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map,
-          std::vector<std::vector<VertexDesc<FloatType>>>& ladder_rungs)
+          std::vector<std::vector<VertexDesc<FloatType>>>& ladder_rungs,
+          BGLGraph<FloatType>& eg)
           : eval(edge_eval),
             predecessors(predecessor_map),
-            rungs(ladder_rungs)
+            rungs(ladder_rungs),
+            mutable_graph(eg)
        {
        }
 
-  // must have copy constructor
-  //AddAllVisitor() : AddAllVisitor
-
-  void examine_vertex(VertexDesc<FloatType> u, bglgraph<FloatType> g)
+  void examine_vertex(VertexDesc<FloatType> u, BGLGraph<FloatType> g)
   {
     int out_deg = boost::out_degree(u, g);
     // return if the vertex has any out edges
     if (out_deg == 0)
     {
       // check rung
-      std::size_t next_rung = 0; // = predecessors.size(); //assuming that a dummy start node is still used -> This does not work bc predecessors preallocates based on vertices
-      for (VertexDesc<FloatType> prev = predecessors.at(u); prev != u; u = prev, prev = predecessors.at(u))
+      VertexDesc<FloatType> curr = u;
+      std::size_t next_rung = 0;
+      for (VertexDesc<FloatType> prev = predecessors.at(curr); prev != curr; curr = prev, prev = predecessors.at(curr))
       {
         ++next_rung;
       }
-      FloatType cost;
-      for (std::size_t s = 0; s < rungs[next_rung].size(); ++s)
+      if (next_rung < rungs.size()) //compiler will optimize more if this branching could be avoided
       {
-        std::pair<bool, FloatType> results =
-            eval[static_cast<size_t>(s)].evaluate(*g[u].state, *g[rungs[next_rung][s]].state);
-        if (results.first)
+        FloatType cost;
+        for (std::size_t s = 0; s < rungs[next_rung].size(); ++s)
         {
-          cost = results.second + g[rungs[next_rung][s]].cost;
-          if (next_rung == 1) //this if can probably be captured in the dummy node edges
-            cost += g[u].cost;
-          VertexDesc<FloatType> sap = rungs[next_rung][s];
-          boost::add_edge(u, sap, cost, g);
+          std::pair<bool, FloatType> results =
+              eval[static_cast<size_t>(next_rung-1)]->evaluate(*g[u].sample.state, *g[rungs[next_rung][s]].sample.state);
+          if (results.first)
+          {
+            cost = results.second + g[rungs[next_rung][s]].sample.cost;
+            if (next_rung == 1) //todo: this if can probably be captured in the dummy node edges
+              cost += g[u].sample.cost;
+            VertexDesc<FloatType> sap = rungs[next_rung][s];
+            boost::add_edge(u, sap, cost, mutable_graph);
+          }
         }
       }
     }
@@ -56,9 +58,10 @@ struct AddAllVisitor : boost::default_dijkstra_visitor
   }
 
 private:
-  std::vector<EdgeEvaluator<FloatType>>& eval;
-  std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessors; //this needs to point to the same instance of the predecessor map the ssearch is updating
+  std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> eval{ nullptr };
+  std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessors;
   std::vector<std::vector<VertexDesc<FloatType>>>& rungs;
+  BGLGraph<FloatType>& mutable_graph{ nullptr };
 };
 } //descartes_light
 #endif
