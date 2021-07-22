@@ -43,6 +43,9 @@ public:
 
   SearchResult<FloatType> search() override;
 
+  void writeGraph(const std::string& filename) const;
+  void writeGraphWithPath(const std::string& filename) const;
+
 private:
   std::vector<VertexDesc<FloatType>> reconstructPath(const VertexDesc<FloatType>& source,
                                                      const VertexDesc<FloatType>& target) const;
