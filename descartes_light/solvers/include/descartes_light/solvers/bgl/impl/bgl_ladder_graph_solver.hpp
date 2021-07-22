@@ -89,7 +89,8 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
         VertexDesc<FloatType> vd;
         if (state_evaluators.empty())
         {
-          vd = add_vertex(sample, graph_);
+          vd = boost::add_vertex(graph_);
+          graph_[vd] = sample;
           ladder_rungs_[static_cast<size_t>(i)].push_back(vd);
         }
         else
@@ -98,7 +99,8 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
           if (results.first)
           {
             sample.cost += results.second;
-            vd = add_vertex(sample, graph_);
+            vd = boost::add_vertex(graph_);
+            graph_[vd] = sample;
             ladder_rungs_[static_cast<size_t>(i)].push_back(vd);
           }
         }
@@ -186,9 +188,9 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
 
   // Create a zero-value, zero-cost start node and connect it with a zero-cost edge to each node in the first rung
   {
+    source_ = boost::add_vertex(graph_);
     auto arr = std::make_shared<State<FloatType>>();
-    StateSample<FloatType> start_sample = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
-    source_ = add_vertex(start_sample, graph_);
+    graph_[source_] = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
     for (const VertexDesc<FloatType>& target : ladder_rungs_[0])
     {
       boost::add_edge(source_, target, static_cast<FloatType>(0.0), graph_);

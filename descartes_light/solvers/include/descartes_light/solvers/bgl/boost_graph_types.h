@@ -21,20 +21,51 @@
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/graph/graph_traits.hpp>
 #include <boost/graph/adjacency_list.hpp>
+#include <boost/graph/graphviz.hpp>
 DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_light/types.h>
 
 namespace descartes_light
 {
+using GraphvizAttributes = std::map<std::string, std::string>;
+
+// clang-format off
 template <typename FloatType>
-using EdgeProperty = boost::property<boost::edge_weight_t, FloatType>;
+using VertexProperty = boost::property<boost::vertex_index_t, std::size_t,
+                                       boost::property<boost::vertex_attribute_t, GraphvizAttributes,
+                                       StateSample<FloatType>>>;
+
+template <typename FloatType>
+using EdgeProperty = boost::property<boost::edge_weight_t, FloatType,
+                     boost::property<boost::edge_index_t, std::size_t, // required for sub-graphs
+                     boost::property<boost::edge_attribute_t, GraphvizAttributes>>>;
+
+using GraphProperty = boost::property<boost::graph_name_t, std::string,
+                      boost::property<boost::graph_graph_attribute_t, GraphvizAttributes,
+                      boost::property<boost::graph_vertex_attribute_t, GraphvizAttributes,
+                      boost::property<boost::graph_edge_attribute_t, GraphvizAttributes>>>>;
 
 template <typename FloatType>
 using BGLGraph =
-    boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, StateSample<FloatType>, EdgeProperty<FloatType>>;
+    boost::adjacency_list<boost::vecS, boost::vecS, boost::directedS, VertexProperty<FloatType>, EdgeProperty<FloatType>, GraphProperty>;
+// clang-format on
+
+template <typename FloatType>
+using SubGraph = boost::subgraph<BGLGraph<FloatType>>;
 
 template <typename FloatType>
 using VertexDesc = typename BGLGraph<FloatType>::vertex_descriptor;
+
+template <typename FloatType>
+using VertexIt = typename BGLGraph<FloatType>::vertex_iterator;
+
+template <typename FloatType>
+using EdgeDesc = typename BGLGraph<FloatType>::edge_descriptor;
+
+template <typename FloatType>
+using EdgeIt = typename BGLGraph<FloatType>::edge_iterator;
+
+using ColorTraits = boost::color_traits<unsigned>;
 
 }  // namespace descartes_light
