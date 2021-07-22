@@ -153,6 +153,7 @@ public:
 template <typename FloatType>
 struct StateSample
 {
+  StateSample() = default;
   // NOLINTNEXTLINE(modernize-pass-by-value)
   StateSample(typename State<FloatType>::ConstPtr state_, FloatType cost_) : state(std::move(state_)), cost(cost_) {}
   // NOLINTNEXTLINE(modernize-pass-by-value)
@@ -161,9 +162,9 @@ struct StateSample
   }
 
   /** @brief State values */
-  typename State<FloatType>::ConstPtr state;
+  typename State<FloatType>::ConstPtr state{ nullptr };
   /** @brief State cost */
-  FloatType cost;
+  FloatType cost{ static_cast<FloatType>(0.0) };
 };
 
 }  // namespace descartes_light
