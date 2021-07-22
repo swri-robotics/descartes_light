@@ -138,11 +138,11 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
     bool found = false;
     for (long j = 0; j < static_cast<long>(from.size()); ++j)
     {
-      StateSample<FloatType> from_sample = graph_[from[static_cast<size_t>(j)]];
+      const StateSample<FloatType> from_sample = graph_[from[static_cast<size_t>(j)]];
       for (long k = 0; k < static_cast<long>(to.size()); ++k)
       {
         // Consider the edge:
-        StateSample<FloatType> to_sample = graph_[to[static_cast<size_t>(k)]];
+        const StateSample<FloatType> to_sample = graph_[to[static_cast<size_t>(k)]];
         std::pair<bool, FloatType> results =
             edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(*from_sample.state, *to_sample.state);
         if (results.first)
