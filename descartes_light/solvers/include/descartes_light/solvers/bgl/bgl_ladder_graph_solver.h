@@ -15,8 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_BGL_SOLVER_H
-#define DESCARTES_LIGHT_BGL_SOLVER_H
+#pragma once
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
@@ -24,8 +23,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <vector>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <boost/graph/dijkstra_shortest_paths.hpp>
-#include <descartes_light/solvers/bgl/boost_ladder_types.h>
+#include <descartes_light/solvers/bgl/boost_graph_types.h>
 #include <descartes_light/core/solver.h>
 
 namespace descartes_light
@@ -51,13 +49,11 @@ public:
 
 private:
   std::size_t dof_;
-  bglgraph<FloatType> graph_;
   int num_threads_;
+  BGLGraph<FloatType> graph_;
 };
 
 using BGLLadderGraphSolverF = BGLLadderGraphSolver<float>;
 using BGLLadderGraphSolverD = BGLLadderGraphSolver<double>;
 
 }  // namespace descartes_light
-
-#endif  // DESCARTES_LIGHT_BGL_SOLVER_H
