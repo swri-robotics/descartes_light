@@ -28,6 +28,9 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
+/**
+ * @brief Graph search leveraging the Boost Graph Library implementation of Dijkstra's algorithm
+ */
 template <typename FloatType>
 class BGLLadderGraphSolver : public Solver<FloatType>
 {
@@ -40,17 +43,25 @@ public:
 
   SearchResult<FloatType> search() override;
 
+private:
+  /**
+   * @brief Helper function for reconstructing a path from a predecessor map
+   * @param source
+   * @param target
+   * @param predecessor_map
+   * @return
+   */
   std::vector<typename State<FloatType>::ConstPtr>
   reconstructPath(const VertexDesc<FloatType>& source,
                   const VertexDesc<FloatType>& target,
-                  const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map);
+                  const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map) const;
 
-  std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs;
-
-private:
   std::size_t dof_;
   int num_threads_;
+  /** @brief Graph representation of the planning problem */
   BGLGraph<FloatType> graph_;
+  /** @brief Ladder graph representation of the graph vertices, used for creating edge connections */
+  std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs_;
 };
 
 using BGLLadderGraphSolverF = BGLLadderGraphSolver<float>;
