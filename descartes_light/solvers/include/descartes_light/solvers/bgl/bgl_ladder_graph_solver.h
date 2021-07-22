@@ -35,7 +35,7 @@ template <typename FloatType>
 class BGLLadderGraphSolver : public Solver<FloatType>
 {
 public:
-  BGLLadderGraphSolver(const std::size_t dof, int num_threads = std::thread::hardware_concurrency());
+  BGLLadderGraphSolver(const std::size_t dof, unsigned num_threads = std::thread::hardware_concurrency());
 
   BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
@@ -57,7 +57,7 @@ private:
                   const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map) const;
 
   std::size_t dof_;
-  int num_threads_;
+  unsigned num_threads_;
   /** @brief Graph representation of the planning problem */
   BGLGraph<FloatType> graph_;
   /** @brief Ladder graph representation of the graph vertices, used for creating edge connections */
