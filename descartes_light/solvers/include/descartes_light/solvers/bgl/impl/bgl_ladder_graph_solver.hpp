@@ -181,6 +181,17 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
   duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build edges.", duration);
 
+  // Create a zero-value, zero-cost start node and connect it with a zero-cost edge to each node in the first rung
+  {
+    auto arr = std::make_shared<State<FloatType>>();
+    StateSample<FloatType> start_sample = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
+    source_ = add_vertex(start_sample, graph_);
+    for (const VertexDesc<FloatType>& target : ladder_rungs_[0])
+    {
+      boost::add_edge(source_, target, static_cast<FloatType>(0.0), graph_);
+    }
+  }
+
   std::sort(status.failed_vertices.begin(), status.failed_vertices.end());
   std::sort(status.failed_edges.begin(), status.failed_edges.end());
 
@@ -233,15 +244,6 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   result.cost = std::numeric_limits<FloatType>::max();
   result.trajectory = {};
 
-  // Create a zero-value, zero-cost start node and connect it with a zero-cost edge to each node in the first rung
-  auto arr = std::make_shared<State<FloatType>>();
-  StateSample<FloatType> start_sample = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
-  VertexDesc<FloatType> sd = add_vertex(start_sample, graph_);
-  for (const VertexDesc<FloatType>& source_d : ladder_rungs_[0])
-  {
-    boost::add_edge(sd, source_d, static_cast<FloatType>(0.0), graph_);
-  }
-
   std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;
   boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(
       predecessor_map);
@@ -249,7 +251,7 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   std::map<VertexDesc<FloatType>, FloatType> distance_map;
   boost::associative_property_map<std::map<VertexDesc<FloatType>, FloatType>> distance_prop_map(distance_map);
   boost::dijkstra_shortest_paths(graph_,
-                                 sd,
+                                 source_,
                                  predecessor_prop_map,
                                  distance_prop_map,
                                  weight_prop_map,
@@ -261,17 +263,17 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
                                  boost::default_dijkstra_visitor());
 
   // Find lowest cost node in last rung
-  auto target_d = std::min_element(ladder_rungs_.back().begin(),
-                                   ladder_rungs_.back().end(),
-                                   [&distance_map](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
-                                     return distance_map.at(a) < distance_map.at(b);
-                                   });
+  auto target = std::min_element(ladder_rungs_.back().begin(),
+                                 ladder_rungs_.back().end(),
+                                 [&distance_map](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
+                                   return distance_map.at(a) < distance_map.at(b);
+                                 });
 
   // Reconstruct the path from the predecesor map; remove the artificial start state
-  result.trajectory = reconstructPath(sd, *target_d, predecessor_map);
+  result.trajectory = reconstructPath(source_, *target, predecessor_map);
   result.trajectory.erase(result.trajectory.begin());
 
-  result.cost = distance_map.at(*target_d);
+  result.cost = distance_map.at(*target);
 
   return result;
 }
