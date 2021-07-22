@@ -23,19 +23,18 @@ else()
   endif()
 endif()
 
-add_library(${PROJECT_NAME}_solvers
+add_library(
+  ${PROJECT_NAME}_solvers
   src/bgl/bgl_ladder_graph_solver.cpp
   src/ladder_graph/ladder_graph_solver.cpp
   src/ladder_graph/ladder_graph.cpp
-  src/ladder_graph/ladder_graph_dag_search.cpp
-)
-target_link_libraries(${PROJECT_NAME}_solvers
-  PUBLIC
-    ${PROJECT_NAME}_core
-    OpenMP::OpenMP_CXX
-    console_bridge::console_bridge
-    Boost::graph
-)
+  src/ladder_graph/ladder_graph_dag_search.cpp)
+target_link_libraries(
+  ${PROJECT_NAME}_solvers
+  PUBLIC ${PROJECT_NAME}_core
+         OpenMP::OpenMP_CXX
+         console_bridge::console_bridge
+         Boost::graph)
 target_cxx_version(${PROJECT_NAME}_solvers PUBLIC VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME}_solvers PUBLIC ${DESCARTES_COMPILE_OPTIONS})
 target_compile_definitions(${PROJECT_NAME}_solvers PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})

@@ -62,7 +62,8 @@ private:
   BGLGraph<FloatType> graph_;
   /** @brief Ladder graph representation of the graph vertices, used for creating edge connections */
   std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs_;
-  /** @brief Artificial source vertex with a zero-cost edge to all vertices in the first ladder rung. All searches should start from this vertex */
+  /** @brief Artificial source vertex with a zero-cost edge to all vertices in the first ladder rung. All searches
+   * should start from this vertex */
   VertexDesc<FloatType> source_;
 };
 

@@ -17,7 +17,6 @@
  */
 #pragma once
 
-
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/graph/graph_traits.hpp>
