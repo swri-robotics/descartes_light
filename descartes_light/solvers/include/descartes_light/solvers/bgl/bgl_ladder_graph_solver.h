@@ -44,17 +44,10 @@ public:
   SearchResult<FloatType> search() override;
 
 private:
-  /**
-   * @brief Helper function for reconstructing a path from a predecessor map
-   * @param source
-   * @param target
-   * @param predecessor_map
-   * @return
-   */
-  std::vector<typename State<FloatType>::ConstPtr>
-  reconstructPath(const VertexDesc<FloatType>& source,
-                  const VertexDesc<FloatType>& target,
-                  const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map) const;
+  std::vector<VertexDesc<FloatType>> reconstructPath(const VertexDesc<FloatType>& source,
+                                                     const VertexDesc<FloatType>& target) const;
+
+  std::vector<typename State<FloatType>::ConstPtr> toStates(const std::vector<VertexDesc<FloatType>>& path) const;
 
   unsigned num_threads_;
   /** @brief Graph representation of the planning problem */
@@ -64,6 +57,9 @@ private:
   /** @brief Artificial source vertex with a zero-cost edge to all vertices in the first ladder rung. All searches
    * should start from this vertex */
   VertexDesc<FloatType> source_;
+
+  std::map<VertexDesc<FloatType>, FloatType> distance_map_;
+  std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map_;
 };
 
 using BGLLadderGraphSolverF = BGLLadderGraphSolver<float>;

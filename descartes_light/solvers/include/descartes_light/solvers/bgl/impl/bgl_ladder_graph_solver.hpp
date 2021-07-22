@@ -213,20 +213,19 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
 }
 
 template <typename FloatType>
-std::vector<typename State<FloatType>::ConstPtr> BGLLadderGraphSolver<FloatType>::reconstructPath(
-    const VertexDesc<FloatType>& source,
-    const VertexDesc<FloatType>& target,
-    const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map) const
+std::vector<VertexDesc<FloatType>>
+BGLLadderGraphSolver<FloatType>::reconstructPath(const VertexDesc<FloatType>& source,
+                                                 const VertexDesc<FloatType>& target) const
 {
   // Reconstruct the path from predecessors
-  std::vector<typename State<FloatType>::ConstPtr> path;
+  std::vector<VertexDesc<FloatType>> path;
 
   VertexDesc<FloatType> v = target;
-  path.push_back(graph_[v].state);
+  path.push_back(v);
 
-  for (VertexDesc<FloatType> u = predecessor_map.at(v); u != v; v = u, u = predecessor_map.at(v))
+  for (VertexDesc<FloatType> u = predecessor_map_.at(v); u != v; v = u, u = predecessor_map_.at(v))
   {
-    path.push_back(graph_[u].state);
+    path.push_back(u);
   }
   std::reverse(path.begin(), path.end());
 
@@ -235,6 +234,20 @@ std::vector<typename State<FloatType>::ConstPtr> BGLLadderGraphSolver<FloatType>
     throw std::runtime_error("Failed to find path through the graph");
 
   return path;
+}
+
+template <typename FloatType>
+std::vector<typename State<FloatType>::ConstPtr>
+BGLLadderGraphSolver<FloatType>::toStates(const std::vector<VertexDesc<FloatType>>& path) const
+{
+  // Get the state information from the graph using the vertex descriptors
+  std::vector<typename State<FloatType>::ConstPtr> out;
+  out.reserve(path.size());
+  std::transform(path.begin(), path.end(), std::back_inserter(out), [this](const VertexDesc<FloatType>& vd) {
+    return graph_[vd].state;
+  });
+
+  return out;
 }
 
 template <typename FloatType>
@@ -249,12 +262,14 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   result.cost = std::numeric_limits<FloatType>::max();
   result.trajectory = {};
 
-  std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;
+  predecessor_map_.clear();
   boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(
-      predecessor_map);
+      predecessor_map_);
 
-  std::map<VertexDesc<FloatType>, FloatType> distance_map;
-  boost::associative_property_map<std::map<VertexDesc<FloatType>, FloatType>> distance_prop_map(distance_map);
+  distance_map_.clear();
+  boost::associative_property_map<std::map<VertexDesc<FloatType>, FloatType>> distance_prop_map(distance_map_);
+
+  // Perform the search
   boost::dijkstra_shortest_paths(graph_,
                                  source_,
                                  predecessor_prop_map,
@@ -270,15 +285,15 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   // Find lowest cost node in last rung
   auto target = std::min_element(ladder_rungs_.back().begin(),
                                  ladder_rungs_.back().end(),
-                                 [&distance_map](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
-                                   return distance_map.at(a) < distance_map.at(b);
+                                 [this](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
+                                   return distance_map_.at(a) < distance_map_.at(b);
                                  });
 
   // Reconstruct the path from the predecesor map; remove the artificial start state
-  result.trajectory = reconstructPath(source_, *target, predecessor_map);
+  result.trajectory = toStates(reconstructPath(source_, *target));
   result.trajectory.erase(result.trajectory.begin());
 
-  result.cost = distance_map.at(*target);
+  result.cost = distance_map_.at(*target);
 
   return result;
 }
