@@ -15,26 +15,8 @@ const static std::string RANKDIR_ATTR = "rankdir";
 namespace descartes_light
 {
 template <typename FloatType>
-inline SubGraph<FloatType> createDecoratedSubGraph(const BGLGraph<FloatType>& g,
-                                                   std::vector<std::vector<VertexDesc<FloatType>>> ladder_graph,
-                                                   const std::map<VertexDesc<FloatType>, FloatType>& distance_map)
+inline SubGraph<FloatType> createDecoratedSubGraph(const BGLGraph<FloatType>& g)
 {
-  // Sort the descriptors in each node for efficient searching later
-  for (auto& rung : ladder_graph)
-    std::sort(rung.begin(), rung.end());
-
-  // Define a helper function for finding the rung index of a particular vertex in the ladder graph
-  auto get_rung_idx = [&ladder_graph](const VertexDesc<FloatType>& vd) -> long {
-    for (std::size_t rung_idx = 0; rung_idx < ladder_graph.size(); ++rung_idx)
-    {
-      if (std::binary_search(ladder_graph[rung_idx].begin(), ladder_graph[rung_idx].end(), vd))
-        return static_cast<long>(rung_idx);
-    }
-
-    // Assign any un-found ones to the -1 rung index
-    return -1;
-  };
-
   SubGraph<FloatType> main;
   boost::get_property(main, boost::graph_name) = "G";
 
@@ -45,7 +27,7 @@ inline SubGraph<FloatType> createDecoratedSubGraph(const BGLGraph<FloatType>& g,
   boost::tie(start, end) = boost::vertices(g);
   for (auto it = start; it != end; ++it)
   {
-    const long rung_idx = get_rung_idx(*it);
+    const long rung_idx = g[*it].rung_idx;
     if (rung_subgraph_map.find(rung_idx) == rung_subgraph_map.end())
     {
       // Create a new sub-graph for the rung
@@ -62,28 +44,28 @@ inline SubGraph<FloatType> createDecoratedSubGraph(const BGLGraph<FloatType>& g,
     auto v = boost::add_vertex(*rung_subgraph);
 
     std::stringstream name;
-    name << std::setprecision(4) << distance_map.at(*it);
+    name << std::setprecision(4) << "v" << *it << ": " << g[*it].distance;
     boost::get(boost::vertex_attribute, *rung_subgraph)[v][LABEL_ATTR] = name.str();
 
     // Add colors
-//    auto& color_prop = boost::get(boost::vertex_attribute, *rung_subgraph)[v][FILLCOLOR_ATTR];
-//    switch (g[*it].color)
-//    {
-//      case boost::default_color_type::white_color:
-//        color_prop = "white";
-//        break;
-//      case boost::default_color_type::gray_color:
-//        color_prop = "gray";
-//        break;
-//      case boost::default_color_type::black_color:
-//        color_prop = "gray30";
-//        break;
-//      case boost::default_color_type::red_color:
-//        color_prop = "red";
-//        break;
-//      default:
-//        break;
-//    }
+    auto& color_prop = boost::get(boost::vertex_attribute, *rung_subgraph)[v][FILLCOLOR_ATTR];
+    switch (g[*it].color)
+    {
+      case boost::default_color_type::white_color:
+        color_prop = "white";
+        break;
+      case boost::default_color_type::gray_color:
+        color_prop = "gray";
+        break;
+      case boost::default_color_type::black_color:
+        color_prop = "gray30";
+        break;
+      case boost::default_color_type::red_color:
+        color_prop = "red";
+        break;
+      default:
+        break;
+    }
   }
 
   // Add the edges to the subgraph
@@ -119,7 +101,7 @@ void BGLLadderGraphSolver<FloatType>::writeGraph(const std::string& filename) co
   if (!file.good())
     throw std::runtime_error("Failed to open file '" + filename + "'");
 
-  boost::write_graphviz(file, createDecoratedSubGraph(graph_, ladder_rungs_, distance_map_));
+  boost::write_graphviz(file, createDecoratedSubGraph(graph_));
 }
 
 template <typename FloatType>
@@ -129,13 +111,13 @@ void BGLLadderGraphSolver<FloatType>::writeGraphWithPath(const std::string& file
   if (!file.good())
     throw std::runtime_error("Failed to open file '" + filename + "'");
 
-  SubGraph<FloatType> sg = createDecoratedSubGraph(graph_, ladder_rungs_, distance_map_);
+  SubGraph<FloatType> sg = createDecoratedSubGraph(graph_);
 
   // Get the path through the graph
   auto target = std::min_element(ladder_rungs_.back().begin(),
                                  ladder_rungs_.back().end(),
                                  [this](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
-                                   return distance_map_.at(a) < distance_map_.at(b);
+                                   return graph_[a].distance < graph_[b].distance;
                                  });
   const std::vector<VertexDesc<FloatType>> path = reconstructPath(source_, *target);
 

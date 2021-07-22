@@ -28,13 +28,32 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
+using ColorT = unsigned;
+
+/**
+ * @ Brief structure containing relevant information about a graph vertex
+ */
+template <typename FloatType>
+struct Vertex
+{
+  /** @brief State sample information, assigned by user */
+  StateSample<FloatType> sample;
+  /** @brief Index of the "rung" of the ladder graph with which this node is associated */
+  long rung_idx;
+
+  /** @brief Distance from the start node, assigned graph algorithm at search-time */
+  FloatType distance;
+  /** @brief Search status "color" of the vertex: visited, opened, unvisited. Assigned by the graph algorithm at search-time */
+  ColorT color;
+};
+
 using GraphvizAttributes = std::map<std::string, std::string>;
 
 // clang-format off
 template <typename FloatType>
 using VertexProperty = boost::property<boost::vertex_index_t, std::size_t,
                                        boost::property<boost::vertex_attribute_t, GraphvizAttributes,
-                                       StateSample<FloatType>>>;
+                                       Vertex<FloatType>>>;
 
 template <typename FloatType>
 using EdgeProperty = boost::property<boost::edge_weight_t, FloatType,
@@ -66,6 +85,6 @@ using EdgeDesc = typename BGLGraph<FloatType>::edge_descriptor;
 template <typename FloatType>
 using EdgeIt = typename BGLGraph<FloatType>::edge_iterator;
 
-using ColorTraits = boost::color_traits<unsigned>;
+using ColorTraits = boost::color_traits<ColorT>;
 
 }  // namespace descartes_light

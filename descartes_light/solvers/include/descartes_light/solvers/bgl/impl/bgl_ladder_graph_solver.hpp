@@ -90,7 +90,8 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
         if (state_evaluators.empty())
         {
           vd = boost::add_vertex(graph_);
-          graph_[vd] = sample;
+          graph_[vd].sample = sample;
+          graph_[vd].rung_idx = static_cast<long>(i);
           ladder_rungs_[static_cast<size_t>(i)].push_back(vd);
         }
         else
@@ -100,7 +101,8 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
           {
             sample.cost += results.second;
             vd = boost::add_vertex(graph_);
-            graph_[vd] = sample;
+            graph_[vd].sample = sample;
+            graph_[vd].rung_idx = static_cast<long>(i);
             ladder_rungs_[static_cast<size_t>(i)].push_back(vd);
           }
         }
@@ -138,11 +140,11 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
     bool found = false;
     for (long j = 0; j < static_cast<long>(from.size()); ++j)
     {
-      const StateSample<FloatType> from_sample = graph_[from[static_cast<size_t>(j)]];
+      const StateSample<FloatType> from_sample = graph_[from[static_cast<size_t>(j)]].sample;
       for (long k = 0; k < static_cast<long>(to.size()); ++k)
       {
         // Consider the edge:
-        const StateSample<FloatType> to_sample = graph_[to[static_cast<size_t>(k)]];
+        const StateSample<FloatType> to_sample = graph_[to[static_cast<size_t>(k)]].sample;
         std::pair<bool, FloatType> results =
             edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(*from_sample.state, *to_sample.state);
         if (results.first)
@@ -190,7 +192,8 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
   {
     source_ = boost::add_vertex(graph_);
     auto arr = std::make_shared<State<FloatType>>();
-    graph_[source_] = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
+    graph_[source_].sample = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
+    graph_[source_].rung_idx = -1;
     for (const VertexDesc<FloatType>& target : ladder_rungs_[0])
     {
       boost::add_edge(source_, target, static_cast<FloatType>(0.0), graph_);
@@ -244,7 +247,7 @@ BGLLadderGraphSolver<FloatType>::toStates(const std::vector<VertexDesc<FloatType
   std::vector<typename State<FloatType>::ConstPtr> out;
   out.reserve(path.size());
   std::transform(path.begin(), path.end(), std::back_inserter(out), [this](const VertexDesc<FloatType>& vd) {
-    return graph_[vd].state;
+    return graph_[vd].sample.state;
   });
 
   return out;
@@ -253,21 +256,15 @@ BGLLadderGraphSolver<FloatType>::toStates(const std::vector<VertexDesc<FloatType
 template <typename FloatType>
 SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
 {
-  SearchResult<FloatType> result;
-
   // Internal properties
   auto index_prop_map = boost::get(boost::vertex_index, graph_);
   auto weight_prop_map = boost::get(boost::edge_weight, graph_);
-
-  result.cost = std::numeric_limits<FloatType>::max();
-  result.trajectory = {};
+  auto color_prop_map = boost::get(&Vertex<FloatType>::color, graph_);
+  auto distance_prop_map = boost::get(&Vertex<FloatType>::distance, graph_);
 
   predecessor_map_.clear();
   boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(
       predecessor_map_);
-
-  distance_map_.clear();
-  boost::associative_property_map<std::map<VertexDesc<FloatType>, FloatType>> distance_prop_map(distance_map_);
 
   // Perform the search
   boost::dijkstra_shortest_paths(graph_,
@@ -280,20 +277,23 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
                                  std::plus<>(),
                                  std::numeric_limits<FloatType>::max(),
                                  static_cast<FloatType>(0.0),
-                                 boost::default_dijkstra_visitor());
+                                 boost::default_dijkstra_visitor(),
+                                 color_prop_map);
 
   // Find lowest cost node in last rung
   auto target = std::min_element(ladder_rungs_.back().begin(),
                                  ladder_rungs_.back().end(),
                                  [this](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
-                                   return distance_map_.at(a) < distance_map_.at(b);
+                                   return graph_[a].distance < graph_[b].distance;
                                  });
+
+  SearchResult<FloatType> result;
 
   // Reconstruct the path from the predecesor map; remove the artificial start state
   result.trajectory = toStates(reconstructPath(source_, *target));
   result.trajectory.erase(result.trajectory.begin());
 
-  result.cost = distance_map_.at(*target);
+  result.cost = graph_[*target].distance;
 
   return result;
 }
