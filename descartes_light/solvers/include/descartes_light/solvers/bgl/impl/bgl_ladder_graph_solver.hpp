@@ -62,8 +62,7 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 namespace descartes_light
 {
 template <typename FloatType>
-BGLLadderGraphSolver<FloatType>::BGLLadderGraphSolver(unsigned num_threads)
-  : num_threads_{ num_threads } {};
+BGLLadderGraphSolver<FloatType>::BGLLadderGraphSolver(unsigned num_threads) : num_threads_{ num_threads } {};
 
 template <typename FloatType>
 BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
@@ -80,7 +79,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
   using Clock = std::chrono::high_resolution_clock;
   std::chrono::time_point<Clock> start_time = Clock::now();
 #pragma omp parallel for num_threads(num_threads_)
-  for (std::size_t i = 0; i < trajectory.size(); ++i)
+  for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
     std::vector<StateSample<FloatType>> samples = trajectory[static_cast<size_t>(i)]->sample();
     if (!samples.empty())
@@ -91,16 +90,16 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
         if (state_evaluators.empty())
         {
           vd = add_vertex(sample, graph_);
-          ladder_rungs_[i].push_back(vd);
+          ladder_rungs_[static_cast<size_t>(i)].push_back(vd);
         }
         else
         {
-          std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(*samples[i].state);
+          std::pair<bool, FloatType> results = state_evaluators[static_cast<size_t>(i)]->evaluate(*sample.state);
           if (results.first)
           {
             sample.cost += results.second;
             vd = add_vertex(sample, graph_);
-            ladder_rungs_[i].push_back(vd);
+            ladder_rungs_[static_cast<size_t>(i)].push_back(vd);
           }
         }
       }
@@ -129,19 +128,19 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
   cnt = 0;
   start_time = Clock::now();
 #pragma omp parallel for num_threads(num_threads_)
-  for (std::size_t i = 1; i < trajectory.size(); ++i)
+  for (long i = 1; i < static_cast<long>(trajectory.size()); ++i)
   {
-    auto& from = ladder_rungs_[i - 1];
-    const auto& to = ladder_rungs_[i];
+    auto& from = ladder_rungs_[static_cast<size_t>(i) - 1];
+    const auto& to = ladder_rungs_[static_cast<size_t>(i)];
 
     bool found = false;
-    for (std::size_t j = 0; j < from.size(); ++j)
+    for (long j = 0; j < static_cast<long>(from.size()); ++j)
     {
-      StateSample<FloatType> from_sample = graph_[from[j]];
-      for (std::size_t k = 0; k < to.size(); ++k)
+      StateSample<FloatType> from_sample = graph_[from[static_cast<size_t>(j)]];
+      for (long k = 0; k < static_cast<long>(to.size()); ++k)
       {
         // Consider the edge:
-        StateSample<FloatType> to_sample = graph_[to[k]];
+        StateSample<FloatType> to_sample = graph_[to[static_cast<size_t>(k)]];
         std::pair<bool, FloatType> results =
             edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(*from_sample.state, *to_sample.state);
         if (results.first)
@@ -150,11 +149,15 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
           if (i == 1)
           {
             // first edge captures first rung weights
-            boost::add_edge(from[j], to[k], from_sample.cost + results.second + to_sample.cost, graph_);
+            boost::add_edge(from[static_cast<size_t>(j)],
+                            to[static_cast<size_t>(k)],
+                            from_sample.cost + results.second + to_sample.cost,
+                            graph_);
           }
           else
           {
-            boost::add_edge(from[j], to[k], results.second + to_sample.cost, graph_);
+            boost::add_edge(
+                from[static_cast<size_t>(j)], to[static_cast<size_t>(k)], results.second + to_sample.cost, graph_);
           }
         }
       }
@@ -164,7 +167,7 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
     {
 #pragma omp critical
       {
-        status.failed_edges.push_back(static_cast<size_t>(i) - static_cast<size_t>(1));
+        status.failed_edges.push_back(static_cast<size_t>(i) - 1);
       }
     }
 #ifndef NDEBUG
