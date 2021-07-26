@@ -130,4 +130,4 @@ void BGLLadderGraphSolver<FloatType>::writeGraphWithPath(const std::string& file
   boost::write_graphviz(file, sg);
 }
 
-} // namespace descartes_light
+}  // namespace descartes_light
