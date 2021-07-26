@@ -9,6 +9,12 @@ find_dependency(Eigen3)
 find_dependency(OpenMP)
 find_dependency(console_bridge)
 
+if(${CMAKE_VERSION} VERSION_LESS "3.15.0")
+    find_package(Boost REQUIRED COMPONENTS graph)
+else()
+    find_dependency(Boost COMPONENTS graph)
+endif()
+
 if(NOT TARGET OpenMP::OpenMP_CXX)
     find_dependency(Threads)
     add_library(OpenMP::OpenMP_CXX IMPORTED INTERFACE)

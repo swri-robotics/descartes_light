@@ -1,6 +1,7 @@
 #include <descartes_light/core/solver.h>
 #include <descartes_light/edge_evaluators/euclidean_distance_edge_evaluator.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
+#include <descartes_light/solvers/bgl/bgl_ladder_graph_solver.h>
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
@@ -122,6 +123,17 @@ struct SolverConfigurator<LadderGraphSolver<FloatT>>
 template struct SolverConfigurator<LadderGraphSolverF>;
 template struct SolverConfigurator<LadderGraphSolverD>;
 
+// Boost Ladder graph solver configurator
+template <typename FloatT>
+struct SolverConfigurator<BGLLadderGraphSolver<FloatT>>
+{
+  using FloatType = FloatT;
+  typename Solver<FloatT>::Ptr create() { return std::make_unique<BGLLadderGraphSolver<FloatT>>(1); }
+};
+
+template struct SolverConfigurator<BGLLadderGraphSolverF>;
+template struct SolverConfigurator<BGLLadderGraphSolverD>;
+
 /**
  * @brief Test fixture for the solver interface
  */
@@ -144,7 +156,7 @@ public:
       auto zero_state_idx = dist(RAND_GEN);
       zero_state_indices_.push_back(zero_state_idx);
       samplers.push_back(
-          std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, dist(RAND_GEN), state_cost));
+          std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, zero_state_idx, state_cost));
     }
   }
 
@@ -157,8 +169,10 @@ public:
   std::vector<std::size_t> zero_state_indices_;
 };
 
-using Implementations =
-    ::testing::Types<SolverConfigurator<LadderGraphSolverF>, SolverConfigurator<LadderGraphSolverD>>;
+using Implementations = ::testing::Types<SolverConfigurator<LadderGraphSolverF>,
+                                         SolverConfigurator<LadderGraphSolverD>,
+                                         SolverConfigurator<BGLLadderGraphSolverF>,
+                                         SolverConfigurator<BGLLadderGraphSolverD>>;
 
 TYPED_TEST_CASE(SolverFixture, Implementations);
 

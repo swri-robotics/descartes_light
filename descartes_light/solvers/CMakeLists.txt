@@ -1,5 +1,6 @@
 find_package(OpenMP REQUIRED)
 find_package(console_bridge)
+find_package(Boost REQUIRED COMPONENTS graph)
 
 if(NOT TARGET OpenMP::OpenMP_CXX)
   find_package(Threads REQUIRED)
@@ -7,7 +8,6 @@ if(NOT TARGET OpenMP::OpenMP_CXX)
   set_property(TARGET OpenMP::OpenMP_CXX PROPERTY INTERFACE_COMPILE_OPTIONS ${OpenMP_CXX_FLAGS})
   # Only works if the same flag is passed to the linker; use CMake 3.9+ otherwise (Intel, AppleClang)
   set_property(TARGET OpenMP::OpenMP_CXX PROPERTY INTERFACE_LINK_LIBRARIES ${OpenMP_CXX_FLAGS} Threads::Threads)
-
 endif()
 
 if(NOT TARGET console_bridge::console_bridge)
@@ -23,10 +23,18 @@ else()
   endif()
 endif()
 
-add_library(${PROJECT_NAME}_solvers src/ladder_graph/ladder_graph_solver.cpp src/ladder_graph/ladder_graph.cpp
-                                    src/ladder_graph/ladder_graph_dag_search.cpp)
-target_link_libraries(${PROJECT_NAME}_solvers PUBLIC ${PROJECT_NAME}_core OpenMP::OpenMP_CXX
-                                                     console_bridge::console_bridge)
+add_library(
+  ${PROJECT_NAME}_solvers
+  src/bgl/bgl_ladder_graph_solver.cpp
+  src/ladder_graph/ladder_graph_solver.cpp
+  src/ladder_graph/ladder_graph.cpp
+  src/ladder_graph/ladder_graph_dag_search.cpp)
+target_link_libraries(
+  ${PROJECT_NAME}_solvers
+  PUBLIC ${PROJECT_NAME}_core
+         OpenMP::OpenMP_CXX
+         console_bridge::console_bridge
+         Boost::graph)
 target_cxx_version(${PROJECT_NAME}_solvers PUBLIC VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME}_solvers PUBLIC ${DESCARTES_COMPILE_OPTIONS})
 target_compile_definitions(${PROJECT_NAME}_solvers PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
