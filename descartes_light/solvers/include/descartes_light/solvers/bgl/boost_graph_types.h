@@ -39,12 +39,12 @@ struct Vertex
   /** @brief State sample information, assigned by user */
   StateSample<FloatType> sample;
   /** @brief Index of the "rung" of the ladder graph with which this node is associated */
-  long rung_idx;
+  long rung_idx{-1};
 
   /** @brief Distance from the start node, assigned graph algorithm at search-time */
-  FloatType distance;
+  FloatType distance{static_cast<FloatType>(0.0)};
   /** @brief Search status "color" of the vertex: visited, opened, unvisited. Assigned by the graph algorithm at search-time */
-  ColorT color;
+  ColorT color{0};
 };
 
 using GraphvizAttributes = std::map<std::string, std::string>;
