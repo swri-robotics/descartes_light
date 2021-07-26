@@ -62,8 +62,8 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 namespace descartes_light
 {
 template <typename FloatType>
-BGLLadderGraphSolver<FloatType>::BGLLadderGraphSolver(const std::size_t dof, unsigned num_threads)
-  : dof_{ dof }, num_threads_{ num_threads } {};
+BGLLadderGraphSolver<FloatType>::BGLLadderGraphSolver(unsigned num_threads)
+  : num_threads_{ num_threads } {};
 
 template <typename FloatType>
 BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
