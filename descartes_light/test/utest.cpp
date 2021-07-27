@@ -1,3 +1,7 @@
+#include <chrono>
+
+#include <boost/format.hpp>
+
 #include <descartes_light/core/solver.h>
 #include <descartes_light/edge_evaluators/euclidean_distance_edge_evaluator.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
@@ -134,6 +138,55 @@ struct SolverConfigurator<BGLLadderGraphSolver<FloatT>>
 template struct SolverConfigurator<BGLLadderGraphSolverF>;
 template struct SolverConfigurator<BGLLadderGraphSolverD>;
 
+template <class ReturnArg>
+class PerformanceResults
+{
+public:
+  PerformanceResults() {}
+  ~PerformanceResults() {}
+
+  void print(const std::string& header)
+  {
+    std::cout << header << std::endl;
+    std::cout << "\tTime elapsed: " << std::setprecision(5) << time_elapsed << " secs" << std::endl;
+    std::cout << "\tMemory Used: " << std::setprecision(5) << memory_used << std::endl;
+  }
+
+  double time_elapsed;
+  double memory_used;
+
+  ReturnArg return_val;
+};
+
+/**
+ * @brief utility function to create a vector of RandomStateSampler
+ * @param dof
+ * @param n_waypoints
+ * @param samples_per_waypoint
+ * @return A vector
+ */
+template <class FloatType>
+static std::vector<typename WaypointSampler<FloatType>::ConstPtr>
+createSamplers(std::size_t dof, std::size_t n_waypoints, std::size_t samples_per_waypoint, FloatType state_cost)
+{
+  std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
+  std::vector<std::size_t> zero_state_indices;
+  samplers.reserve(n_waypoints);
+  zero_state_indices.reserve(n_waypoints);
+
+  std::uniform_int_distribution<std::size_t> dist(0, samples_per_waypoint - 1);
+
+  // Create waypoint samplers
+  for (std::size_t i = 0; i < n_waypoints; ++i)
+  {
+    auto zero_state_idx = dist(RAND_GEN);
+    zero_state_indices.push_back(zero_state_idx);
+    samplers.push_back(
+        std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, zero_state_idx, state_cost));
+  }
+  return samplers;
+}
+
 /**
  * @brief Test fixture for the solver interface
  */
@@ -145,19 +198,7 @@ public:
 
   SolverFixture() : state_cost(static_cast<FloatType>(1.0))
   {
-    samplers.reserve(n_waypoints);
-    zero_state_indices_.reserve(n_waypoints);
-
-    std::uniform_int_distribution<std::size_t> dist(0, samples_per_waypoint - 1);
-
-    // Create waypoint samplers
-    for (std::size_t i = 0; i < n_waypoints; ++i)
-    {
-      auto zero_state_idx = dist(RAND_GEN);
-      zero_state_indices_.push_back(zero_state_idx);
-      samplers.push_back(
-          std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, zero_state_idx, state_cost));
-    }
+    samplers = createSamplers<FloatType>(static_cast<std::size_t>(dof), n_waypoints, samples_per_waypoint, state_cost);
   }
 
   const Eigen::Index dof{ 6 };
@@ -166,7 +207,6 @@ public:
   const FloatType state_cost;
   SolverConfiguratorT configurator;
   std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
-  std::vector<std::size_t> zero_state_indices_;
 };
 
 template <typename SolverConfiguratorT>
@@ -177,31 +217,25 @@ public:
 
   ParameterizedSolverFixture() : state_cost(static_cast<FloatType>(1.0)) {}
 
-  std::vector<typename WaypointSampler<FloatType>::ConstPtr> createSamplers(std::size_t dof,
-                                                                            std::size_t n_waypoints,
-                                                                            std::size_t samples_per_waypoint)
-  {
-    std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
-    std::vector<std::size_t> zero_state_indices;
-    samplers.reserve(n_waypoints);
-    zero_state_indices.reserve(n_waypoints);
-
-    std::uniform_int_distribution<std::size_t> dist(0, samples_per_waypoint - 1);
-
-    // Create waypoint samplers
-    for (std::size_t i = 0; i < n_waypoints; ++i)
-    {
-      auto zero_state_idx = dist(RAND_GEN);
-      zero_state_indices.push_back(zero_state_idx);
-      samplers.push_back(
-          std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, zero_state_idx, state_cost));
-    }
-    return samplers;
-  }
-
   const FloatType state_cost;
   SolverConfiguratorT configurator;
 };
+
+template <class ReturnArg>
+static PerformanceResults<ReturnArg> measurePerformance(std::function<ReturnArg()> funct)
+{
+  using namespace std::chrono;
+  PerformanceResults<ReturnArg> performance_results;
+
+  auto start_time = steady_clock::now();
+  performance_results.return_val = funct();
+  auto end_time = steady_clock::now();
+  std::chrono::duration<double> diff = end_time - start_time;
+
+  // saving performance results
+  performance_results.time_elapsed = diff.count();
+  return performance_results;
+}
 
 using Implementations = ::testing::Types<SolverConfigurator<LadderGraphSolverF>,
                                          SolverConfigurator<LadderGraphSolverD>,
@@ -284,15 +318,30 @@ TYPED_TEST(ParameterizedSolverFixture, ParameterizedKnownPath)
            samples_per_wp++)
       {
         std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers =
-            this->createSamplers(dof, n_waypoints, samples_per_wp);
+            createSamplers<FloatType>(dof, n_waypoints, samples_per_wp, this->state_cost);
+
         typename Solver<FloatType>::Ptr solver = this->configurator.create();
 
-        BuildStatus status = solver->build(samplers, { edge_eval }, { state_eval });
+        // building graph
+        PerformanceResults<BuildStatus> build_performance_results = measurePerformance<BuildStatus>(
+            [&]() -> BuildStatus { return solver->build(samplers, { edge_eval }, { state_eval }); });
+        BuildStatus status = build_performance_results.return_val;
+
         ASSERT_TRUE(status);
         ASSERT_EQ(status.failed_vertices.size(), 0);
         ASSERT_EQ(status.failed_edges.size(), 0);
 
-        SearchResult<FloatType> result = solver->search();
+        std::string inputs_str = boost::str(boost::format("Inputs: {dof: %f, n_waypoints: %f, samples: %f}") % dof %
+                                            n_waypoints % samples_per_wp);
+        build_performance_results.print("======================= Graph Build Performance Results "
+                                        "======================= \n\t" +
+                                        inputs_str);
+
+        // searching graph
+        PerformanceResults<SearchResult<FloatType>> search_performance_results =
+            measurePerformance<SearchResult<FloatType>>([&]() { return solver->search(); });
+        SearchResult<FloatType> result = search_performance_results.return_val;
+
         ASSERT_EQ(result.trajectory.size(), n_waypoints);
 
         // Total path cost should be zero for edge costs and 2 * state_cost (one from sampling, one from state
@@ -305,6 +354,10 @@ TYPED_TEST(ParameterizedSolverFixture, ParameterizedKnownPath)
           ASSERT_TRUE(state->values.isApprox(
               Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(static_cast<Eigen::Index>(dof))));
         }
+
+        search_performance_results.print("======================= Graph Search Performance Results "
+                                         "======================= \n\t" +
+                                         inputs_str);
       }
     }
   }
