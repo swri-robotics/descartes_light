@@ -21,10 +21,12 @@
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <console_bridge/console.h>
+#include <fstream>
 #include <omp.h>
 DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_light/solvers/bgl/bgl_ladder_graph_solver.h>
+#include <descartes_light/solvers/bgl/utils.h>
 #include <descartes_light/types.h>
 
 #define UNUSED(x) (void)(x)
@@ -296,6 +298,32 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   result.cost = graph_[*target].distance;
 
   return result;
+}
+
+template <typename FloatType>
+void BGLLadderGraphSolver<FloatType>::writeGraphWithPath(const std::string& filename) const
+{
+  std::ofstream file(filename);
+  if (!file.good())
+    throw std::runtime_error("Failed to open file '" + filename + "'");
+
+  SubGraph<FloatType> sg = createDecoratedSubGraph(graph_);
+
+  // Get the path through the graph
+  auto target = std::min_element(ladder_rungs_.back().begin(),
+                                 ladder_rungs_.back().end(),
+                                 [this](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
+                                   return graph_[a].distance < graph_[b].distance;
+                                 });
+  const std::vector<VertexDesc<FloatType>> path = reconstructPath(source_, *target);
+
+  // Colorize the path
+  for (const VertexDesc<FloatType>& v : path)
+  {
+    boost::get(boost::vertex_attribute, sg)[v][FILLCOLOR_ATTR] = "green";
+  }
+
+  boost::write_graphviz(file, sg);
 }
 
 }  // namespace descartes_light

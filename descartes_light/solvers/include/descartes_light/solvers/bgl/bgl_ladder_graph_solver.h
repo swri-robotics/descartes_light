@@ -43,13 +43,23 @@ public:
 
   SearchResult<FloatType> search() override;
 
-  void writeGraph(const std::string& filename) const;
+  inline const BGLGraph<FloatType>& getGraph() const { return graph_; }
+
+  /**
+   * @brief Serializes a graph to file, denoting the path through the graph
+   */
   void writeGraphWithPath(const std::string& filename) const;
 
 private:
+  /**
+   * @brief Reconstructs a path through the graph from the source to the target vertex using the predecessor map
+   */
   std::vector<VertexDesc<FloatType>> reconstructPath(const VertexDesc<FloatType>& source,
                                                      const VertexDesc<FloatType>& target) const;
 
+  /**
+   * @brief Converts a path of vertex descriptors into a path of joint states
+   */
   std::vector<typename State<FloatType>::ConstPtr> toStates(const std::vector<VertexDesc<FloatType>>& path) const;
 
   unsigned num_threads_;

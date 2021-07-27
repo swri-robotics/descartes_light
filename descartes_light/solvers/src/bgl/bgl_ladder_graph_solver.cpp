@@ -16,12 +16,18 @@
  * limitations under the License.
  */
 #include <descartes_light/solvers/bgl/impl/bgl_ladder_graph_solver.hpp>
-#include <descartes_light/solvers/bgl/impl/bgl_graph_writer.hpp>
+#include <descartes_light/solvers/bgl/impl/utils.hpp>
 
 namespace descartes_light
 {
 // Explicit template instantiation
 template class BGLLadderGraphSolver<double>;
 template class BGLLadderGraphSolver<float>;
+
+template SubGraph<double> createDecoratedSubGraph(const BGLGraph<double>& g);
+template SubGraph<float> createDecoratedSubGraph(const BGLGraph<float>& g);
+
+template void writeGraph(const std::string& filename, const BGLGraph<double>& graph);
+template void writeGraph(const std::string& filename, const BGLGraph<float>& graph);
 
 }  // namespace descartes_light
