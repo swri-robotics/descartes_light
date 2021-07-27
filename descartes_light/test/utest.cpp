@@ -175,13 +175,11 @@ class ParameterizedSolverFixture : public ::testing::Test
 public:
   using FloatType = typename SolverConfiguratorT::FloatType;
 
-  ParameterizedSolverFixture() : state_cost(static_cast<FloatType>(1.0))
-  {
-  }
+  ParameterizedSolverFixture() : state_cost(static_cast<FloatType>(1.0)) {}
 
   std::vector<typename WaypointSampler<FloatType>::ConstPtr> createSamplers(std::size_t dof,
-                                               std::size_t n_waypoints,
-                                               std::size_t samples_per_waypoint)
+                                                                            std::size_t n_waypoints,
+                                                                            std::size_t samples_per_waypoint)
   {
     std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
     std::vector<std::size_t> zero_state_indices;
@@ -278,16 +276,15 @@ TYPED_TEST(ParameterizedSolverFixture, ParameterizedKnownPath)
   std::size_t samples_per_waypoint_min = 5;
   std::size_t samples_per_waypoint_max = 10;
 
-  for(std::size_t dof = dof_min; dof <= dof_max; dof++)
+  for (std::size_t dof = dof_min; dof <= dof_max; dof++)
   {
-    for(std::size_t n_waypoints = n_waypoints_min; n_waypoints <= n_waypoints_max; n_waypoints++)
+    for (std::size_t n_waypoints = n_waypoints_min; n_waypoints <= n_waypoints_max; n_waypoints++)
     {
-      for(std::size_t samples_per_wp = samples_per_waypoint_min; samples_per_wp <= samples_per_waypoint_max;
-          samples_per_wp++)
+      for (std::size_t samples_per_wp = samples_per_waypoint_min; samples_per_wp <= samples_per_waypoint_max;
+           samples_per_wp++)
       {
-        std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers = this->createSamplers(dof,
-                                                                                                   n_waypoints,
-                                                                                                   samples_per_wp);
+        std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers =
+            this->createSamplers(dof, n_waypoints, samples_per_wp);
         typename Solver<FloatType>::Ptr solver = this->configurator.create();
 
         BuildStatus status = solver->build(samplers, { edge_eval }, { state_eval });
@@ -298,15 +295,15 @@ TYPED_TEST(ParameterizedSolverFixture, ParameterizedKnownPath)
         SearchResult<FloatType> result = solver->search();
         ASSERT_EQ(result.trajectory.size(), n_waypoints);
 
-        // Total path cost should be zero for edge costs and 2 * state_cost (one from sampling, one from state evaluation) for
-        // state costs
+        // Total path cost should be zero for edge costs and 2 * state_cost (one from sampling, one from state
+        // evaluation) for state costs
         FloatType total_cost = static_cast<FloatType>(n_waypoints) * this->state_cost * 2;
         ASSERT_TRUE(std::abs(result.cost - total_cost) < std::numeric_limits<FloatType>::epsilon());
 
         for (const auto& state : result.trajectory)
         {
-          ASSERT_TRUE(state->values.isApprox(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(
-              static_cast<Eigen::Index>(dof))));
+          ASSERT_TRUE(state->values.isApprox(
+              Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(static_cast<Eigen::Index>(dof))));
         }
       }
     }
