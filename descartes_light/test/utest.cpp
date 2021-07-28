@@ -138,26 +138,6 @@ struct SolverConfigurator<BGLLadderGraphSolver<FloatT>>
 template struct SolverConfigurator<BGLLadderGraphSolverF>;
 template struct SolverConfigurator<BGLLadderGraphSolverD>;
 
-template <class ReturnArg>
-class PerformanceResults
-{
-public:
-  PerformanceResults() {}
-  ~PerformanceResults() {}
-
-  void print(const std::string& header)
-  {
-    std::cout << header << std::endl;
-    std::cout << "\tTime elapsed: " << std::setprecision(5) << time_elapsed << " secs" << std::endl;
-    std::cout << "\tMemory Used: " << std::setprecision(5) << memory_used << std::endl;
-  }
-
-  double time_elapsed;
-  double memory_used;
-
-  ReturnArg return_val;
-};
-
 /**
  * @brief utility function to create a vector of RandomStateSampler
  * @param dof
@@ -221,22 +201,6 @@ public:
   SolverConfiguratorT configurator;
 };
 
-template <class ReturnArg>
-static PerformanceResults<ReturnArg> measurePerformance(std::function<ReturnArg()> funct)
-{
-  using namespace std::chrono;
-  PerformanceResults<ReturnArg> performance_results;
-
-  auto start_time = steady_clock::now();
-  performance_results.return_val = funct();
-  auto end_time = steady_clock::now();
-  std::chrono::duration<double> diff = end_time - start_time;
-
-  // saving performance results
-  performance_results.time_elapsed = diff.count();
-  return performance_results;
-}
-
 using Implementations = ::testing::Types<SolverConfigurator<LadderGraphSolverF>,
                                          SolverConfigurator<LadderGraphSolverD>,
                                          SolverConfigurator<BGLLadderGraphSolverF>,
@@ -296,6 +260,8 @@ TYPED_TEST(SolverFixture, KnownPathTest)
 
 TYPED_TEST(ParameterizedSolverFixture, ParameterizedKnownPath)
 {
+  using namespace std::chrono;
+
   using FloatType = typename TypeParam::FloatType;
 
   // Build a graph where one sample for each waypoint is an all zero state; evaluate edges using the Euclidean distance
@@ -323,24 +289,20 @@ TYPED_TEST(ParameterizedSolverFixture, ParameterizedKnownPath)
         typename Solver<FloatType>::Ptr solver = this->configurator.create();
 
         // building graph
-        PerformanceResults<BuildStatus> build_performance_results = measurePerformance<BuildStatus>(
-            [&]() -> BuildStatus { return solver->build(samplers, { edge_eval }, { state_eval }); });
-        BuildStatus status = build_performance_results.return_val;
+        auto start_time = steady_clock::now();
+        BuildStatus status = solver->build(samplers, { edge_eval }, { state_eval });
+        double graph_build_time_elapsed =
+            (static_cast<std::chrono::duration<double>>(steady_clock::now() - start_time)).count();
 
         ASSERT_TRUE(status);
         ASSERT_EQ(status.failed_vertices.size(), 0);
         ASSERT_EQ(status.failed_edges.size(), 0);
 
-        std::string inputs_str = boost::str(boost::format("Inputs: {dof: %f, n_waypoints: %f, samples: %f}") % dof %
-                                            n_waypoints % samples_per_wp);
-        build_performance_results.print("======================= Graph Build Performance Results "
-                                        "======================= \n\t" +
-                                        inputs_str);
-
         // searching graph
-        PerformanceResults<SearchResult<FloatType>> search_performance_results =
-            measurePerformance<SearchResult<FloatType>>([&]() { return solver->search(); });
-        SearchResult<FloatType> result = search_performance_results.return_val;
+        start_time = steady_clock::now();
+        SearchResult<FloatType> result = solver->search();
+        double graph_search_time_elapsed =
+            (static_cast<std::chrono::duration<double>>(steady_clock::now() - start_time)).count();
 
         ASSERT_EQ(result.trajectory.size(), n_waypoints);
 
@@ -355,9 +317,13 @@ TYPED_TEST(ParameterizedSolverFixture, ParameterizedKnownPath)
               Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(static_cast<Eigen::Index>(dof))));
         }
 
-        search_performance_results.print("======================= Graph Search Performance Results "
-                                         "======================= \n\t" +
-                                         inputs_str);
+        // printing time results
+        std::string inputs_str = boost::str(boost::format("Inputs: {dof: %f, n_waypoints: %f, samples: %f}") % dof %
+                                            n_waypoints % samples_per_wp);
+        std::cout << "======================= Graph Timing Results ======================= " << std::endl;
+        std::cout << "\t" << inputs_str << std::endl;
+        std::cout << "\tGraph Build Time: " << graph_build_time_elapsed << std::endl;
+        std::cout << "\tGraph Search Time: " << graph_search_time_elapsed << std::endl;
       }
     }
   }
