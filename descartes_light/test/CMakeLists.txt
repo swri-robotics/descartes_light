@@ -45,3 +45,6 @@ install(
   RUNTIME DESTINATION bin/tests
   LIBRARY DESTINATION lib/test
   ARCHIVE DESTINATION lib/test)
+
+# Benchmarks
+add_subdirectory(benchmarks)
