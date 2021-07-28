@@ -21,10 +21,12 @@
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/graph/dijkstra_shortest_paths.hpp>
 #include <console_bridge/console.h>
+#include <fstream>
 #include <omp.h>
 DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_light/solvers/bgl/bgl_ladder_graph_solver.h>
+#include <descartes_light/solvers/bgl/utils.h>
 #include <descartes_light/types.h>
 
 #define UNUSED(x) (void)(x)
@@ -89,7 +91,9 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
         VertexDesc<FloatType> vd;
         if (state_evaluators.empty())
         {
-          vd = add_vertex(sample, graph_);
+          vd = boost::add_vertex(graph_);
+          graph_[vd].sample = sample;
+          graph_[vd].rung_idx = static_cast<long>(i);
           ladder_rungs_[static_cast<size_t>(i)].push_back(vd);
         }
         else
@@ -98,7 +102,9 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
           if (results.first)
           {
             sample.cost += results.second;
-            vd = add_vertex(sample, graph_);
+            vd = boost::add_vertex(graph_);
+            graph_[vd].sample = sample;
+            graph_[vd].rung_idx = static_cast<long>(i);
             ladder_rungs_[static_cast<size_t>(i)].push_back(vd);
           }
         }
@@ -136,11 +142,11 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
     bool found = false;
     for (long j = 0; j < static_cast<long>(from.size()); ++j)
     {
-      StateSample<FloatType> from_sample = graph_[from[static_cast<size_t>(j)]];
+      const StateSample<FloatType> from_sample = graph_[from[static_cast<size_t>(j)]].sample;
       for (long k = 0; k < static_cast<long>(to.size()); ++k)
       {
         // Consider the edge:
-        StateSample<FloatType> to_sample = graph_[to[static_cast<size_t>(k)]];
+        const StateSample<FloatType> to_sample = graph_[to[static_cast<size_t>(k)]].sample;
         std::pair<bool, FloatType> results =
             edge_evaluators[static_cast<size_t>(i - 1)]->evaluate(*from_sample.state, *to_sample.state);
         if (results.first)
@@ -186,9 +192,10 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
 
   // Create a zero-value, zero-cost start node and connect it with a zero-cost edge to each node in the first rung
   {
+    source_ = boost::add_vertex(graph_);
     auto arr = std::make_shared<State<FloatType>>();
-    StateSample<FloatType> start_sample = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
-    source_ = add_vertex(start_sample, graph_);
+    graph_[source_].sample = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
+    graph_[source_].rung_idx = -1;
     for (const VertexDesc<FloatType>& target : ladder_rungs_[0])
     {
       boost::add_edge(source_, target, static_cast<FloatType>(0.0), graph_);
@@ -211,20 +218,19 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
 }
 
 template <typename FloatType>
-std::vector<typename State<FloatType>::ConstPtr> BGLLadderGraphSolver<FloatType>::reconstructPath(
-    const VertexDesc<FloatType>& source,
-    const VertexDesc<FloatType>& target,
-    const std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>& predecessor_map) const
+std::vector<VertexDesc<FloatType>>
+BGLLadderGraphSolver<FloatType>::reconstructPath(const VertexDesc<FloatType>& source,
+                                                 const VertexDesc<FloatType>& target) const
 {
   // Reconstruct the path from predecessors
-  std::vector<typename State<FloatType>::ConstPtr> path;
+  std::vector<VertexDesc<FloatType>> path;
 
   VertexDesc<FloatType> v = target;
-  path.push_back(graph_[v].state);
+  path.push_back(v);
 
-  for (VertexDesc<FloatType> u = predecessor_map.at(v); u != v; v = u, u = predecessor_map.at(v))
+  for (VertexDesc<FloatType> u = predecessor_map_.at(v); u != v; v = u, u = predecessor_map_.at(v))
   {
-    path.push_back(graph_[u].state);
+    path.push_back(u);
   }
   std::reverse(path.begin(), path.end());
 
@@ -236,23 +242,33 @@ std::vector<typename State<FloatType>::ConstPtr> BGLLadderGraphSolver<FloatType>
 }
 
 template <typename FloatType>
+std::vector<typename State<FloatType>::ConstPtr>
+BGLLadderGraphSolver<FloatType>::toStates(const std::vector<VertexDesc<FloatType>>& path) const
+{
+  // Get the state information from the graph using the vertex descriptors
+  std::vector<typename State<FloatType>::ConstPtr> out;
+  out.reserve(path.size());
+  std::transform(path.begin(), path.end(), std::back_inserter(out), [this](const VertexDesc<FloatType>& vd) {
+    return graph_[vd].sample.state;
+  });
+
+  return out;
+}
+
+template <typename FloatType>
 SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
 {
-  SearchResult<FloatType> result;
-
   // Internal properties
   auto index_prop_map = boost::get(boost::vertex_index, graph_);
   auto weight_prop_map = boost::get(boost::edge_weight, graph_);
+  auto color_prop_map = boost::get(&Vertex<FloatType>::color, graph_);
+  auto distance_prop_map = boost::get(&Vertex<FloatType>::distance, graph_);
 
-  result.cost = std::numeric_limits<FloatType>::max();
-  result.trajectory = {};
-
-  std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map;
+  predecessor_map_.clear();
   boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(
-      predecessor_map);
+      predecessor_map_);
 
-  std::map<VertexDesc<FloatType>, FloatType> distance_map;
-  boost::associative_property_map<std::map<VertexDesc<FloatType>, FloatType>> distance_prop_map(distance_map);
+  // Perform the search
   boost::dijkstra_shortest_paths(graph_,
                                  source_,
                                  predecessor_prop_map,
@@ -263,22 +279,51 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
                                  std::plus<>(),
                                  std::numeric_limits<FloatType>::max(),
                                  static_cast<FloatType>(0.0),
-                                 boost::default_dijkstra_visitor());
+                                 boost::default_dijkstra_visitor(),
+                                 color_prop_map);
 
   // Find lowest cost node in last rung
   auto target = std::min_element(ladder_rungs_.back().begin(),
                                  ladder_rungs_.back().end(),
-                                 [&distance_map](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
-                                   return distance_map.at(a) < distance_map.at(b);
+                                 [this](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
+                                   return graph_[a].distance < graph_[b].distance;
                                  });
 
+  SearchResult<FloatType> result;
+
   // Reconstruct the path from the predecesor map; remove the artificial start state
-  result.trajectory = reconstructPath(source_, *target, predecessor_map);
+  result.trajectory = toStates(reconstructPath(source_, *target));
   result.trajectory.erase(result.trajectory.begin());
 
-  result.cost = distance_map.at(*target);
+  result.cost = graph_[*target].distance;
 
   return result;
+}
+
+template <typename FloatType>
+void BGLLadderGraphSolver<FloatType>::writeGraphWithPath(const std::string& filename) const
+{
+  std::ofstream file(filename);
+  if (!file.good())
+    throw std::runtime_error("Failed to open file '" + filename + "'");
+
+  SubGraph<FloatType> sg = createDecoratedSubGraph(graph_);
+
+  // Get the path through the graph
+  auto target = std::min_element(ladder_rungs_.back().begin(),
+                                 ladder_rungs_.back().end(),
+                                 [this](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
+                                   return graph_[a].distance < graph_[b].distance;
+                                 });
+  const std::vector<VertexDesc<FloatType>> path = reconstructPath(source_, *target);
+
+  // Colorize the path
+  for (const VertexDesc<FloatType>& v : path)
+  {
+    boost::get(boost::vertex_attribute, sg)[v][FILLCOLOR_ATTR] = "green";
+  }
+
+  boost::write_graphviz(file, sg);
 }
 
 }  // namespace descartes_light
