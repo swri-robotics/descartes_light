@@ -11,7 +11,7 @@ template <typename FloatT>
 struct SolverFactory<LadderGraphSolver<FloatT>>
 {
   using FloatType = FloatT;
-  typename Solver<FloatT>::Ptr create() { return std::make_unique<LadderGraphSolver<FloatT>>(6, 1); }
+  typename Solver<FloatT>::Ptr create() const { return std::make_unique<LadderGraphSolver<FloatT>>(1); }
 };
 
 // Boost Ladder graph solver Factory
@@ -19,7 +19,7 @@ template <typename FloatT>
 struct SolverFactory<BGLLadderGraphSolver<FloatT>>
 {
   using FloatType = FloatT;
-  typename Solver<FloatT>::Ptr create() { return std::make_unique<BGLLadderGraphSolver<FloatT>>(1); }
+  typename Solver<FloatT>::Ptr create() const { return std::make_unique<BGLLadderGraphSolver<FloatT>>(1); }
 };
 
 }  // namespace descartes_light

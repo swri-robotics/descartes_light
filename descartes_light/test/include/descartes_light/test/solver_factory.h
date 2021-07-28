@@ -11,7 +11,7 @@ template <typename SolverT>
 struct SolverFactory
 {
   using FloatType = typename SolverT::FloatT;
-  typename Solver<FloatType>::Ptr create();
+  typename Solver<FloatType>::Ptr create() const;
 };
 
 }  // namespace descartes_light
