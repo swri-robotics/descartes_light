@@ -29,19 +29,13 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 /**
- * @brief Graph search leveraging the Boost Graph Library implementation of Dijkstra's algorithm
+ * @brief Partial implementation for solvers leveraging the Boost Graph Library
  */
 template <typename FloatType>
-class BGLLadderGraphSolver : public Solver<FloatType>
+class BGLSolverBase : public Solver<FloatType>
 {
 public:
-  BGLLadderGraphSolver(unsigned num_threads = std::thread::hardware_concurrency());
-
-  BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                        const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                        const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
-
-  SearchResult<FloatType> search() override;
+  BGLSolverBase(unsigned num_threads = std::thread::hardware_concurrency());
 
   inline const BGLGraph<FloatType>& getGraph() const { return graph_; }
 
@@ -50,7 +44,7 @@ public:
    */
   void writeGraphWithPath(const std::string& filename) const;
 
-private:
+protected:
   /**
    * @brief Reconstructs a path through the graph from the source to the target vertex using the predecessor map
    */
@@ -74,7 +68,49 @@ private:
   std::map<VertexDesc<FloatType>, VertexDesc<FloatType>> predecessor_map_;
 };
 
-using BGLLadderGraphSolverF = BGLLadderGraphSolver<float>;
-using BGLLadderGraphSolverD = BGLLadderGraphSolver<double>;
+/**
+ * @brief BGL solver partial implementation that constructs only vertices in the build function with the assumption that
+ * edges will be added by discovery during the search
+ */
+template <typename FloatType>
+class BGLSolverBaseV : public BGLSolverBase<FloatType>
+{
+public:
+  using BGLSolverBase<FloatType>::BGLSolverBase;
+
+  BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                        const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+                        const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
+};
+
+/**
+ * @brief BGL solver partial implementation that constructs both vertices and edges in the build function
+ */
+template <typename FloatType>
+class BGLSolverBaseVE : public BGLSolverBaseV<FloatType>
+{
+public:
+  using BGLSolverBaseV<FloatType>::BGLSolverBaseV;
+
+  BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                        const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+                        const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
+};
+
+/**
+ * @brief BGL solver implementation that constructs vertices and edges in the build function and uses Dijkstra's
+ * algorithm with a default visitor to search the graph
+ */
+template <typename FloatType>
+class BGLDijkstraSolverVE : public BGLSolverBaseVE<FloatType>
+{
+public:
+  using BGLSolverBaseVE<FloatType>::BGLSolverBaseVE;
+
+  SearchResult<FloatType> search() override;
+};
+
+using BGLDijkstraSolverVEF = BGLDijkstraSolverVE<float>;
+using BGLDijkstraSolverVED = BGLDijkstraSolverVE<double>;
 
 }  // namespace descartes_light

@@ -31,6 +31,8 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 #define UNUSED(x) (void)(x)
 
+using Clock = std::chrono::high_resolution_clock;
+
 static void reportFailedEdges(const std::vector<std::size_t>& indices)
 {
   if (indices.empty())
@@ -64,23 +66,90 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 namespace descartes_light
 {
 template <typename FloatType>
-BGLLadderGraphSolver<FloatType>::BGLLadderGraphSolver(unsigned num_threads) : num_threads_{ num_threads } {};
+BGLSolverBase<FloatType>::BGLSolverBase(unsigned num_threads) : num_threads_{ num_threads } {};
 
 template <typename FloatType>
-BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
-    const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_evaluators,
-    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
+std::vector<VertexDesc<FloatType>> BGLSolverBase<FloatType>::reconstructPath(const VertexDesc<FloatType>& source,
+                                                                             const VertexDesc<FloatType>& target) const
 {
+  // Reconstruct the path from predecessors
+  std::vector<VertexDesc<FloatType>> path;
+
+  VertexDesc<FloatType> v = target;
+  path.push_back(v);
+
+  for (VertexDesc<FloatType> u = predecessor_map_.at(v); u != v; v = u, u = predecessor_map_.at(v))
+  {
+    path.push_back(u);
+  }
+  std::reverse(path.begin(), path.end());
+
+  // Check that the last traversed vertex is the source vertex
+  if (v != source)
+    throw std::runtime_error("Failed to find path through the graph");
+
+  return path;
+}
+
+template <typename FloatType>
+std::vector<typename State<FloatType>::ConstPtr>
+BGLSolverBase<FloatType>::toStates(const std::vector<VertexDesc<FloatType>>& path) const
+{
+  // Get the state information from the graph using the vertex descriptors
+  std::vector<typename State<FloatType>::ConstPtr> out;
+  out.reserve(path.size());
+  std::transform(path.begin(), path.end(), std::back_inserter(out), [this](const VertexDesc<FloatType>& vd) {
+    return graph_[vd].sample.state;
+  });
+
+  return out;
+}
+
+template <typename FloatType>
+void BGLSolverBase<FloatType>::writeGraphWithPath(const std::string& filename) const
+{
+  std::ofstream file(filename);
+  if (!file.good())
+    throw std::runtime_error("Failed to open file '" + filename + "'");
+
+  SubGraph<FloatType> sg = createDecoratedSubGraph(graph_);
+
+  // Get the path through the graph
+  auto target = std::min_element(ladder_rungs_.back().begin(),
+                                 ladder_rungs_.back().end(),
+                                 [this](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
+                                   return graph_[a].distance < graph_[b].distance;
+                                 });
+  const std::vector<VertexDesc<FloatType>> path = reconstructPath(source_, *target);
+
+  // Colorize the path
+  for (const VertexDesc<FloatType>& v : path)
+  {
+    boost::get(boost::vertex_attribute, sg)[v][FILLCOLOR_ATTR] = "green";
+  }
+
+  boost::write_graphviz(file, sg);
+}
+
+template <typename FloatType>
+BuildStatus
+BGLSolverBaseV<FloatType>::buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                                     const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>&,
+                                     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
+{
+  // Convenience aliases
+  auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
+  auto& graph_ = BGLSolverBase<FloatType>::graph_;
+  auto& source_ = BGLSolverBase<FloatType>::source_;
+
   BuildStatus status;
 
   // Build Vertices
   ladder_rungs_.resize(trajectory.size());
   long cnt = 0;
 
-  using Clock = std::chrono::high_resolution_clock;
   std::chrono::time_point<Clock> start_time = Clock::now();
-#pragma omp parallel for num_threads(num_threads_)
+#pragma omp parallel for num_threads(BGLSolverBase <FloatType>::num_threads_)
   for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
     std::vector<StateSample<FloatType>> samples = trajectory[static_cast<size_t>(i)]->sample();
@@ -130,10 +199,43 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
   double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build vertices.", duration);
 
+  // Create a zero-value, zero-cost start node and connect it with a zero-cost edge to each node in the first rung
+  {
+    source_ = boost::add_vertex(graph_);
+    auto arr = std::make_shared<State<FloatType>>();
+    graph_[source_].sample = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
+    graph_[source_].rung_idx = -1;
+    for (const VertexDesc<FloatType>& target : ladder_rungs_[0])
+    {
+      boost::add_edge(source_, target, static_cast<FloatType>(0.0), graph_);
+    }
+  }
+
+  // Report the failed vertices
+  std::sort(status.failed_vertices.begin(), status.failed_vertices.end());
+  // todo: move these to a utilites function
+  reportFailedVertices(status.failed_vertices);
+
+  return status;
+}
+
+template <typename FloatType>
+BuildStatus
+BGLSolverBaseVE<FloatType>::buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+                                      const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_evaluators,
+                                      const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
+{
+  // Convenience aliases
+  auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
+  auto& graph_ = BGLSolverBase<FloatType>::graph_;
+
+  // Use the base class to build the vertices
+  BuildStatus status = BGLSolverBaseV<FloatType>::buildImpl(trajectory, edge_evaluators, state_evaluators);
+
   // Build Edges
-  cnt = 0;
-  start_time = Clock::now();
-#pragma omp parallel for num_threads(num_threads_)
+  long cnt = 0;
+  auto start_time = Clock::now();
+#pragma omp parallel for num_threads(BGLSolverBase <FloatType>::num_threads_)
   for (long i = 1; i < static_cast<long>(trajectory.size()); ++i)
   {
     auto& from = ladder_rungs_[static_cast<size_t>(i) - 1];
@@ -187,77 +289,25 @@ BuildStatus BGLLadderGraphSolver<FloatType>::buildImpl(
 #endif
   }  // rung loop
   UNUSED(cnt);
-  duration = std::chrono::duration<double>(Clock::now() - start_time).count();
+  auto duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build edges.", duration);
 
-  // Create a zero-value, zero-cost start node and connect it with a zero-cost edge to each node in the first rung
-  {
-    source_ = boost::add_vertex(graph_);
-    auto arr = std::make_shared<State<FloatType>>();
-    graph_[source_].sample = StateSample<FloatType>{ arr, static_cast<FloatType>(0.0) };
-    graph_[source_].rung_idx = -1;
-    for (const VertexDesc<FloatType>& target : ladder_rungs_[0])
-    {
-      boost::add_edge(source_, target, static_cast<FloatType>(0.0), graph_);
-    }
-  }
-
-  std::sort(status.failed_vertices.begin(), status.failed_vertices.end());
+  // Report the failed edges
   std::sort(status.failed_edges.begin(), status.failed_edges.end());
-
-  // todo: move these to a utilites function
-  reportFailedVertices(status.failed_vertices);
   reportFailedEdges(status.failed_edges);
-
-  if (!status)
-  {
-    CONSOLE_BRIDGE_logError("LadderGraphSolver failed to build graph.");
-  }
 
   return status;
 }
 
 template <typename FloatType>
-std::vector<VertexDesc<FloatType>>
-BGLLadderGraphSolver<FloatType>::reconstructPath(const VertexDesc<FloatType>& source,
-                                                 const VertexDesc<FloatType>& target) const
+SearchResult<FloatType> BGLDijkstraSolverVE<FloatType>::search()
 {
-  // Reconstruct the path from predecessors
-  std::vector<VertexDesc<FloatType>> path;
+  // Convenience aliases
+  auto& graph_ = BGLSolverBase<FloatType>::graph_;
+  const auto& source_ = BGLSolverBase<FloatType>::source_;
+  auto& predecessor_map_ = BGLSolverBase<FloatType>::predecessor_map_;
+  const auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
 
-  VertexDesc<FloatType> v = target;
-  path.push_back(v);
-
-  for (VertexDesc<FloatType> u = predecessor_map_.at(v); u != v; v = u, u = predecessor_map_.at(v))
-  {
-    path.push_back(u);
-  }
-  std::reverse(path.begin(), path.end());
-
-  // Check that the last traversed vertex is the source vertex
-  if (v != source)
-    throw std::runtime_error("Failed to find path through the graph");
-
-  return path;
-}
-
-template <typename FloatType>
-std::vector<typename State<FloatType>::ConstPtr>
-BGLLadderGraphSolver<FloatType>::toStates(const std::vector<VertexDesc<FloatType>>& path) const
-{
-  // Get the state information from the graph using the vertex descriptors
-  std::vector<typename State<FloatType>::ConstPtr> out;
-  out.reserve(path.size());
-  std::transform(path.begin(), path.end(), std::back_inserter(out), [this](const VertexDesc<FloatType>& vd) {
-    return graph_[vd].sample.state;
-  });
-
-  return out;
-}
-
-template <typename FloatType>
-SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
-{
   // Internal properties
   auto index_prop_map = boost::get(boost::vertex_index, graph_);
   auto weight_prop_map = boost::get(boost::edge_weight, graph_);
@@ -285,45 +335,20 @@ SearchResult<FloatType> BGLLadderGraphSolver<FloatType>::search()
   // Find lowest cost node in last rung
   auto target = std::min_element(ladder_rungs_.back().begin(),
                                  ladder_rungs_.back().end(),
-                                 [this](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
+                                 [&](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
                                    return graph_[a].distance < graph_[b].distance;
                                  });
 
   SearchResult<FloatType> result;
 
   // Reconstruct the path from the predecesor map; remove the artificial start state
-  result.trajectory = toStates(reconstructPath(source_, *target));
+  const auto vd_path = BGLSolverBase<FloatType>::reconstructPath(source_, *target);
+  result.trajectory = BGLSolverBase<FloatType>::toStates(vd_path);
   result.trajectory.erase(result.trajectory.begin());
 
   result.cost = graph_[*target].distance;
 
   return result;
-}
-
-template <typename FloatType>
-void BGLLadderGraphSolver<FloatType>::writeGraphWithPath(const std::string& filename) const
-{
-  std::ofstream file(filename);
-  if (!file.good())
-    throw std::runtime_error("Failed to open file '" + filename + "'");
-
-  SubGraph<FloatType> sg = createDecoratedSubGraph(graph_);
-
-  // Get the path through the graph
-  auto target = std::min_element(ladder_rungs_.back().begin(),
-                                 ladder_rungs_.back().end(),
-                                 [this](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
-                                   return graph_[a].distance < graph_[b].distance;
-                                 });
-  const std::vector<VertexDesc<FloatType>> path = reconstructPath(source_, *target);
-
-  // Colorize the path
-  for (const VertexDesc<FloatType>& v : path)
-  {
-    boost::get(boost::vertex_attribute, sg)[v][FILLCOLOR_ATTR] = "green";
-  }
-
-  boost::write_graphviz(file, sg);
 }
 
 }  // namespace descartes_light
