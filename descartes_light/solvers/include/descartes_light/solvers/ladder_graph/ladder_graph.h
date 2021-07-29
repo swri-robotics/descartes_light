@@ -91,12 +91,6 @@ public:
   using NodeList = std::vector<Node<FloatType>>;
 
   /**
-   * @brief LadderGraph
-   * @param dof The number of joints that constitute a single 'DOF'
-   */
-  explicit LadderGraph(std::size_t dof) noexcept;
-
-  /**
    * @brief resize Resizes the internal ladder to have 'n_rung' rungs
    * @param n_rungs Number of individual rungs
    */
@@ -137,12 +131,6 @@ public:
    */
   std::size_t size() const noexcept;
 
-  /**
-   * @brief The number of degrees of freedom
-   * @return
-   */
-  std::size_t dof() const noexcept;
-
   void removeRung(std::size_t rung_index);
 
   void clearNodes(std::size_t rung_index);
@@ -161,7 +149,6 @@ public:
   void clear();
 
 private:
-  const std::size_t dof_;
   std::vector<Rung<FloatType>> rungs_;
 };
 

@@ -23,12 +23,6 @@
 namespace descartes_light
 {
 template <typename FloatType>
-LadderGraph<FloatType>::LadderGraph(std::size_t dof) noexcept : dof_(dof)
-{
-  assert(dof != 0);
-}
-
-template <typename FloatType>
 void LadderGraph<FloatType>::resize(std::size_t n_rungs)
 {
   rungs_.resize(n_rungs);
@@ -38,12 +32,6 @@ template <typename FloatType>
 std::size_t LadderGraph<FloatType>::size() const noexcept
 {
   return rungs_.size();
-}
-
-template <typename FloatType>
-std::size_t LadderGraph<FloatType>::dof() const noexcept
-{
-  return dof_;
 }
 
 template <typename FloatType>
