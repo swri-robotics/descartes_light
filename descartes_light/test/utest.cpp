@@ -41,8 +41,8 @@ public:
 
 using Implementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
                                          SolverFactory<LadderGraphSolverD>,
-                                         SolverFactory<BGLLadderGraphSolverF>,
-                                         SolverFactory<BGLLadderGraphSolverD>>;
+                                         SolverFactory<BGLDijkstraSolverVEF>,
+                                         SolverFactory<BGLDijkstraSolverVED>>;
 
 TYPED_TEST_CASE(SolverFixture, Implementations);
 

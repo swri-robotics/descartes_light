@@ -81,8 +81,8 @@ int main(int, char**)
   benchmark(SolverFactory<LadderGraphSolverF>());
 
   // BGL ladder graph
-  benchmark(SolverFactory<BGLLadderGraphSolverD>());
-  benchmark(SolverFactory<BGLLadderGraphSolverF>());
+  benchmark(SolverFactory<BGLDijkstraSolverVED>());
+  benchmark(SolverFactory<BGLDijkstraSolverVEF>());
 
   return 0;
 }

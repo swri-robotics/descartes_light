@@ -16,10 +16,10 @@ struct SolverFactory<LadderGraphSolver<FloatT>>
 
 // Boost Ladder graph solver Factory
 template <typename FloatT>
-struct SolverFactory<BGLLadderGraphSolver<FloatT>>
+struct SolverFactory<BGLDijkstraSolverVE<FloatT>>
 {
   using FloatType = FloatT;
-  typename Solver<FloatT>::Ptr create() const { return std::make_unique<BGLLadderGraphSolver<FloatT>>(1); }
+  typename Solver<FloatT>::Ptr create() const { return std::make_unique<BGLDijkstraSolverVE<FloatT>>(1); }
 };
 
 }  // namespace descartes_light
