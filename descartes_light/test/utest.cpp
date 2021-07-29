@@ -1,11 +1,9 @@
-#include <chrono>
-
-#include <boost/format.hpp>
-
 #include <descartes_light/core/solver.h>
 #include <descartes_light/edge_evaluators/euclidean_distance_edge_evaluator.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
 #include <descartes_light/solvers/bgl/bgl_ladder_graph_solver.h>
+#include <descartes_light/test/utils.h>
+#include <descartes_light/test/solver_factory.h>
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
@@ -19,162 +17,14 @@ DESCARTES_IGNORE_WARNINGS_POP
 
 using namespace descartes_light;
 
-static std::mt19937 RAND_GEN(0);
-
-template <typename FloatType>
-typename State<FloatType>::Ptr generateRandomState(Eigen::Index dof)
-{
-  std::normal_distribution<FloatType> dist;
-  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> sol(dof);
-  for (Eigen::Index i = 0; i < dof; ++i)
-    sol(i) = dist(RAND_GEN);
-
-  return std::make_shared<State<FloatType>>(sol);
-}
-
-/**
- * @brief Waypoint sampler that creates a set of random joint states with one all-zero joint state at a specified index
- */
-template <typename FloatType>
-class RandomStateSampler : public WaypointSampler<FloatType>
-{
-public:
-  RandomStateSampler(const Eigen::Index dof,
-                     const std::size_t n_samples,
-                     const std::size_t zero_state_idx,
-                     const FloatType state_cost)
-    : dof_(dof), n_samples_(n_samples), zero_state_idx_(zero_state_idx), state_cost_(state_cost)
-  {
-  }
-
-  typename std::vector<StateSample<FloatType>> sample() const override
-  {
-    // Generate some random joint states
-    typename std::vector<StateSample<FloatType>> waypoints;
-    waypoints.reserve(n_samples_);
-    std::generate_n(std::back_inserter(waypoints), n_samples_, [this]() {
-      return StateSample<FloatType>{ generateRandomState<FloatType>(dof_), state_cost_ };
-    });
-
-    // Set one of the joint states to all zeros
-    waypoints.at(zero_state_idx_) = StateSample<FloatType>{
-      std::make_shared<State<FloatType>>(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof_)), state_cost_
-    };
-
-    return waypoints;
-  }
-
-private:
-  const Eigen::Index dof_;
-  const std::size_t n_samples_;
-  const std::size_t zero_state_idx_;
-  const FloatType state_cost_;
-};
-
-/**
- * @brief Edge evaluator class that evaluates all edges to be either valid or invalid, depending on the input, with a
- * cost of zero
- */
-template <typename FloatType>
-class NaiveEdgeEvaluator : public EdgeEvaluator<FloatType>
-{
-public:
-  NaiveEdgeEvaluator(const bool valid) : valid_(valid) {}
-
-  std::pair<bool, FloatType> evaluate(const State<FloatType>&, const State<FloatType>&) const override
-  {
-    return std::make_pair(valid_, 0.0);
-  }
-
-private:
-  const bool valid_;
-};
-
-/**
- * @brief State evaluator that evaluates all states to be either valid or invalid, depending on the input, with a cost
- * of zero
- */
-template <typename FloatType>
-class NaiveStateEvaluator : public StateEvaluator<FloatType>
-{
-public:
-  NaiveStateEvaluator(const bool valid, const FloatType cost) : valid_(valid), cost_(cost) {}
-
-  std::pair<bool, FloatType> evaluate(const State<FloatType>&) const override { return std::make_pair(valid_, cost_); }
-
-private:
-  const bool valid_;
-  const FloatType cost_;
-};
-
-/**
- * @brief Object for configuring a Descartes solver for the unit test fixture
- */
-template <typename SolverT>
-struct SolverConfigurator
-{
-  using FloatType = typename SolverT::FloatT;
-  typename Solver<FloatType>::Ptr create();
-};
-
-// Ladder graph solver configurator
-template <typename FloatT>
-struct SolverConfigurator<LadderGraphSolver<FloatT>>
-{
-  using FloatType = FloatT;
-  typename Solver<FloatT>::Ptr create() { return std::make_unique<LadderGraphSolver<FloatT>>(6, 1); }
-};
-template struct SolverConfigurator<LadderGraphSolverF>;
-template struct SolverConfigurator<LadderGraphSolverD>;
-
-// Boost Ladder graph solver configurator
-template <typename FloatT>
-struct SolverConfigurator<BGLLadderGraphSolver<FloatT>>
-{
-  using FloatType = FloatT;
-  typename Solver<FloatT>::Ptr create() { return std::make_unique<BGLLadderGraphSolver<FloatT>>(1); }
-};
-
-template struct SolverConfigurator<BGLLadderGraphSolverF>;
-template struct SolverConfigurator<BGLLadderGraphSolverD>;
-
-/**
- * @brief utility function to create a vector of RandomStateSampler
- * @param dof
- * @param n_waypoints
- * @param samples_per_waypoint
- * @return A vector
- */
-template <class FloatType>
-static std::vector<typename WaypointSampler<FloatType>::ConstPtr>
-createSamplers(std::size_t dof, std::size_t n_waypoints, std::size_t samples_per_waypoint, FloatType state_cost)
-{
-  std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
-  std::vector<std::size_t> zero_state_indices;
-  samplers.reserve(n_waypoints);
-  zero_state_indices.reserve(n_waypoints);
-
-  std::uniform_int_distribution<std::size_t> dist(0, samples_per_waypoint - 1);
-
-  // Create waypoint samplers
-  for (std::size_t i = 0; i < n_waypoints; ++i)
-  {
-    auto zero_state_idx = dist(RAND_GEN);
-    zero_state_indices.push_back(zero_state_idx);
-    samplers.push_back(
-        std::make_shared<RandomStateSampler<FloatType>>(dof, samples_per_waypoint, zero_state_idx, state_cost));
-  }
-  return samplers;
-}
-
 /**
  * @brief Test fixture for the solver interface
  */
-template <typename SolverConfiguratorT>
+template <typename SolverFactoryT>
 class SolverFixture : public ::testing::Test
 {
 public:
-  using FloatType = typename SolverConfiguratorT::FloatType;
+  using FloatType = typename SolverFactoryT::FloatType;
 
   SolverFixture() : state_cost(static_cast<FloatType>(1.0))
   {
@@ -185,34 +35,21 @@ public:
   const std::size_t n_waypoints{ 10 };
   const std::size_t samples_per_waypoint{ 4 };
   const FloatType state_cost;
-  SolverConfiguratorT configurator;
+  SolverFactoryT Factory;
   std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
 };
 
-template <typename SolverConfiguratorT>
-class ParameterizedSolverFixture : public ::testing::Test
-{
-public:
-  using FloatType = typename SolverConfiguratorT::FloatType;
-
-  ParameterizedSolverFixture() : state_cost(static_cast<FloatType>(1.0)) {}
-
-  const FloatType state_cost;
-  SolverConfiguratorT configurator;
-};
-
-using Implementations = ::testing::Types<SolverConfigurator<LadderGraphSolverF>,
-                                         SolverConfigurator<LadderGraphSolverD>,
-                                         SolverConfigurator<BGLLadderGraphSolverF>,
-                                         SolverConfigurator<BGLLadderGraphSolverD>>;
+using Implementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
+                                         SolverFactory<LadderGraphSolverD>,
+                                         SolverFactory<BGLLadderGraphSolverF>,
+                                         SolverFactory<BGLLadderGraphSolverD>>;
 
 TYPED_TEST_CASE(SolverFixture, Implementations);
-TYPED_TEST_CASE(ParameterizedSolverFixture, Implementations);
 
 TYPED_TEST(SolverFixture, NoEdges)
 {
   using FloatType = typename TypeParam::FloatType;
-  typename Solver<FloatType>::Ptr solver = this->configurator.create();
+  typename Solver<FloatType>::Ptr solver = this->Factory.create();
 
   auto edge_eval = std::make_shared<const NaiveEdgeEvaluator<FloatType>>(false);
   auto state_eval = std::make_shared<const NaiveStateEvaluator<FloatType>>(true, this->state_cost);
@@ -232,7 +69,7 @@ TYPED_TEST(SolverFixture, NoEdges)
 TYPED_TEST(SolverFixture, KnownPathTest)
 {
   using FloatType = typename TypeParam::FloatType;
-  typename Solver<FloatType>::Ptr solver = this->configurator.create();
+  typename Solver<FloatType>::Ptr solver = this->Factory.create();
 
   // Build a graph where one sample for each waypoint is an all zero state; evaluate edges using the Euclidean distance
   // metric Since each waypoint has an all-zero state, the shortest path should be through these samples
@@ -255,77 +92,6 @@ TYPED_TEST(SolverFixture, KnownPathTest)
   for (const auto& state : result.trajectory)
   {
     ASSERT_TRUE(state->values.isApprox(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof)));
-  }
-}
-
-TYPED_TEST(ParameterizedSolverFixture, ParameterizedKnownPath)
-{
-  using namespace std::chrono;
-
-  using FloatType = typename TypeParam::FloatType;
-
-  // Build a graph where one sample for each waypoint is an all zero state; evaluate edges using the Euclidean distance
-  // metric Since each waypoint has an all-zero state, the shortest path should be through these samples
-  auto edge_eval = std::make_shared<const EuclideanDistanceEdgeEvaluator<FloatType>>();
-  auto state_eval = std::make_shared<const NaiveStateEvaluator<FloatType>>(true, this->state_cost);
-
-  std::size_t dof_min = 4;
-  std::size_t dof_max = 8;
-  std::size_t n_waypoints_min = 12;
-  std::size_t n_waypoints_max = 20;
-  std::size_t samples_per_waypoint_min = 5;
-  std::size_t samples_per_waypoint_max = 10;
-
-  for (std::size_t dof = dof_min; dof <= dof_max; dof++)
-  {
-    for (std::size_t n_waypoints = n_waypoints_min; n_waypoints <= n_waypoints_max; n_waypoints++)
-    {
-      for (std::size_t samples_per_wp = samples_per_waypoint_min; samples_per_wp <= samples_per_waypoint_max;
-           samples_per_wp++)
-      {
-        std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers =
-            createSamplers<FloatType>(dof, n_waypoints, samples_per_wp, this->state_cost);
-
-        typename Solver<FloatType>::Ptr solver = this->configurator.create();
-
-        // building graph
-        auto start_time = steady_clock::now();
-        BuildStatus status = solver->build(samplers, { edge_eval }, { state_eval });
-        double graph_build_time_elapsed =
-            (static_cast<std::chrono::duration<double>>(steady_clock::now() - start_time)).count();
-
-        ASSERT_TRUE(status);
-        ASSERT_EQ(status.failed_vertices.size(), 0);
-        ASSERT_EQ(status.failed_edges.size(), 0);
-
-        // searching graph
-        start_time = steady_clock::now();
-        SearchResult<FloatType> result = solver->search();
-        double graph_search_time_elapsed =
-            (static_cast<std::chrono::duration<double>>(steady_clock::now() - start_time)).count();
-
-        ASSERT_EQ(result.trajectory.size(), n_waypoints);
-
-        // Total path cost should be zero for edge costs and 2 * state_cost (one from sampling, one from state
-        // evaluation) for state costs
-        FloatType total_cost = static_cast<FloatType>(n_waypoints) * this->state_cost * 2;
-        ASSERT_TRUE(std::abs(result.cost - total_cost) < std::numeric_limits<FloatType>::epsilon());
-
-        for (const auto& state : result.trajectory)
-        {
-          ASSERT_TRUE(state->values.isApprox(
-              Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(static_cast<Eigen::Index>(dof))));
-        }
-
-        // printing time results
-        std::string inputs_str = boost::str(boost::format("Inputs: {dof: %f, n_waypoints: %f, samples: %f}") % dof %
-                                            n_waypoints % samples_per_wp);
-        std::cout << "======================= Graph Timing Results ======================= " << std::endl;
-        std::cout << "\t" << inputs_str << std::endl;
-        std::cout << "\tGraph Build Time: " << graph_build_time_elapsed << std::endl;
-        std::cout << "\tGraph Search Time: " << graph_search_time_elapsed << std::endl;
-      }
-    }
   }
 }
 
