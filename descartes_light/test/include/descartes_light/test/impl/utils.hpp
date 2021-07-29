@@ -77,7 +77,7 @@ std::pair<bool, FloatType> NaiveStateEvaluator<FloatType>::evaluate(const State<
 }
 
 template <class FloatType>
-static std::vector<typename WaypointSampler<FloatType>::ConstPtr>
+std::vector<typename WaypointSampler<FloatType>::ConstPtr>
 createSamplers(std::size_t dof, std::size_t n_waypoints, std::size_t samples_per_waypoint, FloatType state_cost)
 {
   std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
