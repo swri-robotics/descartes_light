@@ -36,4 +36,5 @@ install(
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
-install(DIRECTORY include/${PROJECT_NAME}/ DESTINATION include/${PROJECT_NAME})
+# Install headers
+install(DIRECTORY include/ DESTINATION include/)

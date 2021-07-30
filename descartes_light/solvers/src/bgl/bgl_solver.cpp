@@ -15,15 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <descartes_light/solvers/bgl/impl/bgl_ladder_graph_solver.hpp>
+#include <descartes_light/solvers/bgl/impl/bgl_solver.hpp>
 #include <descartes_light/solvers/bgl/impl/utils.hpp>
 
 namespace descartes_light
 {
 // Explicit template instantiation
-template class BGLLadderGraphSolver<double>;
-template class BGLLadderGraphSolver<float>;
+// Partial implementations
+template class BGLSolverBase<double>;
+template class BGLSolverBase<float>;
 
+template class BGLSolverBaseV<double>;
+template class BGLSolverBaseV<float>;
+
+template class BGLSolverBaseVE<double>;
+template class BGLSolverBaseVE<float>;
+
+// Full Implementations
+template class BGLDijkstraSolverVE<double>;
+template class BGLDijkstraSolverVE<float>;
+
+// Free functions
 template SubGraph<double> createDecoratedSubGraph(const BGLGraph<double>& g);
 template SubGraph<float> createDecoratedSubGraph(const BGLGraph<float>& g);
 

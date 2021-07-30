@@ -3,7 +3,7 @@
 #include <descartes_light/test/solver_factory.h>
 // Solvers
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
-#include <descartes_light/solvers/bgl/bgl_ladder_graph_solver.h>
+#include <descartes_light/solvers/bgl/bgl_solver.h>
 
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/core/demangle.hpp>
@@ -81,8 +81,8 @@ int main(int, char**)
   benchmark(SolverFactory<LadderGraphSolverF>());
 
   // BGL ladder graph
-  benchmark(SolverFactory<BGLLadderGraphSolverD>());
-  benchmark(SolverFactory<BGLLadderGraphSolverF>());
+  benchmark(SolverFactory<BGLDijkstraSolverVED>());
+  benchmark(SolverFactory<BGLDijkstraSolverVEF>());
 
   return 0;
 }
