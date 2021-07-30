@@ -36,6 +36,9 @@ template class BGLSolverBaseVE<float>;
 template class BGLDijkstraSolverVE<double>;
 template class BGLDijkstraSolverVE<float>;
 
+template class BGLEfficientDijkstraSolverVE<double>;
+template class BGLEfficientDijkstraSolverVE<float>;
+
 // Free functions
 template SubGraph<double> createDecoratedSubGraph(const BGLGraph<double>& g);
 template SubGraph<float> createDecoratedSubGraph(const BGLGraph<float>& g);
