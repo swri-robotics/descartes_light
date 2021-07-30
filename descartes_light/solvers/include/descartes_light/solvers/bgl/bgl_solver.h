@@ -69,11 +69,12 @@ protected:
 };
 
 /**
- * @brief BGL solver partial implementation that constructs only vertices in the build function with the assumption that
- * edges will be added by discovery during the search
+ * @brief BGL Solver Static Vertex Dynamic Edge (SVDE) partial implementation
+ * @details Constructs only vertices in the build function (i.e. statically) with the assumption that edges will be
+ * added during the search (i.e. dynamically)
  */
 template <typename FloatType>
-class BGLSolverBaseV : public BGLSolverBase<FloatType>
+class BGLSolverBaseSVDE : public BGLSolverBase<FloatType>
 {
 public:
   using BGLSolverBase<FloatType>::BGLSolverBase;
@@ -84,33 +85,18 @@ public:
 };
 
 /**
- * @brief BGL solver partial implementation that constructs both vertices and edges in the build function
+ * @brief BGL solver Static Vertex Static Edge (SVSE) partial implementation
+ * @details Constructs both vertices and edges in the build function (i.e. statically)
  */
 template <typename FloatType>
-class BGLSolverBaseVE : public BGLSolverBaseV<FloatType>
+class BGLSolverBaseSVSE : public BGLSolverBaseSVDE<FloatType>
 {
 public:
-  using BGLSolverBaseV<FloatType>::BGLSolverBaseV;
+  using BGLSolverBaseSVDE<FloatType>::BGLSolverBaseSVDE;
 
   BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
                         const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
 };
-
-/**
- * @brief BGL solver implementation that constructs vertices and edges in the build function and uses Dijkstra's
- * algorithm with a default visitor to search the graph
- */
-template <typename FloatType>
-class BGLDijkstraSolverVE : public BGLSolverBaseVE<FloatType>
-{
-public:
-  using BGLSolverBaseVE<FloatType>::BGLSolverBaseVE;
-
-  SearchResult<FloatType> search() override;
-};
-
-using BGLDijkstraSolverVEF = BGLDijkstraSolverVE<float>;
-using BGLDijkstraSolverVED = BGLDijkstraSolverVE<double>;
 
 }  // namespace descartes_light

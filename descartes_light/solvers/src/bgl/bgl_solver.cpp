@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 #include <descartes_light/solvers/bgl/impl/bgl_solver.hpp>
+#include <descartes_light/solvers/bgl/impl/bgl_dijkstra_solver.hpp>
 #include <descartes_light/solvers/bgl/impl/utils.hpp>
 
 namespace descartes_light
@@ -25,15 +26,18 @@ namespace descartes_light
 template class BGLSolverBase<double>;
 template class BGLSolverBase<float>;
 
-template class BGLSolverBaseV<double>;
-template class BGLSolverBaseV<float>;
+template class BGLSolverBaseSVDE<double>;
+template class BGLSolverBaseSVDE<float>;
 
-template class BGLSolverBaseVE<double>;
-template class BGLSolverBaseVE<float>;
+template class BGLSolverBaseSVSE<double>;
+template class BGLSolverBaseSVSE<float>;
 
 // Full Implementations
-template class BGLDijkstraSolverVE<double>;
-template class BGLDijkstraSolverVE<float>;
+template class BGLDijkstraSVSESolver<double>;
+template class BGLDijkstraSVSESolver<float>;
+
+template class BGLEfficientDijkstraSVSESolver<double>;
+template class BGLEfficientDijkstraSVSESolver<float>;
 
 // Free functions
 template SubGraph<double> createDecoratedSubGraph(const BGLGraph<double>& g);

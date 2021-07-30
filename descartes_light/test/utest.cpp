@@ -1,7 +1,7 @@
 #include <descartes_light/core/solver.h>
 #include <descartes_light/edge_evaluators/euclidean_distance_edge_evaluator.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
-#include <descartes_light/solvers/bgl/bgl_solver.h>
+#include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
 #include <descartes_light/test/utils.h>
 #include <descartes_light/test/solver_factory.h>
 
@@ -41,8 +41,10 @@ public:
 
 using Implementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
                                          SolverFactory<LadderGraphSolverD>,
-                                         SolverFactory<BGLDijkstraSolverVEF>,
-                                         SolverFactory<BGLDijkstraSolverVED>>;
+                                         SolverFactory<BGLDijkstraSVSESolverF>,
+                                         SolverFactory<BGLDijkstraSVSESolverD>,
+                                         SolverFactory<BGLEfficientDijkstraSVSESolverF>,
+                                         SolverFactory<BGLEfficientDijkstraSVSESolverD>>;
 
 TYPED_TEST_CASE(SolverFixture, Implementations);
 
@@ -87,7 +89,7 @@ TYPED_TEST(SolverFixture, KnownPathTest)
   // Total path cost should be zero for edge costs and 2 * state_cost (one from sampling, one from state evaluation) for
   // state costs
   FloatType total_cost = static_cast<FloatType>(this->n_waypoints) * this->state_cost * 2;
-  ASSERT_TRUE(std::abs(result.cost - total_cost) < std::numeric_limits<FloatType>::epsilon());
+  ASSERT_DOUBLE_EQ(static_cast<double>(result.cost), static_cast<double>(total_cost));
 
   for (const auto& state : result.trajectory)
   {
