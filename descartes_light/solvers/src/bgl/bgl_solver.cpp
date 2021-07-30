@@ -16,6 +16,7 @@
  * limitations under the License.
  */
 #include <descartes_light/solvers/bgl/impl/bgl_solver.hpp>
+#include <descartes_light/solvers/bgl/impl/bgl_dijkstra_solver.hpp>
 #include <descartes_light/solvers/bgl/impl/utils.hpp>
 
 namespace descartes_light
