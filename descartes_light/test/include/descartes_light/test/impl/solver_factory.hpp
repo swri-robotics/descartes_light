@@ -20,4 +20,14 @@ struct SolverFactory<BGLDijkstraSolverVE<FloatType>>
   typename Solver<FloatType>::Ptr create() const { return std::make_shared<BGLDijkstraSolverVE<FloatType>>(1); }
 };
 
+// Boost efficient Dijkstra graph solver factory
+template <typename FloatType>
+struct SolverFactory<BGLEfficientDijkstraSolverVE<FloatType>>
+{
+  typename Solver<FloatType>::Ptr create() const
+  {
+    return std::make_shared<BGLEfficientDijkstraSolverVE<FloatType>>(1);
+  }
+};
+
 }  // namespace descartes_light

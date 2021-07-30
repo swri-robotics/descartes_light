@@ -84,5 +84,9 @@ int main(int, char**)
   benchmark(SolverFactory<BGLDijkstraSolverVED>());
   benchmark(SolverFactory<BGLDijkstraSolverVEF>());
 
+  // BGL efficient Dijkstra solver
+  benchmark(SolverFactory<BGLEfficientDijkstraSolverVED>());
+  benchmark(SolverFactory<BGLEfficientDijkstraSolverVEF>());
+
   return 0;
 }
