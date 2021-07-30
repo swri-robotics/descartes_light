@@ -89,7 +89,7 @@ TYPED_TEST(SolverFixture, KnownPathTest)
   // Total path cost should be zero for edge costs and 2 * state_cost (one from sampling, one from state evaluation) for
   // state costs
   FloatType total_cost = static_cast<FloatType>(this->n_waypoints) * this->state_cost * 2;
-  ASSERT_TRUE(std::abs(result.cost - total_cost) < std::numeric_limits<FloatType>::epsilon());
+  ASSERT_DOUBLE_EQ(static_cast<double>(result.cost), static_cast<double>(total_cost));
 
   for (const auto& state : result.trajectory)
   {
