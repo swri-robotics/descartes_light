@@ -19,6 +19,7 @@ install(
   LIBRARY DESTINATION lib
   ARCHIVE DESTINATION lib)
 
+# Install headers
 install(DIRECTORY include/ DESTINATION include/)
 
 # Unit Tests
