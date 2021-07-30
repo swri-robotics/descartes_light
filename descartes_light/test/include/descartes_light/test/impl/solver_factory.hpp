@@ -15,18 +15,18 @@ struct SolverFactory<LadderGraphSolver<FloatType>>
 
 // Boost full Dijkstra graph solver factory
 template <typename FloatType>
-struct SolverFactory<BGLDijkstraSolverVE<FloatType>>
+struct SolverFactory<BGLDijkstraSVSESolver<FloatType>>
 {
-  typename Solver<FloatType>::Ptr create() const { return std::make_shared<BGLDijkstraSolverVE<FloatType>>(1); }
+  typename Solver<FloatType>::Ptr create() const { return std::make_shared<BGLDijkstraSVSESolver<FloatType>>(1); }
 };
 
 // Boost efficient Dijkstra graph solver factory
 template <typename FloatType>
-struct SolverFactory<BGLEfficientDijkstraSolverVE<FloatType>>
+struct SolverFactory<BGLEfficientDijkstraSVSESolver<FloatType>>
 {
   typename Solver<FloatType>::Ptr create() const
   {
-    return std::make_shared<BGLEfficientDijkstraSolverVE<FloatType>>(1);
+    return std::make_shared<BGLEfficientDijkstraSVSESolver<FloatType>>(1);
   }
 };
 

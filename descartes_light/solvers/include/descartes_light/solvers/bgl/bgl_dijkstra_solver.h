@@ -10,16 +10,16 @@ namespace descartes_light
  * algorithm with a default visitor to search the graph
  */
 template <typename FloatType>
-class BGLDijkstraSolverVE : public BGLSolverBaseVE<FloatType>
+class BGLDijkstraSVSESolver : public BGLSolverBaseSVSE<FloatType>
 {
 public:
-  using BGLSolverBaseVE<FloatType>::BGLSolverBaseVE;
+  using BGLSolverBaseSVSE<FloatType>::BGLSolverBaseSVSE;
 
   SearchResult<FloatType> search() override;
 };
 
-using BGLDijkstraSolverVEF = BGLDijkstraSolverVE<float>;
-using BGLDijkstraSolverVED = BGLDijkstraSolverVE<double>;
+using BGLDijkstraSVSESolverF = BGLDijkstraSVSESolver<float>;
+using BGLDijkstraSVSESolverD = BGLDijkstraSVSESolver<double>;
 
 /**
  * @brief BGL solver implementation that constructs vertices and edges in the build function and uses Dijkstra's
@@ -27,16 +27,16 @@ using BGLDijkstraSolverVED = BGLDijkstraSolverVE<double>;
  * than allowing it to continue until the distance to all nodes in the graph has been calculated
  */
 template <typename FloatType>
-class BGLEfficientDijkstraSolverVE : public BGLSolverBaseVE<FloatType>
+class BGLEfficientDijkstraSVSESolver : public BGLSolverBaseSVSE<FloatType>
 {
 public:
-  using BGLSolverBaseVE<FloatType>::BGLSolverBaseVE;
+  using BGLSolverBaseSVSE<FloatType>::BGLSolverBaseSVSE;
 
   SearchResult<FloatType> search() override;
 };
 
-using BGLEfficientDijkstraSolverVEF = BGLEfficientDijkstraSolverVE<float>;
-using BGLEfficientDijkstraSolverVED = BGLEfficientDijkstraSolverVE<double>;
+using BGLEfficientDijkstraSVSESolverF = BGLEfficientDijkstraSVSESolver<float>;
+using BGLEfficientDijkstraSVSESolverD = BGLEfficientDijkstraSVSESolver<double>;
 
 }  // namespace descartes_light
 

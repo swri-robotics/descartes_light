@@ -131,10 +131,10 @@ void BGLSolverBase<FloatType>::writeGraphWithPath(const std::string& filename) c
 }
 
 template <typename FloatType>
-BuildStatus
-BGLSolverBaseV<FloatType>::buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                                     const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>&,
-                                     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
+BuildStatus BGLSolverBaseSVDE<FloatType>::buildImpl(
+    const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>&,
+    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
 {
   // Convenience aliases
   auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
@@ -219,17 +219,17 @@ BGLSolverBaseV<FloatType>::buildImpl(const std::vector<typename WaypointSampler<
 }
 
 template <typename FloatType>
-BuildStatus
-BGLSolverBaseVE<FloatType>::buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-                                      const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_evaluators,
-                                      const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
+BuildStatus BGLSolverBaseSVSE<FloatType>::buildImpl(
+    const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
+    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_evaluators,
+    const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
 {
   // Convenience aliases
   auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
   auto& graph_ = BGLSolverBase<FloatType>::graph_;
 
   // Use the base class to build the vertices
-  BuildStatus status = BGLSolverBaseV<FloatType>::buildImpl(trajectory, edge_evaluators, state_evaluators);
+  BuildStatus status = BGLSolverBaseSVDE<FloatType>::buildImpl(trajectory, edge_evaluators, state_evaluators);
 
   // Build Edges
   long cnt = 0;

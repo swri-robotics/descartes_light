@@ -81,12 +81,12 @@ int main(int, char**)
   benchmark(SolverFactory<LadderGraphSolverF>());
 
   // BGL full Dijkstra solver
-  benchmark(SolverFactory<BGLDijkstraSolverVED>());
-  benchmark(SolverFactory<BGLDijkstraSolverVEF>());
+  benchmark(SolverFactory<BGLDijkstraSVSESolverD>());
+  benchmark(SolverFactory<BGLDijkstraSVSESolverF>());
 
   // BGL efficient Dijkstra solver
-  benchmark(SolverFactory<BGLEfficientDijkstraSolverVED>());
-  benchmark(SolverFactory<BGLEfficientDijkstraSolverVEF>());
+  benchmark(SolverFactory<BGLEfficientDijkstraSVSESolverD>());
+  benchmark(SolverFactory<BGLEfficientDijkstraSVSESolverF>());
 
   return 0;
 }

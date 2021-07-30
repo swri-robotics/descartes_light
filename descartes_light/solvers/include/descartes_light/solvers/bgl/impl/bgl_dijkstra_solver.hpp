@@ -11,7 +11,7 @@ DESCARTES_IGNORE_WARNINGS_POP
 namespace descartes_light
 {
 template <typename FloatType>
-SearchResult<FloatType> BGLDijkstraSolverVE<FloatType>::search()
+SearchResult<FloatType> BGLDijkstraSVSESolver<FloatType>::search()
 {
   // Convenience aliases
   auto& graph_ = BGLSolverBase<FloatType>::graph_;
@@ -87,7 +87,7 @@ private:
 };
 
 template <typename FloatType>
-SearchResult<FloatType> BGLEfficientDijkstraSolverVE<FloatType>::search()
+SearchResult<FloatType> BGLEfficientDijkstraSVSESolver<FloatType>::search()
 {
   // Convenience aliases
   auto& graph_ = BGLSolverBase<FloatType>::graph_;
