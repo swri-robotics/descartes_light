@@ -4,6 +4,11 @@
 #include <descartes_light/core/state_evaluator.h>
 #include <descartes_light/core/waypoint_sampler.h>
 
+#include <descartes_light/descartes_macros.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
+#include <random>
+DESCARTES_IGNORE_WARNINGS_POP
+
 namespace descartes_light
 {
 /**
@@ -15,16 +20,18 @@ class RandomStateSampler : public WaypointSampler<FloatType>
 public:
   RandomStateSampler(const Eigen::Index dof,
                      const std::size_t n_samples,
+                     const FloatType state_cost,
                      const std::size_t zero_state_idx,
-                     const FloatType state_cost);
+                     std::shared_ptr<std::mt19937> rand_gen);
 
   typename std::vector<StateSample<FloatType>> sample() const override;
 
 private:
   const Eigen::Index dof_;
   const std::size_t n_samples_;
-  const std::size_t zero_state_idx_;
   const FloatType state_cost_;
+  const std::size_t zero_state_idx_;
+  std::shared_ptr<std::mt19937> rand_gen_;
 };
 
 /**
