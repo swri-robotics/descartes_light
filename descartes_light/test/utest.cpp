@@ -1,7 +1,7 @@
 #include <descartes_light/core/solver.h>
 #include <descartes_light/edge_evaluators/euclidean_distance_edge_evaluator.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
-#include <descartes_light/solvers/bgl/bgl_ladder_graph_solver.h>
+#include <descartes_light/solvers/bgl/bgl_solver.h>
 #include <descartes_light/test/utils.h>
 #include <descartes_light/test/solver_factory.h>
 

@@ -15,7 +15,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <descartes_light/solvers/bgl/impl/bgl_ladder_graph_solver.hpp>
+#include <descartes_light/solvers/bgl/impl/bgl_solver.hpp>
 #include <descartes_light/solvers/bgl/impl/utils.hpp>
 
 namespace descartes_light
