@@ -1,8 +1,10 @@
 #include <descartes_light/core/solver.h>
 #include <descartes_light/edge_evaluators/euclidean_distance_edge_evaluator.h>
-#include <descartes_light/solvers/bgl/dfs_add_all_solver.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
 #include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
+#include <descartes_light/solvers/bgl/dfs_add_all_solver.h>
+#include <descartes_light/solvers/bgl/dfs_sort_ladder_graph_solver.h>
+#include <descartes_light/solvers/bgl/dfs_random_graph_solver.h>
 #include <descartes_light/test/utils.h>
 #include <descartes_light/test/solver_factory.h>
 
@@ -17,147 +19,16 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 DESCARTES_IGNORE_WARNINGS_POP
 
 using namespace descartes_light;
-
-static std::mt19937 RAND_GEN(0);
-
-template <typename FloatType>
-typename State<FloatType>::Ptr generateRandomState(Eigen::Index dof)
-{
-  std::normal_distribution<FloatType> dist;
-  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> sol(dof);
-  for (Eigen::Index i = 0; i < dof; ++i)
-    sol(i) = dist(RAND_GEN);
-
-  return std::make_shared<State<FloatType>>(sol);
-}
-
-/**
- * @brief Waypoint sampler that creates a set of random joint states with one all-zero joint state at a specified index
- */
-template <typename FloatType>
-class RandomStateSampler : public WaypointSampler<FloatType>
-{
-public:
-  RandomStateSampler(const Eigen::Index dof,
-                     const std::size_t n_samples,
-                     const std::size_t zero_state_idx,
-                     const FloatType state_cost)
-    : dof_(dof), n_samples_(n_samples), zero_state_idx_(zero_state_idx), state_cost_(state_cost)
-  {
-  }
-
-  typename std::vector<StateSample<FloatType>> sample() const override
-  {
-    // Generate some random joint states
-    typename std::vector<StateSample<FloatType>> waypoints;
-    waypoints.reserve(n_samples_);
-    std::generate_n(std::back_inserter(waypoints), n_samples_, [this]() {
-      return StateSample<FloatType>{ generateRandomState<FloatType>(dof_), state_cost_ };
-    });
-
-    // Set one of the joint states to all zeros
-    waypoints.at(zero_state_idx_) = StateSample<FloatType>{
-      std::make_shared<State<FloatType>>(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof_)), state_cost_
-    };
-
-    return waypoints;
-  }
-
-private:
-  const Eigen::Index dof_;
-  const std::size_t n_samples_;
-  const std::size_t zero_state_idx_;
-  const FloatType state_cost_;
-};
-
-/**
- * @brief Edge evaluator class that evaluates all edges to be either valid or invalid, depending on the input, with a
- * cost of zero
- */
-template <typename FloatType>
-class NaiveEdgeEvaluator : public EdgeEvaluator<FloatType>
-{
-public:
-  NaiveEdgeEvaluator(const bool valid) : valid_(valid) {}
-
-  std::pair<bool, FloatType> evaluate(const State<FloatType>&, const State<FloatType>&) const override
-  {
-    return std::make_pair(valid_, 0.0);
-  }
-
-private:
-  const bool valid_;
-};
-
-/**
- * @brief State evaluator that evaluates all states to be either valid or invalid, depending on the input, with a cost
- * of zero
- */
-template <typename FloatType>
-class NaiveStateEvaluator : public StateEvaluator<FloatType>
-{
-public:
-  NaiveStateEvaluator(const bool valid, const FloatType cost) : valid_(valid), cost_(cost) {}
-
-  std::pair<bool, FloatType> evaluate(const State<FloatType>&) const override { return std::make_pair(valid_, cost_); }
-
-private:
-  const bool valid_;
-  const FloatType cost_;
-};
-
-/**
- * @brief Object for configuring a Descartes solver for the unit test fixture
- */
-template <typename SolverT>
-struct SolverConfigurator
-{
-  using FloatType = typename SolverT::FloatT;
-  typename Solver<FloatType>::Ptr create();
-};
-
-// Ladder graph solver configurator
-template <typename FloatT>
-struct SolverConfigurator<LadderGraphSolver<FloatT>>
-{
-  using FloatType = FloatT;
-  typename Solver<FloatT>::Ptr create() { return std::make_unique<LadderGraphSolver<FloatT>>(6, 1); }
-};
-template struct SolverConfigurator<LadderGraphSolverF>;
-template struct SolverConfigurator<LadderGraphSolverD>;
-
-// Boost Ladder graph solver configurator
-template <typename FloatT>
-struct SolverConfigurator<BGLLadderGraphSolver<FloatT>>
-{
-  using FloatType = FloatT;
-  typename Solver<FloatT>::Ptr create() { return std::make_unique<BGLLadderGraphSolver<FloatT>>(1); }
-};
-
-template struct SolverConfigurator<BGLLadderGraphSolverF>;
-template struct SolverConfigurator<BGLLadderGraphSolverD>;
-
-
-// DFSSort Ladder graph solver configurator
-template <typename FloatT>
-struct SolverConfigurator<DFSAddAllSolver<FloatT>>
-{
-  using FloatType = FloatT;
-  typename Solver<FloatT>::Ptr create() { return std::make_unique<DFSAddAllSolver<FloatT>>(6, 1); }
-};
-template struct SolverConfigurator<DFSAddAllSolverF>;
-template struct SolverConfigurator<DFSAddAllSolverD>;
-
 /**
  * @brief Test fixture for the solver interface
  */
 template <typename SolverFactoryT>
-class SolverFixture : public ::testing::Test
+class OptimalSolverFixture : public ::testing::Test
 {
 public:
   using FloatType = typename SolverFactoryT::FloatType;
 
-  SolverFixture() : state_cost(static_cast<FloatType>(1.0))
+  OptimalSolverFixture() : state_cost(static_cast<FloatType>(1.0))
   {
     samplers = createSamplers<FloatType>(static_cast<std::size_t>(dof), n_waypoints, samples_per_waypoint, state_cost);
   }
@@ -170,19 +41,16 @@ public:
   std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
 };
 
-using Implementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
+using OptimalImplementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
                                          SolverFactory<LadderGraphSolverD>,
                                          SolverFactory<BGLDijkstraSVSESolverF>,
                                          SolverFactory<BGLDijkstraSVSESolverD>,
                                          SolverFactory<BGLEfficientDijkstraSVSESolverF>,
-                                         SolverFactory<BGLEfficientDijkstraSVSESolverD>
-                                         SolverFactory<DFSSortLadderGraphSolverF>,
-                                         SolverFactory<DFSSortLadderGraphSolverD>,
-                                         SolverFactory<DFSAddAllSolverF>,
-                                         SolverFactory<DFSAddAllSolverD>>;
-TYPED_TEST_CASE(SolverFixture, Implementations);
+                                         SolverFactory<BGLEfficientDijkstraSVSESolverD>>;
 
-TYPED_TEST(SolverFixture, NoEdges)
+TYPED_TEST_SUITE(OptimalSolverFixture, OptimalImplementations);
+
+TYPED_TEST(OptimalSolverFixture, NoEdges)
 {
   using FloatType = typename TypeParam::FloatType;
   typename Solver<FloatType>::Ptr solver = this->Factory.create();
@@ -202,7 +70,7 @@ TYPED_TEST(SolverFixture, NoEdges)
   ASSERT_THROW(solver->search(), std::runtime_error);  // NOLINT
 }
 
-TYPED_TEST(SolverFixture, KnownPathTest)
+TYPED_TEST(OptimalSolverFixture, KnownPathTest)
 {
   using FloatType = typename TypeParam::FloatType;
   typename Solver<FloatType>::Ptr solver = this->Factory.create();
@@ -230,6 +98,21 @@ TYPED_TEST(SolverFixture, KnownPathTest)
     ASSERT_TRUE(state->values.isApprox(Eigen::Matrix<FloatType, Eigen::Dynamic, 1>::Zero(this->dof)));
   }
 }
+
+template <typename SolverFactoryT>
+class NonOptimalSolverFixture : public OptimalSolverFixture<SolverFactoryT>
+{};
+using DynEdgeImplementations  = ::testing::Types<SolverFactory<DFSAddAllSolverF>,
+                                             SolverFactory<DFSAddAllSolverD>,
+                                             SolverFactory<DFSSortLadderGraphSolverF>,
+                                             SolverFactory<DFSSortLadderGraphSolverD>,
+                                             SolverFactory<DFSRandomLadderGraphSolverF>,
+                                             SolverFactory<DFSRandomLadderGraphSolverD>>;
+
+TYPED_TEST_CASE(NonOptimalSolverFixture, DynEdgeImplementations);
+
+TYPED_TEST(NonOptimalSolverFixture, Check) {}
+
 
 int main(int argc, char** argv)
 {

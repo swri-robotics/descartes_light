@@ -15,14 +15,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <descartes_light/solvers/bgl/impl/dfs_add_all_solver.hpp>
-#include <vector>
-#include <list>
+#ifndef DESCARTES_LIGHT_DFS_RANDOM_SOLVER_H
+#define DESCARTES_LIGHT_DFS_RANDOM_SOLVER_H
+
+#include <descartes_light/solvers/bgl/bgl_solver.h>
 
 namespace descartes_light
 {
-// Explicit template instantiation
-template class DFSAddAllSolver<double>;
-template class DFSAddAllSolver<float>;
+
+template <typename FloatType>
+class DFSRandomLadderGraphSolver : public BGLSolverBaseSVDE<FloatType>
+{
+public:
+  using BGLSolverBaseSVDE<FloatType>::BGLSolverBaseSVDE;
+  SearchResult<FloatType> search() override;
+
+};
+
+using DFSRandomLadderGraphSolverF = DFSRandomLadderGraphSolver<float>;
+using DFSRandomLadderGraphSolverD = DFSRandomLadderGraphSolver<double>;
 
 }  // namespace descartes_light
+
+#endif  // DESCARTES_LIGHT_DFS_RANDOM_SOLVER_H

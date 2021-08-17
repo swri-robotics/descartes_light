@@ -82,6 +82,9 @@ public:
   BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
                         const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_eval) override;
+
+protected:
+  std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> edge_eval_{ nullptr };
 };
 
 /**

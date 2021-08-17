@@ -15,19 +15,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_DFS_ALL_SOLVER_H
-#define DESCARTES_LIGHT_DFS_ALL_SOLVER_H
+#ifndef DESCARTES_LIGHT_DFS_SORT_SOLVER_H
+#define DESCARTES_LIGHT_DFS_SORT_SOLVER_H
 
 #include <descartes_light/solvers/bgl/bgl_solver.h>
 
 namespace descartes_light
 {
-/**
- * @brief
- *
- */
+
 template <typename FloatType>
-class DFSAddAllSolver : public BGLSolverBaseSVDE<FloatType>
+class DFSSortLadderGraphSolver : public BGLSolverBaseSVDE<FloatType>
 {
 public:
   using BGLSolverBaseSVDE<FloatType>::BGLSolverBaseSVDE;
@@ -35,9 +32,9 @@ public:
 
 };
 
-using DFSAddAllSolverF = DFSAddAllSolver<float>;
-using DFSAddAllSolverD = DFSAddAllSolver<double>;
+using DFSSortLadderGraphSolverF = DFSSortLadderGraphSolver<float>;
+using DFSSortLadderGraphSolverD = DFSSortLadderGraphSolver<double>;
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_LIGHT_DFS_ALL_SOLVER_H
+#endif  // DESCARTES_LIGHT_DFS_SORT_SOLVER_H
