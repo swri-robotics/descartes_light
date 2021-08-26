@@ -2,6 +2,7 @@
 #define DESCARTES_LIGHT_SOLVERS_BGL_IMPL_BGL_DIJKSTRA_SOLVER_HPP
 
 #include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
+#include <descartes_light/solvers/bgl/impl/event_visitors.hpp>
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
@@ -62,30 +63,6 @@ SearchResult<FloatType> BGLDijkstraSVSESolver<FloatType>::search()
   return result;
 }
 
-/**
- * @brief Visitor for Dijkstra search that terminates the search once a vertex in the last rung has been encountered
- */
-template <typename FloatType>
-class DijkstraTerminateEarlyVisitor : public boost::default_dijkstra_visitor
-{
-public:
-  DijkstraTerminateEarlyVisitor(long last_rung_idx) : last_rung_idx_(last_rung_idx) {}
-
-  /**
-   * @brief Hook for introspecting the search when a new vertex is opened by the search.
-   * @details Throws the vertex descriptor that is the termination of the path once the first vertex in the last rung of
-   * the graph is encountered
-   */
-  void examine_vertex(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g)
-  {
-    if (g[u].rung_idx == last_rung_idx_)
-      throw u;
-  }
-
-private:
-  const long last_rung_idx_;
-};
-
 template <typename FloatType>
 SearchResult<FloatType> BGLEfficientDijkstraSVSESolver<FloatType>::search()
 {
@@ -105,7 +82,8 @@ SearchResult<FloatType> BGLEfficientDijkstraSVSESolver<FloatType>::search()
   boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(
       predecessor_map_);
 
-  DijkstraTerminateEarlyVisitor<FloatType> visitor(static_cast<long>(ladder_rungs_.size() - 1));
+  const long last_rung_idx = static_cast<long>(ladder_rungs_.size() - 1);
+  auto visitor = boost::make_dijkstra_visitor(early_terminator<FloatType>(last_rung_idx));
 
   // Perform the search
   try
