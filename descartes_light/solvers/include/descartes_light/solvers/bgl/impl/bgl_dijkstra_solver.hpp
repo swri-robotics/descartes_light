@@ -4,6 +4,8 @@
 #include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
 #include <descartes_light/solvers/bgl/impl/event_visitors.hpp>
 
+#include <descartes_light/solvers/bgl/boost_graph_types.h>
+
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/graph/dijkstra_shortest_paths.hpp>
@@ -26,14 +28,16 @@ SearchResult<FloatType> BGLDijkstraSVSESolver<FloatType>::search()
   auto color_prop_map = boost::get(&Vertex<FloatType>::color, graph_);
   auto distance_prop_map = boost::get(&Vertex<FloatType>::distance, graph_);
 
-  predecessor_map_.clear();
-  boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(
-      predecessor_map_);
+  typedef typename boost::property_map<BGLGraph<FloatType>, boost::vertex_index_t>::type IndexMap;
+  typedef boost::iterator_property_map<typename std::vector<VertexDesc<FloatType>>::iterator, IndexMap> VertMap;
+  predecessor_map_.resize(boost::num_vertices(graph_), std::numeric_limits<std::size_t>::max());
+  VertMap predecessor_it_map = boost::make_iterator_property_map(predecessor_map_.begin(), index_prop_map);
+
 
   // Perform the search
   boost::dijkstra_shortest_paths(graph_,
                                  source_,
-                                 predecessor_prop_map,
+                                 predecessor_it_map,
                                  distance_prop_map,
                                  weight_prop_map,
                                  index_prop_map,
@@ -78,9 +82,10 @@ SearchResult<FloatType> BGLEfficientDijkstraSVSESolver<FloatType>::search()
   auto color_prop_map = boost::get(&Vertex<FloatType>::color, graph_);
   auto distance_prop_map = boost::get(&Vertex<FloatType>::distance, graph_);
 
-  predecessor_map_.clear();
-  boost::associative_property_map<std::map<VertexDesc<FloatType>, VertexDesc<FloatType>>> predecessor_prop_map(
-      predecessor_map_);
+  typedef typename boost::property_map<BGLGraph<FloatType>, boost::vertex_index_t>::type IndexMap;
+  typedef boost::iterator_property_map<typename std::vector<VertexDesc<FloatType>>::iterator, IndexMap> VertMap;
+  predecessor_map_.resize(boost::num_vertices(graph_), std::numeric_limits<std::size_t>::max());
+  VertMap predecessor_it_map = boost::make_iterator_property_map(predecessor_map_.begin(), index_prop_map);
 
   const long last_rung_idx = static_cast<long>(ladder_rungs_.size() - 1);
   auto visitor = boost::make_dijkstra_visitor(early_terminator<FloatType>(last_rung_idx));
@@ -90,7 +95,7 @@ SearchResult<FloatType> BGLEfficientDijkstraSVSESolver<FloatType>::search()
   {
     boost::dijkstra_shortest_paths(graph_,
                                    source_,
-                                   predecessor_prop_map,
+                                   predecessor_it_map,
                                    distance_prop_map,
                                    weight_prop_map,
                                    index_prop_map,
