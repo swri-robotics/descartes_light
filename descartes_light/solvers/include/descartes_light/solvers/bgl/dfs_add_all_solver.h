@@ -31,7 +31,6 @@ class DFSAddAllSolver : public BGLSolverBaseSVDE<FloatType>
 public:
   using BGLSolverBaseSVDE<FloatType>::BGLSolverBaseSVDE;
   SearchResult<FloatType> search() override;
-
 };
 
 using DFSAddAllSolverF = DFSAddAllSolver<float>;

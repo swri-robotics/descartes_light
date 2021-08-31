@@ -29,7 +29,6 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 
 namespace descartes_light
 {
-
 template <typename FloatType>
 SearchResult<FloatType> DFSAddAllSolver<FloatType>::search()
 {
@@ -50,21 +49,19 @@ SearchResult<FloatType> DFSAddAllSolver<FloatType>::search()
   std::vector<VertexDesc<FloatType>> dist_vec(boost::num_vertices(graph_), std::numeric_limits<std::size_t>::max());
   auto color_prop_map = boost::get(&Vertex<FloatType>::color, graph_);
 
-  auto visitor = boost::make_dfs_visitor(std::make_pair(add_all_dfs<FloatType>(edge_eval_, ladder_rungs_),
-                                         std::make_pair(boost::record_predecessors(predecessor_map_.data(), boost::on_tree_edge()),
-                                                        cost_recorder<FloatType>())));
+  auto visitor = boost::make_dfs_visitor(
+      std::make_pair(add_all_dfs<FloatType>(edge_eval_, ladder_rungs_),
+                     std::make_pair(boost::record_predecessors(predecessor_map_.data(), boost::on_tree_edge()),
+                                    cost_recorder<FloatType>())));
 
   try
   {
-      boost::depth_first_search(graph_,
-                                visitor,
-                                color_prop_map,
-                                source_);
+    boost::depth_first_search(graph_, visitor, color_prop_map, source_);
   }
   catch (const VertexDesc<FloatType>& target)
   {
-    //the source point is always the last vertex inthe vector
-    predecessor_map_[predecessor_map_.size()-1] = predecessor_map_.size()-1;
+    // the source point is always the last vertex inthe vector
+    predecessor_map_[predecessor_map_.size() - 1] = predecessor_map_.size() - 1;
     const auto valid_path = BGLSolverBase<FloatType>::reconstructPath(source_, target);
     result.trajectory = BGLSolverBase<FloatType>::toStates(valid_path);
 
@@ -76,9 +73,8 @@ SearchResult<FloatType> DFSAddAllSolver<FloatType>::search()
   }
 
   throw std::runtime_error("Failed to reach last rung");
-
 }
 
-}  //namespace descartes_light
+}  // namespace descartes_light
 
-#endif //DESCARTES_LIGHT_SOLVERS_BGL_IMPL_ADD_ALL_DYNAMIC_DIJKSTRA_SOLVER_HPP
+#endif  // DESCARTES_LIGHT_SOLVERS_BGL_IMPL_ADD_ALL_DYNAMIC_DIJKSTRA_SOLVER_HPP

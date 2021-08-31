@@ -33,7 +33,6 @@ SearchResult<FloatType> BGLDijkstraSVSESolver<FloatType>::search()
   predecessor_map_.resize(boost::num_vertices(graph_), std::numeric_limits<std::size_t>::max());
   VertMap predecessor_it_map = boost::make_iterator_property_map(predecessor_map_.begin(), index_prop_map);
 
-
   // Perform the search
   boost::dijkstra_shortest_paths(graph_,
                                  source_,

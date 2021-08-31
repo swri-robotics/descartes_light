@@ -42,11 +42,11 @@ public:
 };
 
 using OptimalImplementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
-                                         SolverFactory<LadderGraphSolverD>,
-                                         SolverFactory<BGLDijkstraSVSESolverF>,
-                                         SolverFactory<BGLDijkstraSVSESolverD>,
-                                         SolverFactory<BGLEfficientDijkstraSVSESolverF>,
-                                         SolverFactory<BGLEfficientDijkstraSVSESolverD>>;
+                                                SolverFactory<LadderGraphSolverD>,
+                                                SolverFactory<BGLDijkstraSVSESolverF>,
+                                                SolverFactory<BGLDijkstraSVSESolverD>,
+                                                SolverFactory<BGLEfficientDijkstraSVSESolverF>,
+                                                SolverFactory<BGLEfficientDijkstraSVSESolverD>>;
 
 TYPED_TEST_SUITE(OptimalSolverFixture, OptimalImplementations);
 
@@ -101,9 +101,9 @@ TYPED_TEST(OptimalSolverFixture, KnownPathTest)
 
 template <typename SolverFactoryT>
 class NonOptimalSolverFixture : public OptimalSolverFixture<SolverFactoryT>
-{};
-using DynEdgeImplementations  = ::testing::Types<SolverFactory<DFSAddAllSolverF>,
-                                             SolverFactory<DFSAddAllSolverD>>;
+{
+};
+using DynEdgeImplementations = ::testing::Types<SolverFactory<DFSAddAllSolverF>, SolverFactory<DFSAddAllSolverD>>;
 
 TYPED_TEST_CASE(NonOptimalSolverFixture, DynEdgeImplementations);
 
@@ -129,7 +129,6 @@ TYPED_TEST(NonOptimalSolverFixture, Check)
   FloatType total_cost = static_cast<FloatType>(this->n_waypoints) * this->state_cost * 2;
   ASSERT_DOUBLE_EQ(static_cast<double>(result.cost), static_cast<double>(total_cost));
 }
-
 
 int main(int argc, char** argv)
 {

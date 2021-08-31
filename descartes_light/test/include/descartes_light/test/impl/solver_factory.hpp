@@ -35,11 +35,7 @@ struct SolverFactory<BGLEfficientDijkstraSVSESolver<FloatType>>
 template <typename FloatType>
 struct SolverFactory<DFSAddAllSolver<FloatType>>
 {
-  typename Solver<FloatType>::Ptr create() const
-  {
-    return std::make_shared<DFSAddAllSolver<FloatType>>(1);
-  }
+  typename Solver<FloatType>::Ptr create() const { return std::make_shared<DFSAddAllSolver<FloatType>>(1); }
 };
-
 
 }  // namespace descartes_light
