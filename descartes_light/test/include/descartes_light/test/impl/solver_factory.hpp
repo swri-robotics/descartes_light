@@ -4,8 +4,6 @@
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
 #include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
 #include <descartes_light/solvers/bgl/dfs_add_all_solver.h>
-#include <descartes_light/solvers/bgl/dfs_sort_ladder_graph_solver.h>
-#include <descartes_light/solvers/bgl/dfs_random_graph_solver.h>
 
 namespace descartes_light
 {
@@ -43,24 +41,5 @@ struct SolverFactory<DFSAddAllSolver<FloatType>>
   }
 };
 
-// Boost Sort rungs graph solver factory
-template <typename FloatType>
-struct SolverFactory<DFSSortLadderGraphSolver<FloatType>>
-{
-  typename Solver<FloatType>::Ptr create() const
-  {
-    return std::make_shared<DFSSortLadderGraphSolver<FloatType>>(1);
-  }
-};
-
-// Boost random selection graph solver factory
-template <typename FloatType>
-struct SolverFactory<DFSRandomLadderGraphSolver<FloatType>>
-{
-  typename Solver<FloatType>::Ptr create() const
-  {
-    return std::make_shared<DFSRandomLadderGraphSolver<FloatType>>(1);
-  }
-};
 
 }  // namespace descartes_light

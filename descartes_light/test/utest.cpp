@@ -103,15 +103,32 @@ template <typename SolverFactoryT>
 class NonOptimalSolverFixture : public OptimalSolverFixture<SolverFactoryT>
 {};
 using DynEdgeImplementations  = ::testing::Types<SolverFactory<DFSAddAllSolverF>,
-                                             SolverFactory<DFSAddAllSolverD>,
-                                             SolverFactory<DFSSortLadderGraphSolverF>,
-                                             SolverFactory<DFSSortLadderGraphSolverD>,
-                                             SolverFactory<DFSRandomLadderGraphSolverF>,
-                                             SolverFactory<DFSRandomLadderGraphSolverD>>;
+                                             SolverFactory<DFSAddAllSolverD>>;
 
 TYPED_TEST_CASE(NonOptimalSolverFixture, DynEdgeImplementations);
 
-TYPED_TEST(NonOptimalSolverFixture, Check) {}
+TYPED_TEST(NonOptimalSolverFixture, Check)
+{
+  using FloatType = typename TypeParam::FloatType;
+  typename Solver<FloatType>::Ptr solver = this->Factory.create();
+
+  // Build a graph where one sample for each waypoint is an all zero state; evaluate edges using the Euclidean distance
+  // metric Since each waypoint has an all-zero state, the shortest path should be through these samples
+  auto edge_eval = std::make_shared<const EuclideanDistanceEdgeEvaluator<FloatType>>();
+  auto state_eval = std::make_shared<const NaiveStateEvaluator<FloatType>>(true, this->state_cost);
+
+  BuildStatus status = solver->build(this->samplers, { edge_eval }, { state_eval });
+  ASSERT_TRUE(status);
+  ASSERT_EQ(status.failed_vertices.size(), 0);
+
+  SearchResult<FloatType> result = solver->search();
+  ASSERT_EQ(result.trajectory.size(), this->n_waypoints);
+
+  // Total path cost should be zero for edge costs and 2 * state_cost (one from sampling, one from state evaluation) for
+  // state costs
+  FloatType total_cost = static_cast<FloatType>(this->n_waypoints) * this->state_cost * 2;
+  ASSERT_DOUBLE_EQ(static_cast<double>(result.cost), static_cast<double>(total_cost));
+}
 
 
 int main(int argc, char** argv)
