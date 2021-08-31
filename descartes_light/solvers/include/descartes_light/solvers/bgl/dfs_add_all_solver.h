@@ -23,8 +23,7 @@
 namespace descartes_light
 {
 /**
- * @brief
- *
+ * @brief Depth First Search that adds edged from source node to all ndes in the target rung
  */
 template <typename FloatType>
 class DFSAddAllSolver : public BGLSolverBaseSVDE<FloatType>
