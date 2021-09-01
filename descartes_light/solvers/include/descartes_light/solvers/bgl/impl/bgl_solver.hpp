@@ -77,7 +77,7 @@ std::vector<VertexDesc<FloatType>> BGLSolverBase<FloatType>::reconstructPath(con
   VertexDesc<FloatType> v = target;
   path.push_back(v);
 
-  for (VertexDesc<FloatType> u = predecessor_map_[v]; u != v; v = u, u = predecessor_map_[v])
+  for (VertexDesc<FloatType> u = predecessors_.at(v); u != v; v = u, u = predecessors_.at(v))
   {
     path.push_back(u);
   }

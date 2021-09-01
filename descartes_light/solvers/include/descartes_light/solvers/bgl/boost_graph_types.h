@@ -42,7 +42,7 @@ struct Vertex
   long rung_idx{ -1 };
 
   /** @brief Distance from the start node, assigned graph algorithm at search-time */
-  FloatType distance{ static_cast<FloatType>(0.0) };
+  FloatType distance{ std::numeric_limits<FloatType>::max() };
   /** @brief Search status "color" of the vertex: visited, opened, unvisited. Assigned by the graph algorithm at
    * search-time */
   ColorT color{ 0 };

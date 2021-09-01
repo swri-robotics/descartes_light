@@ -15,27 +15,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_DFS_ALL_SOLVER_H
-#define DESCARTES_LIGHT_DFS_ALL_SOLVER_H
+#ifndef DESCARTES_LIGHT_SOLVERS_BGL_DFS_SOLVER_H
+#define DESCARTES_LIGHT_SOLVERS_BGL_DFS_SOLVER_H
 
 #include <descartes_light/solvers/bgl/bgl_solver.h>
 
 namespace descartes_light
 {
 /**
- * @brief Depth First Search that adds edged from source node to all ndes in the target rung
+ * @brief Depth First Search that adds edged from source node to all nodes in the target rung
  */
 template <typename FloatType>
-class DFSAddAllSolver : public BGLSolverBaseSVDE<FloatType>
+class DepthFirstSVDESolver : public BGLSolverBaseSVDE<FloatType>
 {
 public:
   using BGLSolverBaseSVDE<FloatType>::BGLSolverBaseSVDE;
   SearchResult<FloatType> search() override;
 };
 
-using DFSAddAllSolverF = DFSAddAllSolver<float>;
-using DFSAddAllSolverD = DFSAddAllSolver<double>;
+using DepthFirstSVDESolverF = DepthFirstSVDESolver<float>;
+using DepthFirstSVDESolverD = DepthFirstSVDESolver<double>;
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_LIGHT_DFS_ALL_SOLVER_H
+#endif  // DESCARTES_LIGHT_SOLVERS_BGL_DFS_SOLVER_H

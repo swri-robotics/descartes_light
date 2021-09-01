@@ -2,9 +2,7 @@
 #include <descartes_light/edge_evaluators/euclidean_distance_edge_evaluator.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
 #include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
-#include <descartes_light/solvers/bgl/dfs_add_all_solver.h>
-#include <descartes_light/solvers/bgl/dfs_sort_ladder_graph_solver.h>
-#include <descartes_light/solvers/bgl/dfs_random_graph_solver.h>
+#include <descartes_light/solvers/bgl/bgl_dfs_solver.h>
 #include <descartes_light/test/utils.h>
 #include <descartes_light/test/solver_factory.h>
 
@@ -103,9 +101,9 @@ template <typename SolverFactoryT>
 class NonOptimalSolverFixture : public OptimalSolverFixture<SolverFactoryT>
 {
 };
-using DynEdgeImplementations = ::testing::Types<SolverFactory<DFSAddAllSolverF>, SolverFactory<DFSAddAllSolverD>>;
+using NonOptimalImplementations = ::testing::Types<SolverFactory<DepthFirstSVDESolverF>, SolverFactory<DepthFirstSVDESolverD>>;
 
-TYPED_TEST_CASE(NonOptimalSolverFixture, DynEdgeImplementations);
+TYPED_TEST_CASE(NonOptimalSolverFixture, NonOptimalImplementations);
 
 TYPED_TEST(NonOptimalSolverFixture, Check)
 {
@@ -123,11 +121,6 @@ TYPED_TEST(NonOptimalSolverFixture, Check)
 
   SearchResult<FloatType> result = solver->search();
   ASSERT_EQ(result.trajectory.size(), this->n_waypoints);
-
-  // Total path cost should be zero for edge costs and 2 * state_cost (one from sampling, one from state evaluation) for
-  // state costs
-  FloatType total_cost = static_cast<FloatType>(this->n_waypoints) * this->state_cost * 2;
-  ASSERT_DOUBLE_EQ(static_cast<double>(result.cost), static_cast<double>(total_cost));
 }
 
 int main(int argc, char** argv)
