@@ -44,29 +44,13 @@ using Implementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
                                          SolverFactory<BGLDijkstraSVSESolverF>,
                                          SolverFactory<BGLDijkstraSVSESolverD>,
                                          SolverFactory<BGLEfficientDijkstraSVSESolverF>,
-                                         SolverFactory<BGLEfficientDijkstraSVSESolverD>>;
+                                         SolverFactory<BGLEfficientDijkstraSVSESolverD>,
+                                         SolverFactory<BGLDijkstraSVDESolverF>,
+                                         SolverFactory<BGLDijkstraSVDESolverD>,
+                                         SolverFactory<BGLEfficientDijkstraSVDESolverF>,
+                                         SolverFactory<BGLEfficientDijkstraSVDESolverD>>;
 
 TYPED_TEST_CASE(SolverFixture, Implementations);
-
-TYPED_TEST(SolverFixture, NoEdges)
-{
-  using FloatType = typename TypeParam::FloatType;
-  typename Solver<FloatType>::Ptr solver = this->Factory.create();
-
-  auto edge_eval = std::make_shared<const NaiveEdgeEvaluator<FloatType>>(false);
-  auto state_eval = std::make_shared<const NaiveStateEvaluator<FloatType>>(true, this->state_cost);
-
-  BuildStatus status = solver->build(this->samplers, { edge_eval }, { state_eval });
-  ASSERT_FALSE(status);
-
-  std::vector<std::size_t> expected_failed_edges(this->n_waypoints - 1);
-  std::iota(expected_failed_edges.begin(), expected_failed_edges.end(), 0);
-
-  ASSERT_TRUE(std::equal(status.failed_edges.begin(), status.failed_edges.end(), expected_failed_edges.begin()));
-  ASSERT_EQ(status.failed_vertices.size(), 0);
-
-  ASSERT_THROW(solver->search(), std::runtime_error);  // NOLINT
-}
 
 TYPED_TEST(SolverFixture, KnownPathTest)
 {
