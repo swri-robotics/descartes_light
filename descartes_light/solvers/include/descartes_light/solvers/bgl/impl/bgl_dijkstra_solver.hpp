@@ -142,7 +142,8 @@ SearchResult<FloatType> BGLDijkstraSVDESolver<FloatType>::search()
   predecessors_.resize(boost::num_vertices(graph_), std::numeric_limits<std::size_t>::max());
   PredecessorMap predecessor_it_map = boost::make_iterator_property_map(predecessors_.begin(), index_prop_map);
 
-  auto visitor = boost::make_dijkstra_visitor(add_all_edges_dynamically<FloatType, boost::on_examine_vertex>(edge_eval_, ladder_rungs_));
+  auto visitor = boost::make_dijkstra_visitor(
+      add_all_edges_dynamically<FloatType, boost::on_examine_vertex>(edge_eval_, ladder_rungs_));
 
   // Perform the search
   boost::dijkstra_shortest_paths(graph_,
@@ -199,9 +200,9 @@ SearchResult<FloatType> BGLEfficientDijkstraSVDESolver<FloatType>::search()
   PredecessorMap predecessor_it_map = boost::make_iterator_property_map(predecessors_.begin(), index_prop_map);
 
   const long last_rung_idx = static_cast<long>(ladder_rungs_.size() - 1);
-  auto visitor =
-      boost::make_dijkstra_visitor(std::make_pair(early_terminator<FloatType, boost::on_examine_vertex>(last_rung_idx),
-                                                  add_all_edges_dynamically<FloatType, boost::on_examine_vertex>(edge_eval_, ladder_rungs_)));
+  auto visitor = boost::make_dijkstra_visitor(
+      std::make_pair(early_terminator<FloatType, boost::on_examine_vertex>(last_rung_idx),
+                     add_all_edges_dynamically<FloatType, boost::on_examine_vertex>(edge_eval_, ladder_rungs_)));
 
   // Perform the search
   try
