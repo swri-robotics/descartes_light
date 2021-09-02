@@ -17,6 +17,7 @@
  */
 #include <descartes_light/solvers/bgl/impl/bgl_solver.hpp>
 #include <descartes_light/solvers/bgl/impl/bgl_dijkstra_solver.hpp>
+#include <descartes_light/solvers/bgl/impl/bgl_dfs_solver.hpp>
 #include <descartes_light/solvers/bgl/impl/utils.hpp>
 
 #include <descartes_light/descartes_macros.h>
@@ -65,6 +66,10 @@ INSTANTIATE_PRODUCT(BGLSolverBaseSVDE, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
 // BGL Dijkstra search
 INSTANTIATE_PRODUCT(BGLDijkstraSVSESolver, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
 INSTANTIATE_PRODUCT(BGLDijkstraSVDESolver, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
+
+// BGL DFS
+template class DepthFirstSVDESolver<double>;
+template class DepthFirstSVDESolver<float>;
 
 // Free functions
 template SubGraph<double> createDecoratedSubGraph(const BGLGraph<double>& g);

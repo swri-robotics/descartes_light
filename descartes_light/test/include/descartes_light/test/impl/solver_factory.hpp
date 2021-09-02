@@ -3,6 +3,7 @@
 #include <descartes_light/test/solver_factory.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
 #include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
+#include <descartes_light/solvers/bgl/bgl_dfs_solver.h>
 
 namespace descartes_light
 {
@@ -55,6 +56,13 @@ struct SolverFactory<BGLDijkstraSVDESolver<FloatType, early_terminator<boost::on
   {
     return std::make_shared<BGLDijkstraSVDESolver<FloatType, Visitors>>(Visitors(n_waypoints - 1), 1);
   }
+};
+
+// Boost Add All Edges graph solver factory
+template <typename FloatType>
+struct SolverFactory<DepthFirstSVDESolver<FloatType>>
+{
+  typename Solver<FloatType>::Ptr create() const { return std::make_shared<DepthFirstSVDESolver<FloatType>>(1); }
 };
 
 }  // namespace descartes_light

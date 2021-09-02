@@ -16,5 +16,8 @@ template struct SolverFactory<BGLDijkstraSVDESolver<double, boost::null_visitor>
 // BGL Dijkstra searhc with early termination, static vertex dynamic edge
 template struct SolverFactory<BGLDijkstraSVDESolverF>;
 template struct SolverFactory<BGLDijkstraSVDESolverD>;
+// BGL DFS
+template struct SolverFactory<DepthFirstSVDESolverF>;
+template struct SolverFactory<DepthFirstSVDESolverD>;
 
 }  // namespace descartes_light
