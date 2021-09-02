@@ -1,0 +1,1032 @@
+
+==============================================
+descartes_light::LadderGraphSolver<double>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00243656
+	Graph Search Time (s): 0.000258692
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0358792
+	Graph Search Time (s): 0.00247971
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.130431
+	Graph Search Time (s): 0.00935411
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0116429
+	Graph Search Time (s): 0.00081854
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.186244
+	Graph Search Time (s): 0.0131346
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.701623
+	Graph Search Time (s): 0.0509252
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0234489
+	Graph Search Time (s): 0.00163914
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.382783
+	Graph Search Time (s): 0.0272354
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 1.42743
+	Graph Search Time (s): 0.101936
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00227689
+	Graph Search Time (s): 0.000160633
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0359399
+	Graph Search Time (s): 0.00243103
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.13357
+	Graph Search Time (s): 0.0091891
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0119933
+	Graph Search Time (s): 0.00079703
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.197377
+	Graph Search Time (s): 0.0134936
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.731704
+	Graph Search Time (s): 0.0498279
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0242883
+	Graph Search Time (s): 0.00159907
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.396648
+	Graph Search Time (s): 0.0279445
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 1.47483
+	Graph Search Time (s): 0.101413
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00261499
+	Graph Search Time (s): 0.000160122
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0374096
+	Graph Search Time (s): 0.0024387
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.13886
+	Graph Search Time (s): 0.00915758
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0128889
+	Graph Search Time (s): 0.00079124
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.203851
+	Graph Search Time (s): 0.0132597
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.761373
+	Graph Search Time (s): 0.0509091
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0253922
+	Graph Search Time (s): 0.00159387
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.409508
+	Graph Search Time (s): 0.0272901
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 1.54244
+	Graph Search Time (s): 0.103391
+
+==============================================
+descartes_light::LadderGraphSolver<float>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00243229
+	Graph Search Time (s): 0.000247204
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0343876
+	Graph Search Time (s): 0.00252867
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.125676
+	Graph Search Time (s): 0.00936469
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0117701
+	Graph Search Time (s): 0.00082542
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.183277
+	Graph Search Time (s): 0.013293
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.688243
+	Graph Search Time (s): 0.0508323
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0225777
+	Graph Search Time (s): 0.00159895
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.377831
+	Graph Search Time (s): 0.0280274
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 1.41249
+	Graph Search Time (s): 0.10308
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00215763
+	Graph Search Time (s): 0.000157523
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0334135
+	Graph Search Time (s): 0.00258971
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.123815
+	Graph Search Time (s): 0.00960054
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0113755
+	Graph Search Time (s): 0.000812558
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.182145
+	Graph Search Time (s): 0.0134132
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.671722
+	Graph Search Time (s): 0.0508445
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0228605
+	Graph Search Time (s): 0.00161633
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.364858
+	Graph Search Time (s): 0.0270648
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 1.35868
+	Graph Search Time (s): 0.102318
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00229414
+	Graph Search Time (s): 0.000160696
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0355244
+	Graph Search Time (s): 0.00253623
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.131374
+	Graph Search Time (s): 0.00933504
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0121076
+	Graph Search Time (s): 0.000799732
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.193319
+	Graph Search Time (s): 0.0133877
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.716825
+	Graph Search Time (s): 0.0518234
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0249518
+	Graph Search Time (s): 0.00164868
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.403824
+	Graph Search Time (s): 0.0275735
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 1.45593
+	Graph Search Time (s): 0.103091
+
+==============================================
+descartes_light::BGLDijkstraSVSESolver<double>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.0053907
+	Graph Search Time (s): 0.00208921
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.102103
+	Graph Search Time (s): 0.0394618
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.397147
+	Graph Search Time (s): 0.154179
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0280829
+	Graph Search Time (s): 0.0100585
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.56928
+	Graph Search Time (s): 0.215951
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.22111
+	Graph Search Time (s): 0.84062
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0553989
+	Graph Search Time (s): 0.0206015
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.13686
+	Graph Search Time (s): 0.426602
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.43667
+	Graph Search Time (s): 1.70603
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00560983
+	Graph Search Time (s): 0.00195327
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.108195
+	Graph Search Time (s): 0.0412391
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.441067
+	Graph Search Time (s): 0.158639
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.029035
+	Graph Search Time (s): 0.0102262
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.587674
+	Graph Search Time (s): 0.214426
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.32686
+	Graph Search Time (s): 0.834281
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0675145
+	Graph Search Time (s): 0.0226266
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.18199
+	Graph Search Time (s): 0.417118
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.50825
+	Graph Search Time (s): 1.67709
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00554709
+	Graph Search Time (s): 0.0019434
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.105418
+	Graph Search Time (s): 0.0385694
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.430929
+	Graph Search Time (s): 0.156319
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0301644
+	Graph Search Time (s): 0.0104939
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.596769
+	Graph Search Time (s): 0.20815
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.2402
+	Graph Search Time (s): 0.79643
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0570684
+	Graph Search Time (s): 0.0200318
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.16209
+	Graph Search Time (s): 0.413378
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.51309
+	Graph Search Time (s): 1.60897
+
+==============================================
+descartes_light::BGLDijkstraSVSESolver<float>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00524113
+	Graph Search Time (s): 0.00209268
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0996571
+	Graph Search Time (s): 0.0403386
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.395432
+	Graph Search Time (s): 0.158206
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0267021
+	Graph Search Time (s): 0.0101682
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.543306
+	Graph Search Time (s): 0.221432
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.12035
+	Graph Search Time (s): 0.844389
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0540168
+	Graph Search Time (s): 0.0204793
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.10353
+	Graph Search Time (s): 0.435797
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.28784
+	Graph Search Time (s): 1.70666
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00509135
+	Graph Search Time (s): 0.00197912
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0995166
+	Graph Search Time (s): 0.0398563
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.393455
+	Graph Search Time (s): 0.155115
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0268742
+	Graph Search Time (s): 0.0101625
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.543733
+	Graph Search Time (s): 0.217855
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.12632
+	Graph Search Time (s): 0.82685
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0539647
+	Graph Search Time (s): 0.0203742
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.10432
+	Graph Search Time (s): 0.427904
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.29222
+	Graph Search Time (s): 1.67898
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00527853
+	Graph Search Time (s): 0.00193375
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.101833
+	Graph Search Time (s): 0.0394023
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.405734
+	Graph Search Time (s): 0.153335
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0276839
+	Graph Search Time (s): 0.0100982
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.559359
+	Graph Search Time (s): 0.214546
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.30092
+	Graph Search Time (s): 0.873539
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0568242
+	Graph Search Time (s): 0.0208789
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.14952
+	Graph Search Time (s): 0.443408
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.44756
+	Graph Search Time (s): 1.64936
+
+==============================================
+descartes_light::BGLEfficientDijkstraSVSESolver<double>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00515478
+	Graph Search Time (s): 0.00160953
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.101592
+	Graph Search Time (s): 0.0317945
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.40193
+	Graph Search Time (s): 0.125792
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0272486
+	Graph Search Time (s): 0.00998826
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.553886
+	Graph Search Time (s): 0.206836
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.1762
+	Graph Search Time (s): 0.790343
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0548442
+	Graph Search Time (s): 0.0202055
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.12795
+	Graph Search Time (s): 0.415307
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.37046
+	Graph Search Time (s): 1.62779
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.005287
+	Graph Search Time (s): 0.00135009
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.103523
+	Graph Search Time (s): 0.0273185
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.408211
+	Graph Search Time (s): 0.104549
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0278478
+	Graph Search Time (s): 0.0094415
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.566838
+	Graph Search Time (s): 0.196281
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.20016
+	Graph Search Time (s): 0.757073
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0560024
+	Graph Search Time (s): 0.0195568
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.14441
+	Graph Search Time (s): 0.404141
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.44433
+	Graph Search Time (s): 1.57609
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00540012
+	Graph Search Time (s): 0.00124204
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.104766
+	Graph Search Time (s): 0.0227889
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.414359
+	Graph Search Time (s): 0.0852654
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.028385
+	Graph Search Time (s): 0.00930064
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.575377
+	Graph Search Time (s): 0.190745
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.23258
+	Graph Search Time (s): 0.731222
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0570707
+	Graph Search Time (s): 0.0194364
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.16365
+	Graph Search Time (s): 0.395282
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.50728
+	Graph Search Time (s): 1.53811
+
+==============================================
+descartes_light::BGLEfficientDijkstraSVSESolver<float>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00505608
+	Graph Search Time (s): 0.00164787
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0996373
+	Graph Search Time (s): 0.031717
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.392317
+	Graph Search Time (s): 0.127854
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.026537
+	Graph Search Time (s): 0.00969197
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.54244
+	Graph Search Time (s): 0.20975
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.13687
+	Graph Search Time (s): 0.7969
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.053733
+	Graph Search Time (s): 0.0198332
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.10627
+	Graph Search Time (s): 0.418127
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.28095
+	Graph Search Time (s): 1.63447
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00507656
+	Graph Search Time (s): 0.00144603
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0993952
+	Graph Search Time (s): 0.0277347
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.395292
+	Graph Search Time (s): 0.104189
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.0267391
+	Graph Search Time (s): 0.00950331
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.543216
+	Graph Search Time (s): 0.2021
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.21427
+	Graph Search Time (s): 0.782284
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0552121
+	Graph Search Time (s): 0.0200147
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.11401
+	Graph Search Time (s): 0.404398
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.35013
+	Graph Search Time (s): 1.5758
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00523536
+	Graph Search Time (s): 0.00127905
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.102523
+	Graph Search Time (s): 0.0233869
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.403143
+	Graph Search Time (s): 0.0865604
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.027598
+	Graph Search Time (s): 0.00930681
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.558608
+	Graph Search Time (s): 0.191808
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 2.21453
+	Graph Search Time (s): 0.728823
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0556763
+	Graph Search Time (s): 0.0195945
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 1.14944
+	Graph Search Time (s): 0.398891
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 4.64163
+	Graph Search Time (s): 1.64029
+
+==============================================
+descartes_light::BGLDijkstraSVDESolver<float>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000793751
+	Graph Search Time (s): 0.00663783
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00325009
+	Graph Search Time (s): 0.143953
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00646463
+	Graph Search Time (s): 0.567959
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00357779
+	Graph Search Time (s): 0.035424
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0168997
+	Graph Search Time (s): 0.785302
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0320262
+	Graph Search Time (s): 3.06923
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00758216
+	Graph Search Time (s): 0.0765121
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0407952
+	Graph Search Time (s): 1.59742
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0646635
+	Graph Search Time (s): 6.07175
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000822998
+	Graph Search Time (s): 0.00626391
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00336792
+	Graph Search Time (s): 0.136695
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00659594
+	Graph Search Time (s): 0.543218
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00369486
+	Graph Search Time (s): 0.0339027
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.017704
+	Graph Search Time (s): 0.746481
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0352953
+	Graph Search Time (s): 2.96876
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00716822
+	Graph Search Time (s): 0.0676306
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0345961
+	Graph Search Time (s): 1.51445
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0682114
+	Graph Search Time (s): 5.99436
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000876223
+	Graph Search Time (s): 0.00639183
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00364488
+	Graph Search Time (s): 0.138679
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00715483
+	Graph Search Time (s): 0.558441
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00402957
+	Graph Search Time (s): 0.0351902
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0192043
+	Graph Search Time (s): 0.766829
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0382715
+	Graph Search Time (s): 3.03563
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00793148
+	Graph Search Time (s): 0.0708547
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0380902
+	Graph Search Time (s): 1.55609
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0735012
+	Graph Search Time (s): 6.0952
+
+==============================================
+descartes_light::BGLDijkstraSVDESolver<double>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000818194
+	Graph Search Time (s): 0.00660842
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00332143
+	Graph Search Time (s): 0.142716
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00650801
+	Graph Search Time (s): 0.564325
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00359468
+	Graph Search Time (s): 0.0350447
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0169894
+	Graph Search Time (s): 0.76924
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0335657
+	Graph Search Time (s): 3.0198
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00690845
+	Graph Search Time (s): 0.0688234
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0329884
+	Graph Search Time (s): 1.52792
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0663096
+	Graph Search Time (s): 6.09302
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000863758
+	Graph Search Time (s): 0.00644476
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00354039
+	Graph Search Time (s): 0.141061
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00697691
+	Graph Search Time (s): 0.552337
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00380191
+	Graph Search Time (s): 0.0344487
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0181739
+	Graph Search Time (s): 0.759782
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0373997
+	Graph Search Time (s): 3.05016
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00772594
+	Graph Search Time (s): 0.0693268
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.036251
+	Graph Search Time (s): 1.58056
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0732076
+	Graph Search Time (s): 6.21568
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.00096954
+	Graph Search Time (s): 0.00680582
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0040361
+	Graph Search Time (s): 0.147041
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00778873
+	Graph Search Time (s): 0.570301
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00411039
+	Graph Search Time (s): 0.0345514
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0205712
+	Graph Search Time (s): 0.775005
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.039426
+	Graph Search Time (s): 3.10376
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00839201
+	Graph Search Time (s): 0.0730208
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0409606
+	Graph Search Time (s): 1.62729
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.077443
+	Graph Search Time (s): 6.14409
+
+==============================================
+descartes_light::BGLEfficientDijkstraSVDESolver<float>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000778235
+	Graph Search Time (s): 0.00612756
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00317667
+	Graph Search Time (s): 0.134943
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00629831
+	Graph Search Time (s): 0.523468
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00338548
+	Graph Search Time (s): 0.0340361
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0160672
+	Graph Search Time (s): 0.747612
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0315599
+	Graph Search Time (s): 2.9912
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00673296
+	Graph Search Time (s): 0.0687333
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0323445
+	Graph Search Time (s): 1.55418
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0643429
+	Graph Search Time (s): 6.13795
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000869062
+	Graph Search Time (s): 0.00625556
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00359389
+	Graph Search Time (s): 0.13461
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00695191
+	Graph Search Time (s): 0.518327
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00382926
+	Graph Search Time (s): 0.0351472
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0181113
+	Graph Search Time (s): 0.761561
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0357182
+	Graph Search Time (s): 2.96581
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00715791
+	Graph Search Time (s): 0.0683283
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0345479
+	Graph Search Time (s): 1.51968
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0692192
+	Graph Search Time (s): 5.99596
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000883301
+	Graph Search Time (s): 0.00580777
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00364575
+	Graph Search Time (s): 0.124502
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00716488
+	Graph Search Time (s): 0.492107
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00390942
+	Graph Search Time (s): 0.033906
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0186767
+	Graph Search Time (s): 0.743851
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0368064
+	Graph Search Time (s): 2.92474
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00773658
+	Graph Search Time (s): 0.069064
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0370529
+	Graph Search Time (s): 1.52371
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0731482
+	Graph Search Time (s): 5.97796
+
+==============================================
+descartes_light::BGLEfficientDijkstraSVDESolver<double>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000800796
+	Graph Search Time (s): 0.0062082
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0032446
+	Graph Search Time (s): 0.133062
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00638998
+	Graph Search Time (s): 0.530584
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00350398
+	Graph Search Time (s): 0.034258
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0166676
+	Graph Search Time (s): 0.759964
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0327723
+	Graph Search Time (s): 2.98653
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.0069152
+	Graph Search Time (s): 0.0691995
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0332664
+	Graph Search Time (s): 1.53752
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0651311
+	Graph Search Time (s): 6.06046
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000862539
+	Graph Search Time (s): 0.00596202
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00354272
+	Graph Search Time (s): 0.130428
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00704749
+	Graph Search Time (s): 0.512592
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00385434
+	Graph Search Time (s): 0.0342464
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.018152
+	Graph Search Time (s): 0.756269
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0359804
+	Graph Search Time (s): 2.98646
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00767469
+	Graph Search Time (s): 0.0696595
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0363702
+	Graph Search Time (s): 1.54509
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0710968
+	Graph Search Time (s): 6.04867
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000925343
+	Graph Search Time (s): 0.0058819
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00384252
+	Graph Search Time (s): 0.126408
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00753898
+	Graph Search Time (s): 0.495385
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00411807
+	Graph Search Time (s): 0.0345355
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0196157
+	Graph Search Time (s): 0.756511
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0388478
+	Graph Search Time (s): 2.97184
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00825904
+	Graph Search Time (s): 0.0698922
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0389993
+	Graph Search Time (s): 1.54514
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.077443
+	Graph Search Time (s): 6.06923
+
+==============================================
+descartes_light::DepthFirstSVDESolver<float>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000776454
+	Graph Search Time (s): 0.00077658
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00313454
+	Graph Search Time (s): 0.0022644
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00612649
+	Graph Search Time (s): 0.00435902
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00336587
+	Graph Search Time (s): 0.00291945
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0160195
+	Graph Search Time (s): 0.0119721
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0315533
+	Graph Search Time (s): 0.0233032
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00665921
+	Graph Search Time (s): 0.00582698
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0319082
+	Graph Search Time (s): 0.0240817
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0627338
+	Graph Search Time (s): 0.0490977
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000912426
+	Graph Search Time (s): 0.000741891
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00368222
+	Graph Search Time (s): 0.0024175
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00696926
+	Graph Search Time (s): 0.00459396
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00382139
+	Graph Search Time (s): 0.00295144
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0173668
+	Graph Search Time (s): 0.0119974
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0346914
+	Graph Search Time (s): 0.023887
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00732502
+	Graph Search Time (s): 0.00597847
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.034889
+	Graph Search Time (s): 0.0241207
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0676252
+	Graph Search Time (s): 0.0472973
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000843728
+	Graph Search Time (s): 0.000592311
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00364572
+	Graph Search Time (s): 0.00230145
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00719863
+	Graph Search Time (s): 0.00445309
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00388282
+	Graph Search Time (s): 0.00296183
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0186016
+	Graph Search Time (s): 0.0122158
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0367904
+	Graph Search Time (s): 0.0238306
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00769086
+	Graph Search Time (s): 0.00594333
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0372328
+	Graph Search Time (s): 0.0246093
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0761105
+	Graph Search Time (s): 0.0501139
+
+==============================================
+descartes_light::DepthFirstSVDESolver<double>
+==============================================
+
+Inputs: {dof: 6, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000798186
+	Graph Search Time (s): 0.000751258
+Inputs: {dof: 6, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0033242
+	Graph Search Time (s): 0.00234605
+Inputs: {dof: 6, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00649333
+	Graph Search Time (s): 0.00455022
+Inputs: {dof: 6, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00356327
+	Graph Search Time (s): 0.00302395
+Inputs: {dof: 6, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0169835
+	Graph Search Time (s): 0.012395
+Inputs: {dof: 6, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0332522
+	Graph Search Time (s): 0.0236847
+Inputs: {dof: 6, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00687865
+	Graph Search Time (s): 0.0062262
+Inputs: {dof: 6, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.033112
+	Graph Search Time (s): 0.0244538
+Inputs: {dof: 6, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0650788
+	Graph Search Time (s): 0.0478293
+Inputs: {dof: 8, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000822181
+	Graph Search Time (s): 0.00059389
+Inputs: {dof: 8, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.00354088
+	Graph Search Time (s): 0.00232159
+Inputs: {dof: 8, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00693698
+	Graph Search Time (s): 0.00451502
+Inputs: {dof: 8, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00377811
+	Graph Search Time (s): 0.00299536
+Inputs: {dof: 8, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0180768
+	Graph Search Time (s): 0.0123708
+Inputs: {dof: 8, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0356007
+	Graph Search Time (s): 0.0242071
+Inputs: {dof: 8, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00751642
+	Graph Search Time (s): 0.00599926
+Inputs: {dof: 8, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0359808
+	Graph Search Time (s): 0.0248419
+Inputs: {dof: 8, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.0727591
+	Graph Search Time (s): 0.0519158
+Inputs: {dof: 10, n_waypoints: 10, samples: 10}
+	Graph Build Time (s): 0.000899549
+	Graph Search Time (s): 0.000604119
+Inputs: {dof: 10, n_waypoints: 10, samples: 50}
+	Graph Build Time (s): 0.0038867
+	Graph Search Time (s): 0.00235418
+Inputs: {dof: 10, n_waypoints: 10, samples: 100}
+	Graph Build Time (s): 0.00762156
+	Graph Search Time (s): 0.00465336
+Inputs: {dof: 10, n_waypoints: 50, samples: 10}
+	Graph Build Time (s): 0.00418999
+	Graph Search Time (s): 0.00307926
+Inputs: {dof: 10, n_waypoints: 50, samples: 50}
+	Graph Build Time (s): 0.0201242
+	Graph Search Time (s): 0.0127568
+Inputs: {dof: 10, n_waypoints: 50, samples: 100}
+	Graph Build Time (s): 0.0396341
+	Graph Search Time (s): 0.0245773
+Inputs: {dof: 10, n_waypoints: 100, samples: 10}
+	Graph Build Time (s): 0.00821333
+	Graph Search Time (s): 0.00601044
+Inputs: {dof: 10, n_waypoints: 100, samples: 50}
+	Graph Build Time (s): 0.0389682
+	Graph Search Time (s): 0.0250574
+Inputs: {dof: 10, n_waypoints: 100, samples: 100}
+	Graph Build Time (s): 0.077046
+	Graph Search Time (s): 0.0489953
