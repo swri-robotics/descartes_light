@@ -133,7 +133,7 @@ void BGLSolverBase<FloatType>::writeGraphWithPath(const std::string& filename) c
 template <typename FloatType>
 BuildStatus BGLSolverBaseSVDE<FloatType>::buildImpl(
     const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
-    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>&,
+    const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_evaluators,
     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
 {
   // Convenience aliases
@@ -142,6 +142,7 @@ BuildStatus BGLSolverBaseSVDE<FloatType>::buildImpl(
   auto& source_ = BGLSolverBase<FloatType>::source_;
 
   BuildStatus status;
+  edge_eval_ = std::move(edge_evaluators);
 
   // Build Vertices
   ladder_rungs_.resize(trajectory.size());
