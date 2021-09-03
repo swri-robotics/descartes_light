@@ -1,4 +1,0 @@
-#ifndef EVENT_VISITOR_H
-#define EVENT_VISITOR_H
-
-#endif  // EVENT_VISITOR_H
