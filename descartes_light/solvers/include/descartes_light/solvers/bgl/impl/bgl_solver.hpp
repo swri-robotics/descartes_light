@@ -64,12 +64,16 @@ static void reportFailedVertices(const std::vector<std::size_t>& indices)
 
 namespace descartes_light
 {
-template <typename FloatType>
-BGLSolverBase<FloatType>::BGLSolverBase(unsigned num_threads) : num_threads_{ num_threads } {};
+template <typename FloatType, typename Visitors>
+BGLSolverBase<FloatType, Visitors>::BGLSolverBase(Visitors event_visitors, unsigned num_threads)
+  : event_visitors_(std::move(event_visitors)), num_threads_{ num_threads }
+{
+}
 
-template <typename FloatType>
-std::vector<VertexDesc<FloatType>> BGLSolverBase<FloatType>::reconstructPath(const VertexDesc<FloatType>& source,
-                                                                             const VertexDesc<FloatType>& target) const
+template <typename FloatType, typename Visitors>
+std::vector<VertexDesc<FloatType>>
+BGLSolverBase<FloatType, Visitors>::reconstructPath(const VertexDesc<FloatType>& source,
+                                                    const VertexDesc<FloatType>& target) const
 {
   // Reconstruct the path from predecessors
   std::vector<VertexDesc<FloatType>> path;
@@ -90,9 +94,9 @@ std::vector<VertexDesc<FloatType>> BGLSolverBase<FloatType>::reconstructPath(con
   return path;
 }
 
-template <typename FloatType>
+template <typename FloatType, typename Visitors>
 std::vector<typename State<FloatType>::ConstPtr>
-BGLSolverBase<FloatType>::toStates(const std::vector<VertexDesc<FloatType>>& path) const
+BGLSolverBase<FloatType, Visitors>::toStates(const std::vector<VertexDesc<FloatType>>& path) const
 {
   // Get the state information from the graph using the vertex descriptors
   std::vector<typename State<FloatType>::ConstPtr> out;
@@ -104,8 +108,8 @@ BGLSolverBase<FloatType>::toStates(const std::vector<VertexDesc<FloatType>>& pat
   return out;
 }
 
-template <typename FloatType>
-void BGLSolverBase<FloatType>::writeGraphWithPath(const std::string& filename) const
+template <typename FloatType, typename Visitors>
+void BGLSolverBase<FloatType, Visitors>::writeGraphWithPath(const std::string& filename) const
 {
   std::ofstream file(filename);
   if (!file.good())
@@ -130,16 +134,16 @@ void BGLSolverBase<FloatType>::writeGraphWithPath(const std::string& filename) c
   boost::write_graphviz(file, sg);
 }
 
-template <typename FloatType>
-BuildStatus BGLSolverBaseSVDE<FloatType>::buildImpl(
+template <typename FloatType, typename Visitors>
+BuildStatus BGLSolverBaseSVDE<FloatType, Visitors>::buildImpl(
     const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
     const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_evaluators,
     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
 {
   // Convenience aliases
-  auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
-  auto& graph_ = BGLSolverBase<FloatType>::graph_;
-  auto& source_ = BGLSolverBase<FloatType>::source_;
+  auto& ladder_rungs_ = BGLSolverBase<FloatType, Visitors>::ladder_rungs_;
+  auto& graph_ = BGLSolverBase<FloatType, Visitors>::graph_;
+  auto& source_ = BGLSolverBase<FloatType, Visitors>::source_;
 
   BuildStatus status;
   edge_eval_ = std::move(edge_evaluators);
@@ -149,7 +153,7 @@ BuildStatus BGLSolverBaseSVDE<FloatType>::buildImpl(
   long cnt = 0;
 
   std::chrono::time_point<Clock> start_time = Clock::now();
-#pragma omp parallel for num_threads(BGLSolverBase <FloatType>::num_threads_)
+#pragma omp parallel for num_threads(BGLSolverBase <FloatType, Visitors>::num_threads_)
   for (long i = 0; i < static_cast<long>(trajectory.size()); ++i)
   {
     std::vector<StateSample<FloatType>> samples = trajectory[static_cast<size_t>(i)]->sample();
@@ -219,23 +223,23 @@ BuildStatus BGLSolverBaseSVDE<FloatType>::buildImpl(
   return status;
 }
 
-template <typename FloatType>
-BuildStatus BGLSolverBaseSVSE<FloatType>::buildImpl(
+template <typename FloatType, typename Visitors>
+BuildStatus BGLSolverBaseSVSE<FloatType, Visitors>::buildImpl(
     const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
     const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_evaluators,
     const std::vector<typename StateEvaluator<FloatType>::ConstPtr>& state_evaluators)
 {
   // Convenience aliases
-  auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
-  auto& graph_ = BGLSolverBase<FloatType>::graph_;
+  auto& ladder_rungs_ = BGLSolverBase<FloatType, Visitors>::ladder_rungs_;
+  auto& graph_ = BGLSolverBase<FloatType, Visitors>::graph_;
 
   // Use the base class to build the vertices
-  BuildStatus status = BGLSolverBaseSVDE<FloatType>::buildImpl(trajectory, edge_evaluators, state_evaluators);
+  BuildStatus status = BGLSolverBaseSVDE<FloatType, Visitors>::buildImpl(trajectory, edge_evaluators, state_evaluators);
 
   // Build Edges
   long cnt = 0;
   auto start_time = Clock::now();
-#pragma omp parallel for num_threads(BGLSolverBase <FloatType>::num_threads_)
+#pragma omp parallel for num_threads(BGLSolverBase <FloatType, Visitors>::num_threads_)
   for (long i = 1; i < static_cast<long>(trajectory.size()); ++i)
   {
     auto& from = ladder_rungs_[static_cast<size_t>(i) - 1];

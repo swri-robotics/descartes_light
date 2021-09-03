@@ -31,11 +31,11 @@ namespace descartes_light
 /**
  * @brief Partial implementation for solvers leveraging the Boost Graph Library
  */
-template <typename FloatType>
+template <typename FloatType, typename Visitors>
 class BGLSolverBase : public Solver<FloatType>
 {
 public:
-  BGLSolverBase(unsigned num_threads = std::thread::hardware_concurrency());
+  BGLSolverBase(Visitors event_visitors, unsigned num_threads = std::thread::hardware_concurrency());
 
   inline const BGLGraph<FloatType>& getGraph() const { return graph_; }
 
@@ -56,6 +56,9 @@ protected:
    */
   std::vector<typename State<FloatType>::ConstPtr> toStates(const std::vector<VertexDesc<FloatType>>& path) const;
 
+  /** @brief Event visitors for custom behavior in the search */
+  Visitors event_visitors_;
+  /** @brief Number of threads for parallel processing */
   unsigned num_threads_;
   /** @brief Graph representation of the planning problem */
   BGLGraph<FloatType> graph_;
@@ -73,11 +76,11 @@ protected:
  * @details Constructs only vertices in the build function (i.e. statically) with the assumption that edges will be
  * added during the search (i.e. dynamically)
  */
-template <typename FloatType>
-class BGLSolverBaseSVDE : public BGLSolverBase<FloatType>
+template <typename FloatType, typename Visitors>
+class BGLSolverBaseSVDE : public BGLSolverBase<FloatType, Visitors>
 {
 public:
-  using BGLSolverBase<FloatType>::BGLSolverBase;
+  using BGLSolverBase<FloatType, Visitors>::BGLSolverBase;
 
   BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
@@ -91,11 +94,11 @@ protected:
  * @brief BGL solver Static Vertex Static Edge (SVSE) partial implementation
  * @details Constructs both vertices and edges in the build function (i.e. statically)
  */
-template <typename FloatType>
-class BGLSolverBaseSVSE : public BGLSolverBaseSVDE<FloatType>
+template <typename FloatType, typename Visitors>
+class BGLSolverBaseSVSE : public BGLSolverBaseSVDE<FloatType, Visitors>
 {
 public:
-  using BGLSolverBaseSVDE<FloatType>::BGLSolverBaseSVDE;
+  using BGLSolverBaseSVDE<FloatType, Visitors>::BGLSolverBaseSVDE;
 
   BuildStatus buildImpl(const std::vector<typename WaypointSampler<FloatType>::ConstPtr>& trajectory,
                         const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
