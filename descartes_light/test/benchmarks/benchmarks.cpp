@@ -51,7 +51,7 @@ void benchmark(const SolverFactory<SolverT>& factory)
             createSamplers<FloatType>(dof, n_waypoints, samples_per_wp, state_cost);
 
         // Create the solver
-        typename descartes_light::Solver<FloatType>::Ptr solver = factory.create();
+        typename descartes_light::Solver<FloatType>::Ptr solver = factory.create(static_cast<long>(n_waypoints));
 
         // Build the graph
         auto start_time = Clock::now();
@@ -80,13 +80,21 @@ int main(int, char**)
   benchmark(SolverFactory<LadderGraphSolverD>());
   benchmark(SolverFactory<LadderGraphSolverF>());
 
-  // BGL full Dijkstra solver
+  // BGL Dijkstra full search, static vertex static edge
+  benchmark(SolverFactory<BGLDijkstraSVSESolver<double, boost::null_visitor>>());
+  benchmark(SolverFactory<BGLDijkstraSVSESolver<float, boost::null_visitor>>());
+
+  // BGL Dijkstra early termination, static vertex static edge
   benchmark(SolverFactory<BGLDijkstraSVSESolverD>());
   benchmark(SolverFactory<BGLDijkstraSVSESolverF>());
 
-  // BGL efficient Dijkstra solver
-  benchmark(SolverFactory<BGLEfficientDijkstraSVSESolverD>());
-  benchmark(SolverFactory<BGLEfficientDijkstraSVSESolverF>());
+  // BGL Dijkstra full search, static vertex dynamic edge
+  benchmark(SolverFactory<BGLDijkstraSVDESolver<double, boost::null_visitor>>());
+  benchmark(SolverFactory<BGLDijkstraSVDESolver<float, boost::null_visitor>>());
+
+  // BGL Dijkstra early termination, static vertex, dynamic edge
+  benchmark(SolverFactory<BGLDijkstraSVDESolverD>());
+  benchmark(SolverFactory<BGLDijkstraSVDESolverF>());
 
   return 0;
 }
