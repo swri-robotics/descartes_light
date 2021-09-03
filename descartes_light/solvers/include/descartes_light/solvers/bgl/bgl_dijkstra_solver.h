@@ -2,6 +2,7 @@
 #define DESCARTES_LIGHT_SOLVERS_BGL_BGL_DIJKSTRA_SOLVER_H
 
 #include <descartes_light/solvers/bgl/bgl_solver.h>
+#include <descartes_light/solvers/bgl/event_visitors.h>
 
 namespace descartes_light
 {
@@ -9,68 +10,33 @@ namespace descartes_light
  * @brief BGL solver implementation that constructs vertices and edges in the build function and uses Dijkstra's
  * algorithm with a default visitor to search the graph
  */
-template <typename FloatType>
-class BGLDijkstraSVSESolver : public BGLSolverBaseSVSE<FloatType>
+template <typename FloatType, typename Visitors>
+class BGLDijkstraSVSESolver : public BGLSolverBaseSVSE<FloatType, Visitors>
 {
 public:
-  using BGLSolverBaseSVSE<FloatType>::BGLSolverBaseSVSE;
+  using BGLSolverBaseSVSE<FloatType, Visitors>::BGLSolverBaseSVSE;
 
   SearchResult<FloatType> search() override;
 };
 
-using BGLDijkstraSVSESolverF = BGLDijkstraSVSESolver<float>;
-using BGLDijkstraSVSESolverD = BGLDijkstraSVSESolver<double>;
-
-/**
- * @brief BGL solver implementation that constructs vertices and edges in the build function and uses Dijkstra's
- * algorithm with a visitor that terminates the search once a vertex in the last rung of the graph is encountered rather
- * than allowing it to continue until the distance to all nodes in the graph has been calculated
- */
-template <typename FloatType>
-class BGLEfficientDijkstraSVSESolver : public BGLSolverBaseSVSE<FloatType>
-{
-public:
-  using BGLSolverBaseSVSE<FloatType>::BGLSolverBaseSVSE;
-
-  SearchResult<FloatType> search() override;
-};
-
-using BGLEfficientDijkstraSVSESolverF = BGLEfficientDijkstraSVSESolver<float>;
-using BGLEfficientDijkstraSVSESolverD = BGLEfficientDijkstraSVSESolver<double>;
+using BGLDijkstraSVSESolverF = BGLDijkstraSVSESolver<float, early_terminator<float, boost::on_examine_vertex>>;
+using BGLDijkstraSVSESolverD = BGLDijkstraSVSESolver<double, early_terminator<double, boost::on_examine_vertex>>;
 
 /**
  * @brief BGL solver implementation that constructs vertices build function and uses Dijkstra's
  * algorithm with an edge-adding visitor to search the graph
  */
-template <typename FloatType>
-class BGLDijkstraSVDESolver : public BGLSolverBaseSVDE<FloatType>
+template <typename FloatType, typename Visitors>
+class BGLDijkstraSVDESolver : public BGLSolverBaseSVDE<FloatType, Visitors>
 {
 public:
-  using BGLSolverBaseSVDE<FloatType>::BGLSolverBaseSVDE;
+  using BGLSolverBaseSVDE<FloatType, Visitors>::BGLSolverBaseSVDE;
 
   SearchResult<FloatType> search() override;
 };
 
-using BGLDijkstraSVDESolverF = BGLDijkstraSVDESolver<float>;
-using BGLDijkstraSVDESolverD = BGLDijkstraSVDESolver<double>;
-
-/**
- * @brief BGL solver implementation that constructs vertices in the build function and uses Dijkstra's
- * algorithm with a visitor that adds edges and terminates the search once a vertex in the last rung of
- * the graph is encountered rather than allowing it to continue until the distance to all nodes in the
- * graph has been calculated
- */
-template <typename FloatType>
-class BGLEfficientDijkstraSVDESolver : public BGLSolverBaseSVDE<FloatType>
-{
-public:
-  using BGLSolverBaseSVDE<FloatType>::BGLSolverBaseSVDE;
-
-  SearchResult<FloatType> search() override;
-};
-
-using BGLEfficientDijkstraSVDESolverF = BGLEfficientDijkstraSVDESolver<float>;
-using BGLEfficientDijkstraSVDESolverD = BGLEfficientDijkstraSVDESolver<double>;
+using BGLDijkstraSVDESolverF = BGLDijkstraSVDESolver<float, early_terminator<float, boost::on_examine_vertex>>;
+using BGLDijkstraSVDESolverD = BGLDijkstraSVDESolver<double, early_terminator<double, boost::on_examine_vertex>>;
 
 }  // namespace descartes_light
 
