@@ -42,9 +42,9 @@ struct add_all_edges_dynamically : public boost::base_visitor<add_all_edges_dyna
   /** @brief Event filter typedef defining the events for which this visitor can be used */
   typedef EventType event_filter;
 
-  add_all_edges_dynamically(std::vector<typename EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                            std::vector<std::vector<VertexDesc<FloatType>>>& ladder_rungs)
-    : eval_(edge_eval), ladder_rungs_(ladder_rungs)
+  add_all_edges_dynamically(std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> edge_eval,
+                            std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs)
+    : eval_(std::move(edge_eval)), ladder_rungs_(std::move(ladder_rungs))
   {
   }
 
@@ -76,8 +76,8 @@ struct add_all_edges_dynamically : public boost::base_visitor<add_all_edges_dyna
     }
   }
 
-  std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> eval_;
-  std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs_;
+  const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> eval_;
+  const std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs_;
 };
 
 /**
@@ -100,6 +100,7 @@ struct cost_recorder : public boost::base_visitor<cost_recorder<FloatType>>
     mutable_graph_->operator[](target).distance = g[source].distance + g[target].sample.cost + edge_weight_map[e];
   }
 };
+
 }  // namespace descartes_light
 
 #endif  // DESCARTES_LIGHT_SOLVERS_BGL_IMPL_EVENT_VISITORS_HPP
