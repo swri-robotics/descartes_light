@@ -10,40 +10,50 @@ namespace descartes_light
 template <typename FloatType>
 struct SolverFactory<LadderGraphSolver<FloatType>>
 {
-  typename Solver<FloatType>::Ptr create() const { return std::make_shared<LadderGraphSolver<FloatType>>(1); }
+  typename Solver<FloatType>::Ptr create(long) const { return std::make_shared<LadderGraphSolver<FloatType>>(1); }
 };
 
 // Boost full Dijkstra graph solver factory
 template <typename FloatType>
-struct SolverFactory<BGLDijkstraSVSESolver<FloatType>>
+struct SolverFactory<BGLDijkstraSVSESolver<FloatType, boost::null_visitor>>
 {
-  typename Solver<FloatType>::Ptr create() const { return std::make_shared<BGLDijkstraSVSESolver<FloatType>>(1); }
+  using Visitors = boost::null_visitor;
+  typename Solver<FloatType>::Ptr create(long) const
+  {
+    return std::make_shared<BGLDijkstraSVSESolver<FloatType, Visitors>>(Visitors(), 1);
+  }
 };
 
 // Boost efficient Dijkstra graph solver factory
 template <typename FloatType>
-struct SolverFactory<BGLEfficientDijkstraSVSESolver<FloatType>>
+struct SolverFactory<BGLDijkstraSVSESolver<FloatType, early_terminator<FloatType, boost::on_examine_vertex>>>
 {
-  typename Solver<FloatType>::Ptr create() const
+  using Visitors = early_terminator<FloatType, boost::on_examine_vertex>;
+  typename Solver<FloatType>::Ptr create(long n_waypoints) const
   {
-    return std::make_shared<BGLEfficientDijkstraSVSESolver<FloatType>>(1);
+    return std::make_shared<BGLDijkstraSVSESolver<FloatType, Visitors>>(Visitors(n_waypoints - 1), 1);
   }
 };
 
 // Dynamic Boost full Dijkstra graph solver factory
 template <typename FloatType>
-struct SolverFactory<BGLDijkstraSVDESolver<FloatType>>
+struct SolverFactory<BGLDijkstraSVDESolver<FloatType, boost::null_visitor>>
 {
-  typename Solver<FloatType>::Ptr create() const { return std::make_shared<BGLDijkstraSVDESolver<FloatType>>(1); }
+  using Visitors = boost::null_visitor;
+  typename Solver<FloatType>::Ptr create(long) const
+  {
+    return std::make_shared<BGLDijkstraSVDESolver<FloatType, Visitors>>(Visitors(), 1);
+  }
 };
 
 // Dynamic Boost efficient Dijkstra graph solver factory
 template <typename FloatType>
-struct SolverFactory<BGLEfficientDijkstraSVDESolver<FloatType>>
+struct SolverFactory<BGLDijkstraSVDESolver<FloatType, early_terminator<FloatType, boost::on_examine_vertex>>>
 {
-  typename Solver<FloatType>::Ptr create() const
+  using Visitors = early_terminator<FloatType, boost::on_examine_vertex>;
+  typename Solver<FloatType>::Ptr create(long n_waypoints) const
   {
-    return std::make_shared<BGLEfficientDijkstraSVDESolver<FloatType>>(1);
+    return std::make_shared<BGLDijkstraSVDESolver<FloatType, Visitors>>(Visitors(n_waypoints - 1), 1);
   }
 };
 
