@@ -22,7 +22,26 @@
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/graph/visitors.hpp>
+#include <boost/preprocessor.hpp>
 DESCARTES_IGNORE_WARNINGS_POP
+
+// Macro for explicitly instantiating a class with a variable number of template arguments
+#define INSTANTIATE(T, ...) template class T<__VA_ARGS__>;
+
+// Implementation macro for explicitly instantiating a class for a specific element of the Cartesian product (class_name, (template params))
+#define INSTANTIATE_PRODUCT_IMPL(r, product) \
+  INSTANTIATE(BOOST_PP_SEQ_HEAD(product), BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TAIL(product)))
+
+/**
+ * Macro for instantiating a template class for a Cartesian product of float types and event visitor types
+ * For example, instantiation of class Foo with types ((float)(double)) and visitors ((A)(B)) would result in 4 instantiations:
+ *   - Foo<float, A>
+ *   - Foo<float, B>
+ *   - Foo<double, A>
+ *   - Foo<double, B>
+ */
+#define INSTANTIATE_PRODUCT(TEMPLATE, FLOAT_TYPES, EVENT_VISITORS) \
+  BOOST_PP_SEQ_FOR_EACH_PRODUCT(INSTANTIATE_PRODUCT_IMPL, ((TEMPLATE))(FLOAT_TYPES)(EVENT_VISITORS))
 
 namespace descartes_light
 {
@@ -33,32 +52,17 @@ template struct add_all_edges_dynamically<float, boost::on_examine_vertex>;
 template struct add_all_edges_dynamically<double, boost::on_examine_vertex>;
 
 // Explicit template instantiation
+#define FLOAT_TYPES (double)(float)
+#define DIJKSTRA_EVENT_VISITORS (boost::null_visitor)(early_terminator<boost::on_examine_vertex>)
+
 // Partial implementations
-template class BGLSolverBase<double, early_terminator<boost::on_examine_vertex>>;
-template class BGLSolverBase<float, early_terminator<boost::on_examine_vertex>>;
-template class BGLSolverBase<double, boost::null_visitor>;
-template class BGLSolverBase<float, boost::null_visitor>;
+INSTANTIATE_PRODUCT(BGLSolverBase, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
+INSTANTIATE_PRODUCT(BGLSolverBaseSVSE, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
+INSTANTIATE_PRODUCT(BGLSolverBaseSVDE, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
 
-template class BGLSolverBaseSVDE<double, early_terminator<boost::on_examine_vertex>>;
-template class BGLSolverBaseSVDE<float, early_terminator<boost::on_examine_vertex>>;
-template class BGLSolverBaseSVDE<double, boost::null_visitor>;
-template class BGLSolverBaseSVDE<float, boost::null_visitor>;
-
-template class BGLSolverBaseSVSE<double, early_terminator<boost::on_examine_vertex>>;
-template class BGLSolverBaseSVSE<float, early_terminator<boost::on_examine_vertex>>;
-template class BGLSolverBaseSVSE<double, boost::null_visitor>;
-template class BGLSolverBaseSVSE<float, boost::null_visitor>;
-
-// Full Implementations
-template class BGLDijkstraSVDESolver<double, early_terminator<boost::on_examine_vertex>>;
-template class BGLDijkstraSVDESolver<float, early_terminator<boost::on_examine_vertex>>;
-template class BGLDijkstraSVDESolver<double, boost::null_visitor>;
-template class BGLDijkstraSVDESolver<float, boost::null_visitor>;
-
-template class BGLDijkstraSVSESolver<double, early_terminator<boost::on_examine_vertex>>;
-template class BGLDijkstraSVSESolver<float, early_terminator<boost::on_examine_vertex>>;
-template class BGLDijkstraSVSESolver<double, boost::null_visitor>;
-template class BGLDijkstraSVSESolver<float, boost::null_visitor>;
+// BGL Dijkstra search
+INSTANTIATE_PRODUCT(BGLDijkstraSVSESolver, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
+INSTANTIATE_PRODUCT(BGLDijkstraSVDESolver, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
 
 // Free functions
 template SubGraph<double> createDecoratedSubGraph(const BGLGraph<double>& g);
