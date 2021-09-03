@@ -5,13 +5,14 @@
 
 namespace descartes_light
 {
-template <typename FloatType, typename EventType>
-early_terminator<FloatType, EventType>::early_terminator(long last_rung_idx) : last_rung_idx_(last_rung_idx)
+template <typename EventType>
+early_terminator<EventType>::early_terminator(long last_rung_idx) : last_rung_idx_(last_rung_idx)
 {
 }
 
-template <typename FloatType, typename EventType>
-void early_terminator<FloatType, EventType>::operator()(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g)
+template <typename EventType>
+template <typename FloatType>
+void early_terminator<EventType>::operator()(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g)
 {
   if (g[u].rung_idx == last_rung_idx_)
     throw u;
@@ -55,7 +56,7 @@ void add_all_edges_dynamically<FloatType, EventType>::operator()(VertexDesc<Floa
 }
 
 template <typename FloatType>
-void cost_recorder<FloatType>::operator()(EdgeDesc<FloatType> e, const BGLGraph<FloatType>& g)
+void cost_recorder::operator()(EdgeDesc<FloatType> e, const BGLGraph<FloatType>& g)
 {
   VertexDesc<FloatType> target = boost::target(e, g);
   VertexDesc<FloatType> source = boost::source(e, g);

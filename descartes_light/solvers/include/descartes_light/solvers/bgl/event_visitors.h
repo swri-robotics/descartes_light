@@ -15,14 +15,15 @@ namespace descartes_light
  * @details Throws the vertex descriptor that is the termination of the path once a vertex in the last rung of
  * the graph is operated on
  */
-template <typename FloatType, typename EventType>
-struct early_terminator : public boost::base_visitor<early_terminator<FloatType, EventType>>
+template <typename EventType>
+struct early_terminator : public boost::base_visitor<early_terminator<EventType>>
 {
   /** @brief Event filter typedef defining the events for which this visitor can be used */
   typedef EventType event_filter;
 
   early_terminator(long last_rung_idx);
 
+  template<typename FloatType>
   void operator()(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g);
 
   const long last_rung_idx_;
@@ -50,12 +51,12 @@ struct add_all_edges_dynamically : public boost::base_visitor<add_all_edges_dyna
 /**
  * @brief Event visitor for updating vertex cost
  */
-template <typename FloatType>
-struct cost_recorder : public boost::base_visitor<cost_recorder<FloatType>>
+struct cost_recorder : public boost::base_visitor<cost_recorder>
 {
   /** @brief Event filter typedef defining the events for which this visitor can be used */
   typedef boost::on_tree_edge event_filter;
 
+  template<typename FloatType>
   void operator()(EdgeDesc<FloatType> e, const BGLGraph<FloatType>& g);
 };
 

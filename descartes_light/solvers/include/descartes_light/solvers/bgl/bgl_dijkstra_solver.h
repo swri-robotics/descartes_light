@@ -19,8 +19,8 @@ public:
   SearchResult<FloatType> search() override;
 };
 
-using BGLDijkstraSVSESolverF = BGLDijkstraSVSESolver<float, early_terminator<float, boost::on_examine_vertex>>;
-using BGLDijkstraSVSESolverD = BGLDijkstraSVSESolver<double, early_terminator<double, boost::on_examine_vertex>>;
+using BGLDijkstraSVSESolverF = BGLDijkstraSVSESolver<float, early_terminator<boost::on_examine_vertex>>;
+using BGLDijkstraSVSESolverD = BGLDijkstraSVSESolver<double, early_terminator<boost::on_examine_vertex>>;
 
 /**
  * @brief BGL solver implementation that constructs vertices build function and uses Dijkstra's
@@ -35,8 +35,8 @@ public:
   SearchResult<FloatType> search() override;
 };
 
-using BGLDijkstraSVDESolverF = BGLDijkstraSVDESolver<float, early_terminator<float, boost::on_examine_vertex>>;
-using BGLDijkstraSVDESolverD = BGLDijkstraSVDESolver<double, early_terminator<double, boost::on_examine_vertex>>;
+using BGLDijkstraSVDESolverF = BGLDijkstraSVDESolver<float, early_terminator<boost::on_examine_vertex>>;
+using BGLDijkstraSVDESolverD = BGLDijkstraSVDESolver<double, early_terminator<boost::on_examine_vertex>>;
 
 }  // namespace descartes_light
 
