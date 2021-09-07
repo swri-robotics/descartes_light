@@ -23,7 +23,7 @@ struct early_terminator : public boost::base_visitor<early_terminator<EventType>
 
   early_terminator(long last_rung_idx);
 
-  template<typename FloatType>
+  template <typename FloatType>
   void operator()(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g);
 
   const long last_rung_idx_;
@@ -56,7 +56,7 @@ struct cost_recorder : public boost::base_visitor<cost_recorder>
   /** @brief Event filter typedef defining the events for which this visitor can be used */
   typedef boost::on_tree_edge event_filter;
 
-  template<typename FloatType>
+  template <typename FloatType>
   void operator()(EdgeDesc<FloatType> e, const BGLGraph<FloatType>& g);
 };
 

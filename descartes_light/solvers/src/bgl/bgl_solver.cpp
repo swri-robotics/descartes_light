@@ -28,19 +28,21 @@ DESCARTES_IGNORE_WARNINGS_POP
 // Macro for explicitly instantiating a class with a variable number of template arguments
 #define INSTANTIATE(T, ...) template class T<__VA_ARGS__>;
 
-// Implementation macro for explicitly instantiating a class for a specific element of the Cartesian product (class_name, (template params))
-#define INSTANTIATE_PRODUCT_IMPL(r, product) \
+// Implementation macro for explicitly instantiating a class for a specific element of the Cartesian product
+// (class_name, (template params))
+#define INSTANTIATE_PRODUCT_IMPL(r, product)                                                                           \
   INSTANTIATE(BOOST_PP_SEQ_HEAD(product), BOOST_PP_SEQ_ENUM(BOOST_PP_SEQ_TAIL(product)))
 
 /**
  * Macro for instantiating a template class for a Cartesian product of float types and event visitor types
- * For example, instantiation of class Foo with types ((float)(double)) and visitors ((A)(B)) would result in 4 instantiations:
+ * For example, instantiation of class Foo with types ((float)(double)) and visitors ((A)(B)) would result in 4
+ * instantiations:
  *   - Foo<float, A>
  *   - Foo<float, B>
  *   - Foo<double, A>
  *   - Foo<double, B>
  */
-#define INSTANTIATE_PRODUCT(TEMPLATE, FLOAT_TYPES, EVENT_VISITORS) \
+#define INSTANTIATE_PRODUCT(TEMPLATE, FLOAT_TYPES, EVENT_VISITORS)                                                     \
   BOOST_PP_SEQ_FOR_EACH_PRODUCT(INSTANTIATE_PRODUCT_IMPL, ((TEMPLATE))(FLOAT_TYPES)(EVENT_VISITORS))
 
 namespace descartes_light
