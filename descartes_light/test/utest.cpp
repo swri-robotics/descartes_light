@@ -41,21 +41,21 @@ public:
 
 using Implementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
                                          SolverFactory<LadderGraphSolverD>,
+                                         SolverFactory<BGLDijkstraSVSESolver<float, boost::null_visitor>>,
+                                         SolverFactory<BGLDijkstraSVSESolver<double, boost::null_visitor>>,
                                          SolverFactory<BGLDijkstraSVSESolverF>,
                                          SolverFactory<BGLDijkstraSVSESolverD>,
-                                         SolverFactory<BGLEfficientDijkstraSVSESolverF>,
-                                         SolverFactory<BGLEfficientDijkstraSVSESolverD>,
+                                         SolverFactory<BGLDijkstraSVDESolver<float, boost::null_visitor>>,
+                                         SolverFactory<BGLDijkstraSVDESolver<double, boost::null_visitor>>,
                                          SolverFactory<BGLDijkstraSVDESolverF>,
-                                         SolverFactory<BGLDijkstraSVDESolverD>,
-                                         SolverFactory<BGLEfficientDijkstraSVDESolverF>,
-                                         SolverFactory<BGLEfficientDijkstraSVDESolverD>>;
+                                         SolverFactory<BGLDijkstraSVDESolverD>>;
 
 TYPED_TEST_CASE(SolverFixture, Implementations);
 
 TYPED_TEST(SolverFixture, KnownPathTest)
 {
   using FloatType = typename TypeParam::FloatType;
-  typename Solver<FloatType>::Ptr solver = this->Factory.create();
+  typename Solver<FloatType>::Ptr solver = this->Factory.create(static_cast<long>(this->n_waypoints));
 
   // Build a graph where one sample for each waypoint is an all zero state; evaluate edges using the Euclidean distance
   // metric Since each waypoint has an all-zero state, the shortest path should be through these samples
