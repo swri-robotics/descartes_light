@@ -70,14 +70,19 @@ static VertexDesc<FloatType> solveDijkstra(BGLGraph<FloatType>& graph,
 }
 
 template <typename FloatType, typename Visitors>
+BGLDijkstraSVSESolver<FloatType, Visitors>::BGLDijkstraSVSESolver(Visitors event_visitors, unsigned num_threads)
+  : BGLSolverBaseSVSE<FloatType>(num_threads), event_visitors_(std::move(event_visitors))
+{
+}
+
+template <typename FloatType, typename Visitors>
 SearchResult<FloatType> BGLDijkstraSVSESolver<FloatType, Visitors>::search()
 {
   // Convenience aliases
-  auto& graph_ = BGLSolverBase<FloatType, Visitors>::graph_;
-  const auto& source_ = BGLSolverBase<FloatType, Visitors>::source_;
-  auto& predecessors_ = BGLSolverBase<FloatType, Visitors>::predecessors_;
-  const auto& ladder_rungs_ = BGLSolverBase<FloatType, Visitors>::ladder_rungs_;
-  const auto& event_visitors_ = BGLSolverBase<FloatType, Visitors>::event_visitors_;
+  auto& graph_ = BGLSolverBase<FloatType>::graph_;
+  const auto& source_ = BGLSolverBase<FloatType>::source_;
+  auto& predecessors_ = BGLSolverBase<FloatType>::predecessors_;
+  const auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
 
   VertexDesc<FloatType> target =
       solveDijkstra<FloatType, Visitors>(graph_, predecessors_, source_, event_visitors_, ladder_rungs_);
@@ -85,8 +90,8 @@ SearchResult<FloatType> BGLDijkstraSVSESolver<FloatType, Visitors>::search()
   SearchResult<FloatType> result;
 
   // Reconstruct the path from the predecesor map; remove the artificial start state
-  const auto vd_path = BGLSolverBase<FloatType, Visitors>::reconstructPath(source_, target);
-  result.trajectory = BGLSolverBase<FloatType, Visitors>::toStates(vd_path);
+  const auto vd_path = BGLSolverBase<FloatType>::reconstructPath(source_, target);
+  result.trajectory = BGLSolverBase<FloatType>::toStates(vd_path);
   result.trajectory.erase(result.trajectory.begin());
 
   result.cost = graph_[target].distance;
@@ -95,17 +100,22 @@ SearchResult<FloatType> BGLDijkstraSVSESolver<FloatType, Visitors>::search()
 }
 
 template <typename FloatType, typename Visitors>
+BGLDijkstraSVDESolver<FloatType, Visitors>::BGLDijkstraSVDESolver(Visitors event_visitors, unsigned num_threads)
+  : BGLSolverBaseSVDE<FloatType>(num_threads), event_visitors_(std::move(event_visitors))
+{
+}
+
+template <typename FloatType, typename Visitors>
 SearchResult<FloatType> BGLDijkstraSVDESolver<FloatType, Visitors>::search()
 {
   // Convenience aliases
-  auto& graph_ = BGLSolverBase<FloatType, Visitors>::graph_;
-  const auto& source_ = BGLSolverBase<FloatType, Visitors>::source_;
-  auto& predecessors_ = BGLSolverBase<FloatType, Visitors>::predecessors_;
-  const auto& ladder_rungs_ = BGLSolverBase<FloatType, Visitors>::ladder_rungs_;
-  const auto& event_visitors_ = BGLSolverBase<FloatType, Visitors>::event_visitors_;
+  auto& graph_ = BGLSolverBase<FloatType>::graph_;
+  const auto& source_ = BGLSolverBase<FloatType>::source_;
+  auto& predecessors_ = BGLSolverBase<FloatType>::predecessors_;
+  const auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
 
   // Create the dynamic edge adding event visitor
-  const auto& edge_eval_ = BGLSolverBaseSVDE<FloatType, Visitors>::edge_eval_;
+  const auto& edge_eval_ = BGLSolverBaseSVDE<FloatType>::edge_eval_;
   auto vis = std::make_pair(add_all_edges_dynamically<FloatType, boost::on_examine_vertex>(edge_eval_, ladder_rungs_),
                             event_visitors_);
 
@@ -114,8 +124,8 @@ SearchResult<FloatType> BGLDijkstraSVDESolver<FloatType, Visitors>::search()
   SearchResult<FloatType> result;
 
   // Reconstruct the path from the predecesor map; remove the artificial start state
-  const auto vd_path = BGLSolverBase<FloatType, Visitors>::reconstructPath(source_, target);
-  result.trajectory = BGLSolverBase<FloatType, Visitors>::toStates(vd_path);
+  const auto vd_path = BGLSolverBase<FloatType>::reconstructPath(source_, target);
+  result.trajectory = BGLSolverBase<FloatType>::toStates(vd_path);
   result.trajectory.erase(result.trajectory.begin());
 
   result.cost = graph_[target].distance;

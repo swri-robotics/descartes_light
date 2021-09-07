@@ -30,11 +30,15 @@ namespace descartes_light
  * Therefore, these event visitors do not need to be specified as template parameters
  */
 template <typename FloatType, typename Visitors>
-class BGLDepthFirstSVSESolver : public BGLSolverBaseSVSE<FloatType, Visitors>
+class BGLDepthFirstSVSESolver : public BGLSolverBaseSVSE<FloatType>
 {
 public:
-  using BGLSolverBaseSVSE<FloatType, Visitors>::BGLSolverBaseSVSE;
+  BGLDepthFirstSVSESolver(Visitors event_visitors, unsigned num_threads = std::thread::hardware_concurrency());
   SearchResult<FloatType> search() override;
+
+protected:
+  /** @brief Event visitors for custom behavior in the search */
+  Visitors event_visitors_;
 };
 
 using BGLDepthFirstSVSESolverF = BGLDepthFirstSVSESolver<float, early_terminator<boost::on_discover_vertex>>;
@@ -48,11 +52,15 @@ using BGLDepthFirstSVSESolverD = BGLDepthFirstSVSESolver<double, early_terminato
  * parameters
  */
 template <typename FloatType, typename Visitors>
-class BGLDepthFirstSVDESolver : public BGLSolverBaseSVDE<FloatType, Visitors>
+class BGLDepthFirstSVDESolver : public BGLSolverBaseSVDE<FloatType>
 {
 public:
-  using BGLSolverBaseSVDE<FloatType, Visitors>::BGLSolverBaseSVDE;
+  BGLDepthFirstSVDESolver(Visitors event_visitors, unsigned num_threads = std::thread::hardware_concurrency());
   SearchResult<FloatType> search() override;
+
+protected:
+  /** @brief Event visitors for custom behavior in the search */
+  Visitors event_visitors_;
 };
 
 using BGLDepthFirstSVDESolverF = BGLDepthFirstSVDESolver<float, early_terminator<boost::on_discover_vertex>>;

@@ -11,12 +11,15 @@ namespace descartes_light
  * algorithm with a specifiable visitor to search the graph
  */
 template <typename FloatType, typename Visitors>
-class BGLDijkstraSVSESolver : public BGLSolverBaseSVSE<FloatType, Visitors>
+class BGLDijkstraSVSESolver : public BGLSolverBaseSVSE<FloatType>
 {
 public:
-  using BGLSolverBaseSVSE<FloatType, Visitors>::BGLSolverBaseSVSE;
-
+  BGLDijkstraSVSESolver(Visitors event_visitors, unsigned num_threads = std::thread::hardware_concurrency());
   SearchResult<FloatType> search() override;
+
+protected:
+  /** @brief Event visitors for custom behavior in the search */
+  Visitors event_visitors_;
 };
 
 using BGLDijkstraSVSESolverF = BGLDijkstraSVSESolver<float, early_terminator<boost::on_examine_vertex>>;
@@ -29,12 +32,15 @@ using BGLDijkstraSVSESolverD = BGLDijkstraSVSESolver<double, early_terminator<bo
  * this event visitor does not need to be specified as a template parameter
  */
 template <typename FloatType, typename Visitors>
-class BGLDijkstraSVDESolver : public BGLSolverBaseSVDE<FloatType, Visitors>
+class BGLDijkstraSVDESolver : public BGLSolverBaseSVDE<FloatType>
 {
 public:
-  using BGLSolverBaseSVDE<FloatType, Visitors>::BGLSolverBaseSVDE;
-
+  BGLDijkstraSVDESolver(Visitors event_visitors, unsigned num_threads = std::thread::hardware_concurrency());
   SearchResult<FloatType> search() override;
+
+protected:
+  /** @brief Event visitors for custom behavior in the search */
+  Visitors event_visitors_;
 };
 
 using BGLDijkstraSVDESolverF = BGLDijkstraSVDESolver<float, early_terminator<boost::on_examine_vertex>>;

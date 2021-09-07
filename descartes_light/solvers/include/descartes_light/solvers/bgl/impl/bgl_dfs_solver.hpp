@@ -63,14 +63,19 @@ static VertexDesc<FloatType> solveDFS(BGLGraph<FloatType>& graph,
 }
 
 template <typename FloatType, typename Visitors>
+BGLDepthFirstSVSESolver<FloatType, Visitors>::BGLDepthFirstSVSESolver(Visitors event_visitors, unsigned num_threads)
+  : BGLSolverBaseSVSE<FloatType>(num_threads), event_visitors_(std::move(event_visitors))
+{
+}
+
+template <typename FloatType, typename Visitors>
 SearchResult<FloatType> BGLDepthFirstSVSESolver<FloatType, Visitors>::search()
 {
   // Internal properties
-  auto& graph_ = BGLSolverBase<FloatType, Visitors>::graph_;
-  const auto& source_ = BGLSolverBase<FloatType, Visitors>::source_;
-  auto& predecessors_ = BGLSolverBase<FloatType, Visitors>::predecessors_;
-  const auto& ladder_rungs_ = BGLSolverBase<FloatType, Visitors>::ladder_rungs_;
-  const auto& event_visitors_ = BGLSolverBase<FloatType, Visitors>::event_visitors_;
+  auto& graph_ = BGLSolverBase<FloatType>::graph_;
+  const auto& source_ = BGLSolverBase<FloatType>::source_;
+  auto& predecessors_ = BGLSolverBase<FloatType>::predecessors_;
+  const auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
 
   // Resize the container of predecessors to match the number of vertices
   // Assign the initial values as a vertex descriptor that is definitely not in the graph to avoid mistakes in the
@@ -90,8 +95,8 @@ SearchResult<FloatType> BGLDepthFirstSVSESolver<FloatType, Visitors>::search()
   SearchResult<FloatType> result;
 
   // Reconstruct the path from the predecesor map; remove the artificial start state
-  const auto vd_path = BGLSolverBase<FloatType, Visitors>::reconstructPath(source_, target);
-  result.trajectory = BGLSolverBase<FloatType, Visitors>::toStates(vd_path);
+  const auto vd_path = BGLSolverBase<FloatType>::reconstructPath(source_, target);
+  result.trajectory = BGLSolverBase<FloatType>::toStates(vd_path);
   result.trajectory.erase(result.trajectory.begin());
 
   result.cost = graph_[target].distance;
@@ -100,14 +105,19 @@ SearchResult<FloatType> BGLDepthFirstSVSESolver<FloatType, Visitors>::search()
 }
 
 template <typename FloatType, typename Visitors>
+BGLDepthFirstSVDESolver<FloatType, Visitors>::BGLDepthFirstSVDESolver(Visitors event_visitors, unsigned num_threads)
+  : BGLSolverBaseSVDE<FloatType>(num_threads), event_visitors_(std::move(event_visitors))
+{
+}
+
+template <typename FloatType, typename Visitors>
 SearchResult<FloatType> BGLDepthFirstSVDESolver<FloatType, Visitors>::search()
 {
   // Internal properties
-  auto& graph_ = BGLSolverBase<FloatType, Visitors>::graph_;
-  const auto& source_ = BGLSolverBase<FloatType, Visitors>::source_;
-  auto& predecessors_ = BGLSolverBase<FloatType, Visitors>::predecessors_;
-  const auto& ladder_rungs_ = BGLSolverBase<FloatType, Visitors>::ladder_rungs_;
-  const auto& event_visitors_ = BGLSolverBase<FloatType, Visitors>::event_visitors_;
+  auto& graph_ = BGLSolverBase<FloatType>::graph_;
+  const auto& source_ = BGLSolverBase<FloatType>::source_;
+  auto& predecessors_ = BGLSolverBase<FloatType>::predecessors_;
+  const auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
 
   // Resize the container of predecessors to match the number of vertices
   // Assign the initial values as a vertex descriptor that is definitely not in the graph to avoid mistakes in the
@@ -119,7 +129,7 @@ SearchResult<FloatType> BGLDepthFirstSVDESolver<FloatType, Visitors>::search()
 
   // Make a visitor that combines the internally specified event visitors with ones that add all edges dynamically and
   // record predecessors and vertex costs (i.e. distances)
-  const auto& edge_eval_ = BGLSolverBaseSVDE<FloatType, Visitors>::edge_eval_;
+  const auto& edge_eval_ = BGLSolverBaseSVDE<FloatType>::edge_eval_;
   auto visitor = std::make_pair(
       boost::record_predecessors(predecessors_.data(), boost::on_tree_edge()),
       std::make_pair(
@@ -132,8 +142,8 @@ SearchResult<FloatType> BGLDepthFirstSVDESolver<FloatType, Visitors>::search()
   SearchResult<FloatType> result;
 
   // Reconstruct the path from the predecesor map; remove the artificial start state
-  const auto vd_path = BGLSolverBase<FloatType, Visitors>::reconstructPath(source_, target);
-  result.trajectory = BGLSolverBase<FloatType, Visitors>::toStates(vd_path);
+  const auto vd_path = BGLSolverBase<FloatType>::reconstructPath(source_, target);
+  result.trajectory = BGLSolverBase<FloatType>::toStates(vd_path);
   result.trajectory.erase(result.trajectory.begin());
 
   result.cost = graph_[target].distance;
