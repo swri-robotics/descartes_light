@@ -26,6 +26,8 @@ namespace descartes_light
 /**
  * @brief BGL solver implementation that constructs vertices and edges in the build function and uses a depth first
  * search with a specifiable visitor to search the graph
+ * @details Note: the solver internally creates event visitors for recording predecessors and vertex distances.
+ * Therefore, these event visitors do not need to be specified as template parameters
  */
 template <typename FloatType, typename Visitors>
 class BGLDepthFirstSVSESolver : public BGLSolverBaseSVSE<FloatType, Visitors>
@@ -41,6 +43,9 @@ using BGLDepthFirstSVSESolverD = BGLDepthFirstSVSESolver<double, early_terminato
 /**
  * @brief BGL solver implementation that constructs vertices build function and uses a depth first search
  * with an edge-adding visitor to search the graph
+ * @details Note: the solver internally creates event visitors for recording predecessors and vertex distances and for
+ * adding edges dynamically to the graph. Therefore, these event visitors do not need to be specified as template
+ * parameters
  */
 template <typename FloatType, typename Visitors>
 class BGLDepthFirstSVDESolver : public BGLSolverBaseSVDE<FloatType, Visitors>
