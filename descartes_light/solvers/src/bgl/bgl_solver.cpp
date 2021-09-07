@@ -56,22 +56,29 @@ template struct add_all_edges_dynamically<float, boost::on_examine_vertex>;
 template struct add_all_edges_dynamically<double, boost::on_examine_vertex>;
 
 // Explicit template instantiation
+// Float type(s) with which to instantiate the solvers
 #define FLOAT_TYPES (double)(float)
-#define DIJKSTRA_EVENT_VISITORS (boost::null_visitor)(early_terminator<boost::on_examine_vertex>)
-#define DFS_EVENT_VISITORS (boost::null_visitor)(early_terminator<boost::on_discover_vertex>)
+// Event visitor(s) used by all solvers
+#define COMMON_EVENT_VISITORS (boost::null_visitor)
+// Event visitor(s) used specifically by the Dijkstra solver
+#define DIJKSTRA_EVENT_VISITORS (early_terminator<boost::on_examine_vertex>)
+// Event visitor(s) used specifically by the DFS solver
+#define DFS_EVENT_VISITORS (early_terminator<boost::on_discover_vertex>)
 
 // Partial implementations
-INSTANTIATE_PRODUCT(BGLSolverBase, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
-INSTANTIATE_PRODUCT(BGLSolverBaseSVSE, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
-INSTANTIATE_PRODUCT(BGLSolverBaseSVDE, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
+// These must be instantiated for the unique set of event visitors used by all other BGL solvers
+INSTANTIATE_PRODUCT(BGLSolverBase, FLOAT_TYPES, COMMON_EVENT_VISITORS DIJKSTRA_EVENT_VISITORS DFS_EVENT_VISITORS)
+INSTANTIATE_PRODUCT(BGLSolverBaseSVSE, FLOAT_TYPES, COMMON_EVENT_VISITORS DIJKSTRA_EVENT_VISITORS DFS_EVENT_VISITORS)
+INSTANTIATE_PRODUCT(BGLSolverBaseSVDE, FLOAT_TYPES, COMMON_EVENT_VISITORS DIJKSTRA_EVENT_VISITORS DFS_EVENT_VISITORS)
 
+// Full implementation
 // BGL Dijkstra search
-INSTANTIATE_PRODUCT(BGLDijkstraSVSESolver, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
-INSTANTIATE_PRODUCT(BGLDijkstraSVDESolver, FLOAT_TYPES, DIJKSTRA_EVENT_VISITORS)
+INSTANTIATE_PRODUCT(BGLDijkstraSVSESolver, FLOAT_TYPES, COMMON_EVENT_VISITORS DIJKSTRA_EVENT_VISITORS)
+INSTANTIATE_PRODUCT(BGLDijkstraSVDESolver, FLOAT_TYPES, COMMON_EVENT_VISITORS DIJKSTRA_EVENT_VISITORS)
 
 // BGL DFS
-INSTANTIATE_PRODUCT(BGLDepthFirstSVSESolver, FLOAT_TYPES, DFS_EVENT_VISITORS)
-INSTANTIATE_PRODUCT(BGLDepthFirstSVDESolver, FLOAT_TYPES, DFS_EVENT_VISITORS)
+INSTANTIATE_PRODUCT(BGLDepthFirstSVSESolver, FLOAT_TYPES, COMMON_EVENT_VISITORS DFS_EVENT_VISITORS)
+INSTANTIATE_PRODUCT(BGLDepthFirstSVDESolver, FLOAT_TYPES, COMMON_EVENT_VISITORS DFS_EVENT_VISITORS)
 
 // Free functions
 template SubGraph<double> createDecoratedSubGraph(const BGLGraph<double>& g);
