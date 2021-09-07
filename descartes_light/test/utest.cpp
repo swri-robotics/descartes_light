@@ -21,11 +21,11 @@ using namespace descartes_light;
 /**
  * @brief Test fixture for the solver interface
  */
-template <typename SolverFactoryT>
+template <typename SolverT>
 class OptimalSolverFixture : public ::testing::Test
 {
 public:
-  using FloatType = typename SolverFactoryT::FloatType;
+  using FloatType = typename SolverT::FloatT;
 
   OptimalSolverFixture() : state_cost(static_cast<FloatType>(1.0))
   {
@@ -36,27 +36,27 @@ public:
   const std::size_t n_waypoints{ 10 };
   const std::size_t samples_per_waypoint{ 4 };
   const FloatType state_cost;
-  SolverFactoryT Factory;
+  SolverFactory<SolverT> factory;
   std::vector<typename WaypointSampler<FloatType>::ConstPtr> samplers;
 };
 
-using OptimalImplementations = ::testing::Types<SolverFactory<LadderGraphSolverF>,
-                                                SolverFactory<LadderGraphSolverD>,
-                                                SolverFactory<BGLDijkstraSVSESolver<float, boost::null_visitor>>,
-                                                SolverFactory<BGLDijkstraSVSESolver<double, boost::null_visitor>>,
-                                                SolverFactory<BGLDijkstraSVSESolverF>,
-                                                SolverFactory<BGLDijkstraSVSESolverD>,
-                                                SolverFactory<BGLDijkstraSVDESolver<float, boost::null_visitor>>,
-                                                SolverFactory<BGLDijkstraSVDESolver<double, boost::null_visitor>>,
-                                                SolverFactory<BGLDijkstraSVDESolverF>,
-                                                SolverFactory<BGLDijkstraSVDESolverD>>;
+using OptimalImplementations = ::testing::Types<LadderGraphSolverF,
+                                                LadderGraphSolverD,
+                                                BGLDijkstraSVSESolver<float, boost::null_visitor>,
+                                                BGLDijkstraSVSESolver<double, boost::null_visitor>,
+                                                BGLDijkstraSVSESolverF,
+                                                BGLDijkstraSVSESolverD,
+                                                BGLDijkstraSVDESolver<float, boost::null_visitor>,
+                                                BGLDijkstraSVDESolver<double, boost::null_visitor>,
+                                                BGLDijkstraSVDESolverF,
+                                                BGLDijkstraSVDESolverD>;
 
 TYPED_TEST_CASE(OptimalSolverFixture, OptimalImplementations);
 
 TYPED_TEST(OptimalSolverFixture, KnownPathTest)
 {
-  using FloatType = typename TypeParam::FloatType;
-  typename Solver<FloatType>::Ptr solver = this->Factory.create(static_cast<long>(this->n_waypoints));
+  using FloatType = typename TypeParam::FloatT;
+  typename Solver<FloatType>::Ptr solver = this->factory.create(static_cast<long>(this->n_waypoints));
 
   // Build a graph where one sample for each waypoint is an all zero state; evaluate edges using the Euclidean distance
   // metric Since each waypoint has an all-zero state, the shortest path should be through these samples
@@ -82,26 +82,26 @@ TYPED_TEST(OptimalSolverFixture, KnownPathTest)
   }
 }
 
-template <typename SolverFactoryT>
-class NonOptimalSolverFixture : public OptimalSolverFixture<SolverFactoryT>
+template <typename SolverT>
+class NonOptimalSolverFixture : public OptimalSolverFixture<SolverT>
 {
 };
 
-using NonOptimalImplementations = ::testing::Types<SolverFactory<BGLDepthFirstSVSESolverF>,
-                                                   SolverFactory<BGLDepthFirstSVSESolverD>,
-                                                   SolverFactory<BGLDepthFirstSVSESolver<float, boost::null_visitor>>,
-                                                   SolverFactory<BGLDepthFirstSVSESolver<double, boost::null_visitor>>,
-                                                   SolverFactory<BGLDepthFirstSVDESolverF>,
-                                                   SolverFactory<BGLDepthFirstSVDESolverD>,
-                                                   SolverFactory<BGLDepthFirstSVDESolver<float, boost::null_visitor>>,
-                                                   SolverFactory<BGLDepthFirstSVDESolver<double, boost::null_visitor>>>;
+using NonOptimalImplementations = ::testing::Types<BGLDepthFirstSVSESolverF,
+                                                   BGLDepthFirstSVSESolverD,
+                                                   BGLDepthFirstSVSESolver<float, boost::null_visitor>,
+                                                   BGLDepthFirstSVSESolver<double, boost::null_visitor>,
+                                                   BGLDepthFirstSVDESolverF,
+                                                   BGLDepthFirstSVDESolverD,
+                                                   BGLDepthFirstSVDESolver<float, boost::null_visitor>,
+                                                   BGLDepthFirstSVDESolver<double, boost::null_visitor>>;
 
 TYPED_TEST_CASE(NonOptimalSolverFixture, NonOptimalImplementations);
 
 TYPED_TEST(NonOptimalSolverFixture, Solve)
 {
-  using FloatType = typename TypeParam::FloatType;
-  typename Solver<FloatType>::Ptr solver = this->Factory.create(static_cast<long>(this->n_waypoints));
+  using FloatType = typename TypeParam::FloatT;
+  typename Solver<FloatType>::Ptr solver = this->factory.create(static_cast<long>(this->n_waypoints));
 
   // Build a graph where one sample for each waypoint is an all zero state; evaluate edges using the Euclidean distance
   // metric Since each waypoint has an all-zero state, the shortest path should be through these samples

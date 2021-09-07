@@ -25,7 +25,7 @@ void benchmark(const SolverFactory<SolverT>& factory)
   std::cout << boost::core::demangle(typeid(SolverT).name()) << std::endl;
   std::cout << "==============================================\n" << std::endl;
 
-  using FloatType = typename SolverFactory<SolverT>::FloatType;
+  using FloatType = typename SolverT::FloatT;
   using Clock = std::chrono::steady_clock;
 
   // Parameterize the size of the planning problem in terms of the number of degrees of freedom, number of waypoints in

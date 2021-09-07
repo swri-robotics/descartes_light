@@ -10,8 +10,7 @@ namespace descartes_light
 template <typename SolverT>
 struct SolverFactory
 {
-  using FloatType = typename SolverT::FloatT;
-  typename Solver<FloatType>::Ptr create(long n_waypoints) const;
+  typename Solver<typename SolverT::FloatT>::Ptr create(long n_waypoints) const;
 };
 
 }  // namespace descartes_light
