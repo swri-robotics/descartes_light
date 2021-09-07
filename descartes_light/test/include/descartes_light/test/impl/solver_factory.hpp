@@ -30,4 +30,21 @@ struct SolverFactory<BGLEfficientDijkstraSVSESolver<FloatType>>
   }
 };
 
+// Dynamic Boost full Dijkstra graph solver factory
+template <typename FloatType>
+struct SolverFactory<BGLDijkstraSVDESolver<FloatType>>
+{
+  typename Solver<FloatType>::Ptr create() const { return std::make_shared<BGLDijkstraSVDESolver<FloatType>>(1); }
+};
+
+// Dynamic Boost efficient Dijkstra graph solver factory
+template <typename FloatType>
+struct SolverFactory<BGLEfficientDijkstraSVDESolver<FloatType>>
+{
+  typename Solver<FloatType>::Ptr create() const
+  {
+    return std::make_shared<BGLEfficientDijkstraSVDESolver<FloatType>>(1);
+  }
+};
+
 }  // namespace descartes_light
