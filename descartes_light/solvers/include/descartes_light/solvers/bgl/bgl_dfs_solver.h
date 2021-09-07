@@ -15,27 +15,44 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#ifndef DESCARTES_LIGHT_SOLVERS_BGL_DFS_SOLVER_H
-#define DESCARTES_LIGHT_SOLVERS_BGL_DFS_SOLVER_H
+#ifndef DESCARTES_LIGHT_SOLVERS_BGL_BGL_DFS_SOLVER_H
+#define DESCARTES_LIGHT_SOLVERS_BGL_BGL_DFS_SOLVER_H
 
 #include <descartes_light/solvers/bgl/bgl_solver.h>
+#include <descartes_light/solvers/bgl/event_visitors.h>
 
 namespace descartes_light
 {
 /**
- * @brief Depth First Search that adds edged from source node to all nodes in the target rung
+ * @brief BGL solver implementation that constructs vertices and edges in the build function and uses a depth first
+ * search with a specifiable visitor to search the graph
  */
-template <typename FloatType>
-class DepthFirstSVDESolver : public BGLSolverBaseSVDE<FloatType>
+template <typename FloatType, typename Visitors>
+class BGLDepthFirstSVSESolver : public BGLSolverBaseSVSE<FloatType, Visitors>
 {
 public:
-  using BGLSolverBaseSVDE<FloatType>::BGLSolverBaseSVDE;
+  using BGLSolverBaseSVSE<FloatType, Visitors>::BGLSolverBaseSVSE;
   SearchResult<FloatType> search() override;
 };
 
-using DepthFirstSVDESolverF = DepthFirstSVDESolver<float>;
-using DepthFirstSVDESolverD = DepthFirstSVDESolver<double>;
+using BGLDepthFirstSVSESolverF = BGLDepthFirstSVSESolver<float, early_terminator<boost::on_discover_vertex>>;
+using BGLDepthFirstSVSESolverD = BGLDepthFirstSVSESolver<double, early_terminator<boost::on_discover_vertex>>;
+
+/**
+ * @brief BGL solver implementation that constructs vertices build function and uses a depth first search
+ * with an edge-adding visitor to search the graph
+ */
+template <typename FloatType, typename Visitors>
+class BGLDepthFirstSVDESolver : public BGLSolverBaseSVDE<FloatType, Visitors>
+{
+public:
+  using BGLSolverBaseSVDE<FloatType, Visitors>::BGLSolverBaseSVDE;
+  SearchResult<FloatType> search() override;
+};
+
+using BGLDepthFirstSVDESolverF = BGLDepthFirstSVDESolver<float, early_terminator<boost::on_discover_vertex>>;
+using BGLDepthFirstSVDESolverD = BGLDepthFirstSVDESolver<double, early_terminator<boost::on_discover_vertex>>;
 
 }  // namespace descartes_light
 
-#endif  // DESCARTES_LIGHT_SOLVERS_BGL_DFS_SOLVER_H
+#endif  // DESCARTES_LIGHT_SOLVERS_BGL_BGL_DFS_SOLVER_H
