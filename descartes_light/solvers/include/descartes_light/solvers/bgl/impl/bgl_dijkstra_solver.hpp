@@ -55,7 +55,9 @@ static VertexDesc<FloatType> solveDijkstra(BGLGraph<FloatType>& graph,
                                    [&](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
                                      return graph[a].distance < graph[b].distance;
                                    });
-    if (target != ladder_rungs.back().end())
+
+    // Check that the identified lowest cost vertex is valid and has a cost less than inf
+    if (target != ladder_rungs.back().end() && graph[*target].distance < std::numeric_limits<FloatType>::max())
       throw *target;
   }
   catch (const VertexDesc<FloatType>& target)
