@@ -4,6 +4,7 @@
 // Solvers
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
 #include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
+#include <descartes_light/solvers/bgl/bgl_dfs_solver.h>
 
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/core/demangle.hpp>
@@ -24,7 +25,7 @@ void benchmark(const SolverFactory<SolverT>& factory)
   std::cout << boost::core::demangle(typeid(SolverT).name()) << std::endl;
   std::cout << "==============================================\n" << std::endl;
 
-  using FloatType = typename SolverFactory<SolverT>::FloatType;
+  using FloatType = typename SolverT::FloatT;
   using Clock = std::chrono::steady_clock;
 
   // Parameterize the size of the planning problem in terms of the number of degrees of freedom, number of waypoints in
@@ -95,6 +96,22 @@ int main(int, char**)
   // BGL Dijkstra early termination, static vertex, dynamic edge
   benchmark(SolverFactory<BGLDijkstraSVDESolverD>());
   benchmark(SolverFactory<BGLDijkstraSVDESolverF>());
+
+  // BGL depth first full search, static vertex static edge
+  benchmark(SolverFactory<BGLDepthFirstSVSESolver<double, boost::null_visitor>>());
+  benchmark(SolverFactory<BGLDepthFirstSVSESolver<float, boost::null_visitor>>());
+
+  // BGL depth first early termination, static vertex static edge
+  benchmark(SolverFactory<BGLDepthFirstSVSESolverD>());
+  benchmark(SolverFactory<BGLDepthFirstSVSESolverF>());
+
+  // BGL depth first full search, static vertex dynamic edge
+  benchmark(SolverFactory<BGLDepthFirstSVDESolver<double, boost::null_visitor>>());
+  benchmark(SolverFactory<BGLDepthFirstSVDESolver<float, boost::null_visitor>>());
+
+  // BGL depth first early termination, static vertex, dynamic edge
+  benchmark(SolverFactory<BGLDepthFirstSVDESolverD>());
+  benchmark(SolverFactory<BGLDepthFirstSVDESolverF>());
 
   return 0;
 }
