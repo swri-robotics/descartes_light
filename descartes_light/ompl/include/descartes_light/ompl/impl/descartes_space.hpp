@@ -150,12 +150,19 @@ double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::bas
     if (abs(rung_diff) == 1)
     {
       // ADD edge eval
-      dist += IDX_TO_IDX_DIST * abs(idx_diff);
+      std::pair<bool, FloatType> edge_res
+          = edge_eval_[static_cast<std::size_t>(std::min(rung1, rung2))]->evaluate(*graph_[ladder_rungs_[rung1][idx1]].sample.state,
+                                                                  *graph_[ladder_rungs_[rung2][idx2]].sample.state);
+      if (edge_res.first)
+        dist += static_cast<double>(edge_res.second);
+      else
+        dist += RUNG_TO_RUNG_DIST;
+//      dist += IDX_TO_IDX_DIST * abs(idx_diff);
     }
     else
       dist += IDX_TO_IDX_DIST * abs(idx_diff);
     if (dist == 0)
-      dist += 0.1;
+      dist += 0.0001;
     return dist;
 }
 
@@ -206,7 +213,7 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
     {
       new_rung = rung1 - 1;
     }
-    double maxD = t * distance(from, to);
+//    double maxD = t * distance(from, to);
     long unsigned int new_rung_size = ladder_rungs_[new_rung].size();
     for (std::size_t i = 0; i < new_rung_size; i++)
     {
@@ -214,10 +221,18 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
       if (new_idx_test >= new_rung_size)
         new_idx_test -= new_rung_size;
       // DITANCE CALCULATION
-      int idx_diff = static_cast<int>(idx1) - static_cast<int>(new_idx_test);
-      if (idx_diff < maxD)
+      std::pair<bool, FloatType> edge_res
+          = edge_eval_[static_cast<std::size_t>(std::min(rung1, new_rung))]->evaluate(*graph_[ladder_rungs_[rung1][idx1]].sample.state,
+                                                                  *graph_[ladder_rungs_[new_rung][new_idx_test]].sample.state);
+      double dist;
+      if (edge_res.first)
+        dist = static_cast<double>(edge_res.second);
+      else
+        dist = RUNG_TO_RUNG_DIST;
+//      int idx_diff = static_cast<int>(idx1) - static_cast<int>(new_idx_test);
+      if (dist < max_dist_)
       {
-        new_idx = i;
+        new_idx = new_idx_test;
         break;
       }
     }

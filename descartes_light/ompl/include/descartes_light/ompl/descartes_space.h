@@ -41,6 +41,7 @@ namespace descartes_light
     class DescartesStateSpace : public ompl::base::StateSpace
     {
     public:
+
         /** \brief The definition of a state in R<sup>n</sup> */
         class StateType : public ompl::base::State
         {
@@ -54,8 +55,10 @@ namespace descartes_light
         /** \brief Constructor. The dimension of of the space needs to be specified. A space representing
             R<sup>dim</sup> will be instantiated */
         DescartesStateSpace<FloatType>(descartes_light::BGLGraph<FloatType> graph,
-                                       std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs)
-          : graph_(graph), ladder_rungs_(ladder_rungs), stateBytes_(sizeof(long unsigned int))
+                                       std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs,
+                                       const std::vector<typename descartes_light::EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
+                                       double max_dist)
+          : graph_(graph), ladder_rungs_(ladder_rungs), edge_eval_(std::move(edge_eval)), max_dist_(max_dist), stateBytes_(sizeof(long unsigned int))
         {
             type_ = 14; // Larger than default types
             setName("Descartes" + getName());
@@ -149,6 +152,10 @@ namespace descartes_light
         descartes_light::BGLGraph<FloatType> graph_;
         /** @brief Ladder graph representation of the graph vertices, used for creating edge connections */
         std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs_;
+
+        const std::vector<typename descartes_light::EdgeEvaluator<FloatType>::ConstPtr> edge_eval_;
+
+        double max_dist_;
 
     private:
         /** \brief The size of a state, in bytes */

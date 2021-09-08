@@ -17,8 +17,8 @@ public:
 
   SearchResult<FloatType> search() override;
 
-protected:
-  const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> edge_eval_;
+//protected:
+//  const std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> edge_eval_;
 };
 
 using BGLOMPLSVDESolverF = BGLOMPLSVDESolver<float>;

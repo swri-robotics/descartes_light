@@ -23,6 +23,9 @@ SearchResult<FloatType> BGLOMPLSVDESolver<FloatType>::search()
   const auto& source_ = BGLSolverBase<FloatType>::source_;
 //  auto& predecessor_map_ = BGLSolverBase<FloatType>::predecessor_map_;
   const auto& ladder_rungs_ = BGLSolverBase<FloatType>::ladder_rungs_;
+  const auto& edge_eval_ = BGLSolverBaseSVDE<FloatType>::edge_eval_;
+  std::cout << "EE size: " << edge_eval_.size() << std::endl;
+  double max_dist = 0.5;
 
   // Internal properties
 //  auto index_prop_map = boost::get(boost::vertex_index, graph_);
@@ -36,7 +39,7 @@ SearchResult<FloatType> BGLOMPLSVDESolver<FloatType>::search()
 
   ompl::base::StateSpacePtr state_space_ptr;
 
-  auto dss = std::make_shared<descartes_light::DescartesStateSpace<FloatType>>(graph_, ladder_rungs_);
+  auto dss = std::make_shared<descartes_light::DescartesStateSpace<FloatType>>(graph_, ladder_rungs_, edge_eval_, max_dist);
   std::cout << "1" << std::endl;
 
   auto rvss = std::make_shared<ompl::base::RealVectorStateSpace>(2);
@@ -68,8 +71,9 @@ SearchResult<FloatType> BGLOMPLSVDESolver<FloatType>::search()
   std::cout << "6" << std::endl;
   std::cout << "ladder_rungs_.front().front()" << ladder_rungs_.front().front() << std::endl;
   std::cout << "ladder_rungs_.back().back()" << ladder_rungs_.back().back() << std::endl;
-  std::pair<long unsigned int, long unsigned int> start_v(0, 0);
-  std::pair<long unsigned int, long unsigned int> goal_v(ladder_rungs_.size() - 1, ladder_rungs_.back().size() - 1);
+  std::pair<long unsigned int, long unsigned int> start_v(0, 2);
+//  std::pair<long unsigned int, long unsigned int> goal_v(ladder_rungs_.size() - 1, ladder_rungs_.back().size() - 1);
+  std::pair<long unsigned int, long unsigned int> goal_v(9, 2);
 //  start->value = ladder_rungs_.front().front();
 //  goal->value = ladder_rungs_.back().back();
   start->vertex = start_v;
@@ -94,8 +98,26 @@ SearchResult<FloatType> BGLOMPLSVDESolver<FloatType>::search()
     dss->printState(ref_state, std::cout);
     std::cout << "test_state " << i << ": ";
     dss->printState(test_state, std::cout);
-    std::cout << "distance: " << dss->distance(ref_state, test_state) << std::endl;;
+    std::cout << "distance: " << dss->distance(ref_state, test_state) << std::endl;
   }
+//  for (std::size_t i = 0; i < ladder_rungs_.size() - 1; i++)
+//  {
+//    for (std::size_t j = 0; j < 4; j++)
+//    {
+//      for (std::size_t k = 0; k < 4; k++)
+//      {
+//        std::pair<long unsigned int, long unsigned int> vertex1(i, j);
+//        ref_state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex = vertex1;
+//        std::pair<long unsigned int, long unsigned int> vertex2(i + 1, k);
+//        test_state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex = vertex2;
+//        std::cout << "ref_state " << i << ": ";
+//        dss->printState(ref_state, std::cout);
+//        std::cout << "test_state " << i << ": ";
+//        dss->printState(test_state, std::cout);
+//        std::cout << "distance: " << dss->distance(ref_state, test_state) << std::endl;;
+//      }
+//    }
+//  }
   std::cout << "9.1" << std::endl;
 //  auto si = ss.getSpaceInformation();
   ompl::base::SpaceInformationPtr si(ss.getSpaceInformation());
@@ -110,7 +132,8 @@ SearchResult<FloatType> BGLOMPLSVDESolver<FloatType>::search()
   std::shared_ptr<ompl::geometric::RRT> planner =
       std::make_shared<ompl::geometric::RRT>((ss.getSpaceInformation()));
   std::cout << "10.1" << std::endl;
-  planner->setRange(1.5);
+//  planner->setRange(1000.0);
+  planner->setRange(max_dist);
   std::cout << "10.2" << std::endl;
   ss.setPlanner(planner);
   std::cout << "10.3" << std::endl;
@@ -151,6 +174,17 @@ SearchResult<FloatType> BGLOMPLSVDESolver<FloatType>::search()
   std::cout << "15" << std::endl;
   path.print(std::cout);
   std::cout << "16" << std::endl;
+  std::vector<ompl::base::State *> path_states = path.getStates();
+  for (std::size_t i = 0; i < path_states.size() - 1; i++)
+  {
+    auto curr_state = path_states[i];
+    auto next_state = path_states[i + 1];
+    std::cout << "FROM: ";
+    dss->printState(curr_state, std::cout);
+    std::cout << "TO: ";
+    dss->printState(next_state, std::cout);
+    std::cout << "Distance: " << dss->distance(curr_state, next_state) << std::endl << std::endl;
+  }
 //  ss.simplifySolution();
 //  std::cout << "17" << std::endl;
 //  ompl::geometric::PathGeometric path2 = ss.getSolutionPath();
