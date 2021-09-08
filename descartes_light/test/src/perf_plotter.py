@@ -1,8 +1,8 @@
 #!/usr/bin/env python
-
+import argparse
+import pathlib
 import math
 import numpy as np
-# import matplotlib as mpl
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import axes3d, Axes3D #<-- Note the capitalization! 
 import sys
@@ -11,11 +11,11 @@ class Perf_Plotter():
     def __init__(self):
         self.dict = {}
 
-    def strip(self, filename = "../benchmarks/benchmarks.txt"):
-        #Each title in "dict" refers to a different algorythm: dict["alg_name"]
-        #Each algorithm has a dictionary of lists: dict["alg_name"]['list_name']
-        #There are five lists per alg: "dof", "n_waypoints", "samples", "Graph Build Time", "Graph Search Time"
-        #Ergo to get each data value, use "dict['alg_name']['key_name'][test#]"
+    def strip(self, filename):
+        """Generates a dictionary of algorithm benchmark data. Output stored inside Perf_Plotter.dict.
+        Data values are organized in the form "Perf_Plotter.dict['algorithm_name'(string)]['data_key_name'(string)][test#(int)]"
+        :param filename: (string) Relative path to text file containing benchmark data of interest.
+        """
         currentGraphTitle = ' '
         with open(filename) as input:
             for line in input:
@@ -28,7 +28,7 @@ class Perf_Plotter():
 
                 elif 'Inputs' in line:
                     #New datapoint for a new simulation: Added as the last dict element for this graph
-                    currentDatapointDict = self.stripInputs(line)
+                    currentDatapointDict = self.strip_inputs(line)
                     #add a dictionary to the list of datapoint dictionaries:
                     self.dict[currentGraphTitle]['dofs'].append(float(currentDatapointDict['dofs']))
                     self.dict[currentGraphTitle]['n_waypoints'].append(float(currentDatapointDict['n_waypoints']))
@@ -36,13 +36,15 @@ class Perf_Plotter():
                     
 
                 elif 'Graph' in line:
-                    title, value = self.stripTime(line)
+                    title, value = self.strip_time(line)
                     #Add an entry to the last datapoint dict for this time value:
                     self.dict[currentGraphTitle][title].append(float(value))
 
-
-    def stripInputs(self, textline):
-        #takes inputs in and outputs inputs out.
+    def strip_inputs(self, textline):
+        """Scrapes test config data from a line in a benchmarks file.
+        :param textline: (string) Line of text from which to strip data according to text delimeters.
+        :return: (dict) Label and value pairs of data in input.
+        """
         workingIndex = textline.find("dof: ") + 5
         out_dict = {}
         out_dict['dofs'] = textline[workingIndex:textline.find(',', workingIndex)]
@@ -53,7 +55,11 @@ class Perf_Plotter():
 
         return out_dict
 
-    def stripTime(self, textline):
+    def strip_time(self, textline):
+        """Scrapes time data and associated label from a line in a benchmarks file.
+        :param textline: (string) Line of text from which to strip time and label.
+        :return: (tuple of string, float) Label and value of time data in input.
+        """
         workingIndex = textline.find(" (s): ")
         title = textline[1:workingIndex]
         workingIndex = workingIndex + 6
@@ -61,34 +67,36 @@ class Perf_Plotter():
         
         return title, value
 
-    def plot(self, algList, num = 0, which = 0):
-        # Format a figure for the specified number "num" of subplots requested; default is all plots in algList
-
+    def plot(self, algList):
+        """Create a figure and plot the indicated algorithm performances in subplots.
+        :param algList: (list) A list of names (String) of algorithms to plot.
+        """
+        # print("Alg list is " + str(algList))
+        num=len(algList)
         max_duration = self.find_max(algList[0:num], 'Graph Search Time')
-        print("Longest search duration is " + str(max_duration))
+        # print("Longest search duration is " + str(max_duration))
 
         fig = plt.figure()
         plt.subplots_adjust(left=.05, bottom=.1, right=.95, top=.99, wspace=.2, hspace=.15)
 
-
-        if(num == 1):
-            ax = Axes3D(fig)
-            alg = algList[which]
-            self.subplot(alg, ax)
-        else:
-            num = min(num, len(algList))
-            if num <= 0:
-                num = len(algList)
-            rows = math.ceil(num/4)
-            print("Number of plots is going to be " + str(num) + " using " + str(rows) + " rows.")
+        if num <= 0:
+            print("Error: No elements to graph!")
+            num = len(algList)
+        rows = math.ceil(num/4)
+        print("Number of plots = " + str(num) + 
+            " using " + str(rows) + " rows.")
             
-            for n in range(0, num):
-                ax = fig.add_subplot(rows, math.ceil(num/rows), n+1, projection='3d')
-                self.subplot(algList[n], ax, max=max_duration)
+        for n in range(0, num):
+            ax = fig.add_subplot(rows, math.ceil(num/rows), n+1, projection='3d')
+            self.subplot(algList[n], ax, max=max_duration)
 
         plt.show()
 
     def find_max(self, algs, key):
+        """Scans through performance data to find max value for a metric (time, #samples, etc.)
+        :param algs: (list) A list of names (String) of algorithms to check.
+        :param key: (String) The metric type to plot (must be "dofs", "n_waypoints", "samples", "Graph Search Time", or "Graph Build Time")
+        """
         _max = 0
         for i in range(0,len(algs)):
             m = np.amax( np.array(self.dict[algs[i]][key]))
@@ -96,9 +104,14 @@ class Perf_Plotter():
             _max = max(_max, m)
         return _max
 
-
     def subplot(self, alg, ax, max = None):
-        # Plot alg with average times above clustered time bars. 
+        """ Plot alg with average times above clustered time bars.
+        :param alg: (dict) Dictionary of lists of per-test data addressed by keys 'samples', 
+         'n_waypoints', and 'Graph Search Time'.
+        :param ax: (mpl_toolkits.mplot3d.axes3d) 3d plot axes object onto which to plot data.
+        :param max: (float) Optional maximum z-axis value; by default max is greater than
+         maximum z value of plotted data.
+        """ 
 
         num_tests = len(self.dict[alg][list(self.dict[alg])[0]])
         #print("count of tests = " + str(num_tests))
@@ -117,7 +130,8 @@ class Perf_Plotter():
         b = zip(self.dict[alg]["samples"], self.dict[alg]["n_waypoints"], self.dict[alg]["Graph Search Time"])
         zs = [0]*len(a)
         count = [0]*len(a)
-        #Print a time in seconds for each cluster of data
+
+        #Print the average time in seconds for each cluster of data
         for x, y, z in b:
             if (x,y) in a:
                 n = a.index((x,y))
@@ -134,12 +148,9 @@ class Perf_Plotter():
         b = zip(a, avg_z)
         for (x, y), z in b:
             if (x,y) in a:
-                #If the xy cluster hasn't been labeled yet:
-                ax.text(x, y, z+.25, str(np.round(z, 3)), color=(0,0,.8), fontsize=8, zdir='y')
-                #del a[a.index(x,y)]
+                ax.text(x, y, z+.1, str(np.round(z, 3)), color=(0,0,.8), fontsize=8, zdir='y')
             else:
                 print("Index Error! Can't find cluster!")
-        # ax.text(10, 10, -.5, "Blah", zdir='y')
 
         # Format graph
         ax.set_xlabel('Samples')
@@ -155,21 +166,37 @@ class Perf_Plotter():
     def capped_interp(self, input, max, cap):
         return min(input/max, cap)
 
-    def main(self):
-        
+def main():
+    """Parse inputs, parse input data file; select graphs to display; show them. 
+    """
+    parser = argparse.ArgumentParser(description='Display graphs based on benchmark outputs. ' +
+        'Numbers above tests are the average search time for all tests with identical parameters.')
+    parser.add_argument('--graphs', metavar='N', type=int, nargs='+', default="0",
+        help='Specific tests to graph (first graph = 1). If not included, graph all tests in file.')
+    parser.add_argument('--datapath', type=pathlib.Path, default="../benchmarks/benchmarks.txt",
+        help='File to process (default: ../benchmarks/benchmarks.txt')
 
-        self.strip()
-        solvers_list = list(self.dict)
-        # print("An example algorithm's performance: " + solvers_list[-3])
-        # print(str(self.dict[solvers_list[-3]]))
-        if len(sys.argv) > 1:
-            # argv[1] has your filename
-            input1 = sys.argv[1]
-            print ("Requested single graph of index " + input1)
-            self.plot(solvers_list, 1, int(input1))
-        else:
-            self.plot(solvers_list, len(solvers_list))
-        
-if __name__ == '__main__':
+    args = parser.parse_args()
     application = Perf_Plotter()
-    application.main()
+    application.strip(args.datapath)
+
+    if(args.graphs):
+        # If graph numbers give, plot those; otherwise, plot all.
+        #For simplicity, list the titles of all algorithms found in benchmark file
+        algorithms_list = list(application.dict)
+
+        # Establish a list of graph indices to actually graph
+        to_graph = list()
+        
+        for i in args.graphs:
+            try:
+                to_graph.append(algorithms_list[i-1])
+            except IndexError:
+                print("Error: Index " + str(i) + " invalid for list of indices 0 - " + str(len(list(application.dict))-1))
+            
+    else:
+        to_graph = list(application.dict)
+    application.plot(to_graph)
+
+if __name__ == '__main__':
+    main()
