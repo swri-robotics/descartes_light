@@ -213,69 +213,77 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
     int rung_diff = static_cast<int>(rung1) - static_cast<int>(rung2);
     long unsigned int new_rung = rung1;
     long unsigned int new_idx = idx1;
-    if (rung_diff == 0)
+    if (abs(rung_diff) == 1)
     {
-      if (rung1 != ladder_rungs_.size() - 1)
-        new_rung = rung1 + 1;
-      else if (rung1 != 0)
-        new_rung = rung1 - 1;
-      else
-        throw ompl::Exception("Ladder graph a length of 1");
-    }
-    else if (rung1 < rung2)
-    {
-      new_rung = rung1 + 1;
+      std::pair<long unsigned int, long unsigned int> new_vertex(rung1, idx1);
+      state->as<StateType>()->vertex = new_vertex;
     }
     else
     {
-      new_rung = rung1 - 1;
-    }
-//    double maxD = t * distance(from, to);
-    long unsigned int new_rung_size = ladder_rungs_[new_rung].size();
-    bool found_point_under_max_dist = false;
-    long unsigned int max_rung = std::max(rung1, new_rung);
-    for (std::size_t i = 0; i < new_rung_size; i++)
-    {
-      long unsigned int new_idx_test = i + idx1;
-      if (new_idx_test >= new_rung_size)
-        new_idx_test -= new_rung_size;
-      if (rung1 == 0 || new_rung == 0 || rung1 == ladder_rungs_.size() - 1 || new_rung == ladder_rungs_.size() - 1 )
+      if (rung_diff == 0)
       {
-        new_idx = new_idx_test;
-        found_point_under_max_dist = true;
-        break;
+        if (rung1 != ladder_rungs_.size() - 1)
+          new_rung = rung1 + 1;
+        else if (rung1 != 0)
+          new_rung = rung1 - 1;
+        else
+          throw ompl::Exception("Ladder graph a length of 1");
       }
-      // DITANCE CALCULATION
-      std::pair<bool, FloatType> edge_res
-          = edge_eval_[static_cast<std::size_t>(std::min(rung1 - 1, new_rung - 1))]->evaluate(*graph_[ladder_rungs_[rung1][idx1]].sample.state,
-                                                                                              *graph_[ladder_rungs_[new_rung][new_idx_test]].sample.state);
-      double dist;
-      if (edge_res.first)
+      else if (rung1 < rung2)
       {
-        dist = static_cast<double>(edge_res.second);
-        if (max_rung != ladder_rungs_.size() - 1)
+        new_rung = rung1 + 1;
+      }
+      else
+      {
+        new_rung = rung1 - 1;
+      }
+  //    double maxD = t * distance(from, to);
+      long unsigned int new_rung_size = ladder_rungs_[new_rung].size();
+      bool found_point_under_max_dist = false;
+      long unsigned int max_rung = std::max(rung1, new_rung);
+      for (std::size_t i = 0; i < new_rung_size; i++)
+      {
+        long unsigned int new_idx_test = i + idx1;
+        if (new_idx_test >= new_rung_size)
+          new_idx_test -= new_rung_size;
+        if (rung1 == 0 || new_rung == 0 || rung1 == ladder_rungs_.size() - 1 || new_rung == ladder_rungs_.size() - 1 )
         {
-          if (rung1 == max_rung)
-            dist += graph_[ladder_rungs_[rung1][idx1]].sample.cost;
-          else
-            dist += graph_[ladder_rungs_[new_rung][new_idx_test]].sample.cost;
+          new_idx = new_idx_test;
+          found_point_under_max_dist = true;
+          break;
+        }
+        // DITANCE CALCULATION
+        std::pair<bool, FloatType> edge_res
+            = edge_eval_[static_cast<std::size_t>(std::min(rung1 - 1, new_rung - 1))]->evaluate(*graph_[ladder_rungs_[rung1][idx1]].sample.state,
+                                                                                                *graph_[ladder_rungs_[new_rung][new_idx_test]].sample.state);
+        double dist;
+        if (edge_res.first)
+        {
+          dist = static_cast<double>(edge_res.second);
+          if (max_rung != ladder_rungs_.size() - 1)
+          {
+            if (rung1 == max_rung)
+              dist += graph_[ladder_rungs_[rung1][idx1]].sample.cost;
+            else
+              dist += graph_[ladder_rungs_[new_rung][new_idx_test]].sample.cost;
+          }
+        }
+        else
+          dist = RUNG_TO_RUNG_DIST;
+        if (dist < max_dist_)
+        {
+          new_idx = new_idx_test;
+          found_point_under_max_dist = true;
+          break;
         }
       }
+      std::pair<long unsigned int, long unsigned int> new_vertex;
+      if (found_point_under_max_dist)
+        new_vertex = std::pair<long unsigned int, long unsigned int>(new_rung, new_idx);
       else
-        dist = RUNG_TO_RUNG_DIST;
-      if (dist < max_dist_)
-      {
-        new_idx = new_idx_test;
-        found_point_under_max_dist = true;
-        break;
-      }
+        new_vertex = std::pair<long unsigned int, long unsigned int>(rung1, idx1);
+      state->as<StateType>()->vertex = new_vertex;
     }
-    std::pair<long unsigned int, long unsigned int> new_vertex;
-    if (found_point_under_max_dist)
-      new_vertex = std::pair<long unsigned int, long unsigned int>(new_rung, new_idx);
-    else
-      new_vertex = std::pair<long unsigned int, long unsigned int>(rung1, idx1);
-    state->as<StateType>()->vertex = new_vertex;
   }
 //    state->as<StateType>()->value = (int)floor(from->as<StateType>()->value +
 //                                               (to->as<StateType>()->value - from->as<StateType>()->value) * t + 0.5);

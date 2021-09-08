@@ -121,10 +121,10 @@ SearchResult<FloatType> BGLOMPLSVDESolver<FloatType>::search()
 //        std::make_shared<descartes_light::DescartesMotionValidator<FloatType>(si));
 
   std::cout << "10" << std::endl;
-//  std::shared_ptr<ompl::geometric::RRTConnect> planner =
-//      std::make_shared<ompl::geometric::RRTConnect>((ss.getSpaceInformation()));
-  std::shared_ptr<ompl::geometric::RRT> planner =
-      std::make_shared<ompl::geometric::RRT>((ss.getSpaceInformation()));
+  std::shared_ptr<ompl::geometric::RRTConnect> planner =
+      std::make_shared<ompl::geometric::RRTConnect>((ss.getSpaceInformation()));
+//  std::shared_ptr<ompl::geometric::RRT> planner =
+//      std::make_shared<ompl::geometric::RRT>((ss.getSpaceInformation()));
   std::cout << "10.1" << std::endl;
   planner->setRange(max_dist);
   std::cout << "10.2" << std::endl;
@@ -147,7 +147,7 @@ SearchResult<FloatType> BGLOMPLSVDESolver<FloatType>::search()
   std::cout << "12" << std::endl;
   ss.print();
   std::cout << "13" << std::endl;
-  ss.solve(30.0);
+  ss.solve(5.0);
   std::cout << "14" << std::endl;
   ompl::geometric::PathGeometric path = ss.getSolutionPath();
   std::cout << "15" << std::endl;
