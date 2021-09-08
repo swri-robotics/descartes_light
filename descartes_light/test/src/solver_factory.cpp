@@ -31,4 +31,8 @@ template struct SolverFactory<BGLDepthFirstSVDESolver<double, boost::null_visito
 template struct SolverFactory<BGLDepthFirstSVDESolverF>;
 template struct SolverFactory<BGLDepthFirstSVDESolverD>;
 
+template struct SolverFactory<BGLOMPLSVDESolverF>;
+template struct SolverFactory<BGLOMPLSVDESolverD>;
+//template struct SolverFactory<BGLEfficientOMPLSVSESolverF>;
+//template struct SolverFactory<BGLEfficientOMPLSVSESolverD>;
 }  // namespace descartes_light

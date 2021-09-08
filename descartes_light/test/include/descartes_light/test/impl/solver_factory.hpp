@@ -6,6 +6,8 @@
 #include <descartes_light/bgl/bgl_dfs_solver.h>
 
 const static unsigned N_THREADS = 1;
+#include <descartes_light/ompl/ompl_solver.h>
+#include <descartes_light/ompl/descartes_space.h>
 
 namespace descartes_light
 {
@@ -106,5 +108,25 @@ struct SolverFactory<BGLDepthFirstSVDESolver<FloatType, early_terminator<boost::
     return std::make_shared<BGLDepthFirstSVDESolver<FloatType, Visitors>>(Visitors(n_waypoints - 1), N_THREADS);
   }
 };
+
+// Boost ompl graph solver factory
+template <typename FloatType>
+struct SolverFactory<BGLOMPLSVDESolver<FloatType>>
+{
+  typename Solver<FloatType>::Ptr create(long) const
+  {
+    return std::make_shared<BGLOMPLSVDESolver<FloatType>>(1);
+  }
+};
+
+//// Boost efficient ompl graph solver factory
+//template <typename FloatType>
+//struct SolverFactory<BGLEfficientOMPLSVSESolver<FloatType>>
+//{
+//  typename Solver<FloatType>::Ptr create() const
+//  {
+//    return std::make_shared<BGLEfficientOMPLSVSESolver<FloatType>>(1);
+//  }
+//};
 
 }  // namespace descartes_light

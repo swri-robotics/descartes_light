@@ -12,6 +12,8 @@ target_clang_tidy(
 target_include_directories(${PROJECT_NAME}_test_utils PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                              "$<INSTALL_INTERFACE:include>")
 
+find_package(ompl REQUIRED)
+
 install(
   TARGETS ${PROJECT_NAME}_test_utils
   EXPORT ${PROJECT_NAME}-targets
