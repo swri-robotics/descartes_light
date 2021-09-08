@@ -1,3 +1,6 @@
+#ifndef DESCARTES_LIGHT_SOLVERS_OMPL_IMPL_DESCARTES_SPACE_HPP
+#define DESCARTES_LIGHT_SOLVERS_OMPL_IMPL_DESCARTES_SPACE_HPP
+
 #include "descartes_light/ompl/descartes_space.h"
 #include "ompl/util/Exception.h"
 #include <limits>
@@ -5,6 +8,7 @@
 
 const double RUNG_TO_RUNG_DIST = 10000;
 const double IDX_TO_IDX_DIST = 1;
+const double DISTANCE_EPSILON = 0.0001;
 
 template <typename FloatType>
 void descartes_light::DescartesStateSampler<FloatType>::sampleUniform(ompl::base::State *state)
@@ -138,31 +142,44 @@ double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::bas
     long unsigned int idx1 = state1->as<StateType>()->vertex.second;
     long unsigned int rung2 = state2->as<StateType>()->vertex.first;
     long unsigned int idx2 = state2->as<StateType>()->vertex.second;
-    int rung_diff = static_cast<int>(rung1) - static_cast<int>(rung2);
-    int idx_diff = static_cast<int>(idx1) - static_cast<int>(idx2);
     double dist = 0;
     if (rung1 == rung2 && idx1 == idx2)
       return dist;
+    long unsigned int max_rung = std::max(rung1, rung2);
+    long unsigned int min_rung = std::min(rung1, rung2);
+    int rung_diff = static_cast<int>(rung1) - static_cast<int>(rung2);
+    int idx_diff = static_cast<int>(idx1) - static_cast<int>(idx2);
     if (abs(rung_diff) == 0)
       dist += RUNG_TO_RUNG_DIST;
     else if (abs(rung_diff) > 1)
       dist += RUNG_TO_RUNG_DIST * abs(rung_diff);
     if (abs(rung_diff) == 1)
     {
-      // ADD edge eval
-      std::pair<bool, FloatType> edge_res
-          = edge_eval_[static_cast<std::size_t>(std::min(rung1, rung2))]->evaluate(*graph_[ladder_rungs_[rung1][idx1]].sample.state,
-                                                                  *graph_[ladder_rungs_[rung2][idx2]].sample.state);
-      if (edge_res.first)
-        dist += static_cast<double>(edge_res.second);
+      if (min_rung == 0 || max_rung == ladder_rungs_.size() - 1)
+        dist = 0;
       else
-        dist += RUNG_TO_RUNG_DIST;
-//      dist += IDX_TO_IDX_DIST * abs(idx_diff);
+      {
+        // ADD edge eval
+        std::pair<bool, FloatType> edge_res
+            = edge_eval_[static_cast<std::size_t>(min_rung - 1)]->evaluate(*graph_[ladder_rungs_[rung1][idx1]].sample.state,
+                                                                           *graph_[ladder_rungs_[rung2][idx2]].sample.state);
+        if (edge_res.first)
+          dist += static_cast<double>(edge_res.second);
+        else
+          dist += RUNG_TO_RUNG_DIST;
+      }
     }
     else
       dist += IDX_TO_IDX_DIST * abs(idx_diff);
+    if (max_rung != ladder_rungs_.size() - 1)
+    {
+      if (rung1 == max_rung)
+        dist += graph_[ladder_rungs_[rung1][idx1]].sample.cost;
+      else
+        dist += graph_[ladder_rungs_[rung2][idx2]].sample.cost;
+    }
     if (dist == 0)
-      dist += 0.0001;
+      dist += DISTANCE_EPSILON;
     return dist;
 }
 
@@ -196,7 +213,7 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
     int rung_diff = static_cast<int>(rung1) - static_cast<int>(rung2);
     long unsigned int new_rung = rung1;
     long unsigned int new_idx = idx1;
-    if (rung_diff = 0)
+    if (rung_diff == 0)
     {
       if (rung1 != ladder_rungs_.size() - 1)
         new_rung = rung1 + 1;
@@ -215,28 +232,49 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
     }
 //    double maxD = t * distance(from, to);
     long unsigned int new_rung_size = ladder_rungs_[new_rung].size();
+    bool found_point_under_max_dist = false;
+    long unsigned int max_rung = std::max(rung1, new_rung);
     for (std::size_t i = 0; i < new_rung_size; i++)
     {
       long unsigned int new_idx_test = i + idx1;
       if (new_idx_test >= new_rung_size)
         new_idx_test -= new_rung_size;
+      if (rung1 == 0 || new_rung == 0 || rung1 == ladder_rungs_.size() - 1 || new_rung == ladder_rungs_.size() - 1 )
+      {
+        new_idx = new_idx_test;
+        found_point_under_max_dist = true;
+        break;
+      }
       // DITANCE CALCULATION
       std::pair<bool, FloatType> edge_res
-          = edge_eval_[static_cast<std::size_t>(std::min(rung1, new_rung))]->evaluate(*graph_[ladder_rungs_[rung1][idx1]].sample.state,
-                                                                  *graph_[ladder_rungs_[new_rung][new_idx_test]].sample.state);
+          = edge_eval_[static_cast<std::size_t>(std::min(rung1 - 1, new_rung - 1))]->evaluate(*graph_[ladder_rungs_[rung1][idx1]].sample.state,
+                                                                                              *graph_[ladder_rungs_[new_rung][new_idx_test]].sample.state);
       double dist;
       if (edge_res.first)
+      {
         dist = static_cast<double>(edge_res.second);
+        if (max_rung != ladder_rungs_.size() - 1)
+        {
+          if (rung1 == max_rung)
+            dist += graph_[ladder_rungs_[rung1][idx1]].sample.cost;
+          else
+            dist += graph_[ladder_rungs_[new_rung][new_idx_test]].sample.cost;
+        }
+      }
       else
         dist = RUNG_TO_RUNG_DIST;
-//      int idx_diff = static_cast<int>(idx1) - static_cast<int>(new_idx_test);
       if (dist < max_dist_)
       {
         new_idx = new_idx_test;
+        found_point_under_max_dist = true;
         break;
       }
     }
-    std::pair<long unsigned int, long unsigned int> new_vertex(new_rung, new_idx);
+    std::pair<long unsigned int, long unsigned int> new_vertex;
+    if (found_point_under_max_dist)
+      new_vertex = std::pair<long unsigned int, long unsigned int>(new_rung, new_idx);
+    else
+      new_vertex = std::pair<long unsigned int, long unsigned int>(rung1, idx1);
     state->as<StateType>()->vertex = new_vertex;
   }
 //    state->as<StateType>()->value = (int)floor(from->as<StateType>()->value +
@@ -360,3 +398,4 @@ bool descartes_light::DescartesMotionValidator<FloatType>::checkMotion(const omp
   return true;
 }
 
+#endif  // DESCARTES_LIGHT_SOLVERS_OMPL_IMPL_DESCARTES_SPACE_HPP

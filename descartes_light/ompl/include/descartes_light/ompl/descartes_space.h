@@ -172,7 +172,8 @@ namespace descartes_light
 //      DescartesMotionValidator(const ompl::base::SpaceInformationPtr& si) : si_(si.get()), valid_(0), invalid_(0)
 //      {
 //      }
-      DescartesMotionValidator(const ompl::base::SpaceInformationPtr& si) : MotionValidator(si.get())
+      DescartesMotionValidator(const ompl::base::SpaceInformationPtr& si)
+        : MotionValidator(si.get())
       {
       }
 //      DescartesMotionValidator()
