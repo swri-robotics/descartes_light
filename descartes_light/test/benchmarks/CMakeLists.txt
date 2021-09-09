@@ -1,8 +1,8 @@
 add_executable(${PROJECT_NAME}_benchmarks benchmarks.cpp)
 target_link_libraries(
   ${PROJECT_NAME}_benchmarks
-  PRIVATE ${PROJECT_NAME}_edge_evaluators
-          ${PROJECT_NAME}_solvers
+  PRIVATE ${PROJECT_NAME}
+          ${PROJECT_NAME}_bgl
           ${PROJECT_NAME}_test_utils
           GTest::GTest
           GTest::Main)

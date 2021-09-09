@@ -3,8 +3,8 @@
 #include <descartes_light/test/solver_factory.h>
 // Solvers
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
-#include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
-#include <descartes_light/solvers/bgl/bgl_dfs_solver.h>
+#include <descartes_light/bgl/bgl_dijkstra_solver.h>
+#include <descartes_light/bgl/bgl_dfs_solver.h>
 
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/core/demangle.hpp>

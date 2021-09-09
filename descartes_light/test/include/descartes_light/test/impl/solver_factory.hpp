@@ -2,8 +2,8 @@
 
 #include <descartes_light/test/solver_factory.h>
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
-#include <descartes_light/solvers/bgl/bgl_dijkstra_solver.h>
-#include <descartes_light/solvers/bgl/bgl_dfs_solver.h>
+#include <descartes_light/bgl/bgl_dijkstra_solver.h>
+#include <descartes_light/bgl/bgl_dfs_solver.h>
 
 const static unsigned N_THREADS = 1;
 
