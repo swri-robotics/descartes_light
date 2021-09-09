@@ -16,11 +16,11 @@ find_package(ompl REQUIRED)
 add_subdirectory(core)
 add_subdirectory(bgl)
 
-#if(DESCARTES_ENABLE_TESTING)
+if(DESCARTES_ENABLE_TESTING)
   enable_testing()
   add_run_tests_target(ENABLE ${DESCARTES_ENABLE_RUN_TESTING})
   add_subdirectory(test)
-#endif()
+endif()
 
 # Package configuration
 install(EXPORT ${PROJECT_NAME}-targets NAMESPACE "descartes::" DESTINATION lib/cmake/${PROJECT_NAME})

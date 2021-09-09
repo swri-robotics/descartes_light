@@ -21,17 +21,16 @@ public:
                 double planning_time,
                 unsigned num_threads = std::thread::hardware_concurrency(),
                 double rung_to_rung_dist = 100000)
-    : max_dist_(max_dist)
+    : BGLSolverBaseSVDE<FloatType>(num_threads)
+    , max_dist_(max_dist)
     , planning_time_(planning_time)
-    , BGLSolverBaseSVDE<FloatType>(num_threads)
     , rung_to_rung_dist_(rung_to_rung_dist)
   {
   }
 
   SearchResult<FloatType> ompl_search(std::shared_ptr<ompl::base::Planner> ompl_planner);
-  void initOMPL();
 
-//  SearchResult<FloatType> search() override;
+  void initOMPL();
 
 protected:
   double max_dist_;

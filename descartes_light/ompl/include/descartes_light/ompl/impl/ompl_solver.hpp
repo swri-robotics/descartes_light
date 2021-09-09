@@ -43,7 +43,7 @@ void BGLOMPLSolver<FloatType>::initOMPL()
   start->vertex = start_v;
   goal->vertex = goal_v;
   ss_->setStartAndGoalStates(start, goal);
-  ss_->setStateValidityChecker([](const ompl::base::State *state)
+  ss_->setStateValidityChecker([](const ompl::base::State* /*state*/)
   {
     return true;
   });

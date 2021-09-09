@@ -115,8 +115,7 @@ struct SolverFactory<BGLOMPLRRTSolver<FloatType>>
 {
   typename Solver<FloatType>::Ptr create(long) const
   {
-//    return std::make_shared<BGLOMPLRRTSolver<FloatType>>(2.1, 10.0, 1);
-    return std::make_shared<BGLOMPLRRTSolver<FloatType>>(5.0, 10.0, 1);
+    return std::make_shared<BGLOMPLRRTSolver<FloatType>>(2.1, 10.0, 1);
   }
 };
 
@@ -126,8 +125,7 @@ struct SolverFactory<BGLOMPLRRTConnectSolver<FloatType>>
 {
   typename Solver<FloatType>::Ptr create(long) const
   {
-//    return std::make_shared<BGLOMPLRRTConnectSolver<FloatType>>(2.1, 10.0, 1);
-    return std::make_shared<BGLOMPLRRTConnectSolver<FloatType>>(5.0, 10.0, 1);
+    return std::make_shared<BGLOMPLRRTConnectSolver<FloatType>>(2.1, 10.0, 1);
   }
 };
 
