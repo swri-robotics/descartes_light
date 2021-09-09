@@ -12,10 +12,7 @@ initialize_code_coverage(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 
 add_subdirectory(core)
-add_subdirectory(edge_evaluators)
-add_subdirectory(samplers)
-add_subdirectory(solvers)
-add_subdirectory(state_evaluators)
+add_subdirectory(bgl)
 
 if(DESCARTES_ENABLE_TESTING)
   enable_testing()
