@@ -18,8 +18,8 @@
 #ifndef DESCARTES_LIGHT_SOLVERS_BGL_BGL_DFS_SOLVER_H
 #define DESCARTES_LIGHT_SOLVERS_BGL_BGL_DFS_SOLVER_H
 
-#include <descartes_light/solvers/bgl/bgl_solver.h>
-#include <descartes_light/solvers/bgl/event_visitors.h>
+#include <descartes_light/bgl/bgl_solver.h>
+#include <descartes_light/bgl/event_visitors.h>
 
 namespace descartes_light
 {
