@@ -55,9 +55,7 @@ using OptimalImplementations = ::testing::Types<LadderGraphSolverF,
                                                 BGLDijkstraSVDESolver<float, boost::null_visitor>,
                                                 BGLDijkstraSVDESolver<double, boost::null_visitor>,
                                                 BGLDijkstraSVDESolverF,
-                                                BGLDijkstraSVDESolverD,
-                                                BGLOMPLSVDESolverF,
-                                                BGLOMPLSVDESolverD>;
+                                                BGLDijkstraSVDESolverD>;
 
 TYPED_TEST_CASE(OptimalSolverFixture, OptimalImplementations);
 
@@ -102,7 +100,11 @@ using NonOptimalImplementations = ::testing::Types<BGLDepthFirstSVSESolverF,
                                                    BGLDepthFirstSVDESolverF,
                                                    BGLDepthFirstSVDESolverD,
                                                    BGLDepthFirstSVDESolver<float, boost::null_visitor>,
-                                                   BGLDepthFirstSVDESolver<double, boost::null_visitor>>;
+                                                   BGLDepthFirstSVDESolver<double, boost::null_visitor>,
+                                                   BGLOMPLRRTSolverF,
+                                                   BGLOMPLRRTSolverD,
+                                                   BGLOMPLRRTConnectSolverF,
+                                                   BGLOMPLRRTConnectSolverD>;
 
 TYPED_TEST_CASE(NonOptimalSolverFixture, NonOptimalImplementations);
 

@@ -111,22 +111,24 @@ struct SolverFactory<BGLDepthFirstSVDESolver<FloatType, early_terminator<boost::
 
 // Boost ompl graph solver factory
 template <typename FloatType>
-struct SolverFactory<BGLOMPLSVDESolver<FloatType>>
+struct SolverFactory<BGLOMPLRRTSolver<FloatType>>
 {
   typename Solver<FloatType>::Ptr create(long) const
   {
-    return std::make_shared<BGLOMPLSVDESolver<FloatType>>(1);
+//    return std::make_shared<BGLOMPLRRTSolver<FloatType>>(2.1, 10.0, 1);
+    return std::make_shared<BGLOMPLRRTSolver<FloatType>>(5.0, 10.0, 1);
   }
 };
 
-//// Boost efficient ompl graph solver factory
-//template <typename FloatType>
-//struct SolverFactory<BGLEfficientOMPLSVSESolver<FloatType>>
-//{
-//  typename Solver<FloatType>::Ptr create() const
-//  {
-//    return std::make_shared<BGLEfficientOMPLSVSESolver<FloatType>>(1);
-//  }
-//};
+// Boost ompl graph solver factory
+template <typename FloatType>
+struct SolverFactory<BGLOMPLRRTConnectSolver<FloatType>>
+{
+  typename Solver<FloatType>::Ptr create(long) const
+  {
+//    return std::make_shared<BGLOMPLRRTConnectSolver<FloatType>>(2.1, 10.0, 1);
+    return std::make_shared<BGLOMPLRRTConnectSolver<FloatType>>(5.0, 10.0, 1);
+  }
+};
 
 }  // namespace descartes_light

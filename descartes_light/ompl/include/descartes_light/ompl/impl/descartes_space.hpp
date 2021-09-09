@@ -6,9 +6,7 @@
 #include <limits>
 #include <cstdlib>
 
-const double RUNG_TO_RUNG_DIST = 10000;
 const double IDX_TO_IDX_DIST = 1;
-const double DISTANCE_EPSILON = 0.0001;
 
 template <typename FloatType>
 void descartes_light::DescartesStateSampler<FloatType>::sampleUniform(ompl::base::State *state)
@@ -44,8 +42,9 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleGaussian(ompl::bas
 {
   std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs =
       space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getLadderRungs();
+  const double rung_2_rung_dist = space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getRungToRungDist();
   double rung = static_cast<double>(mean->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first);
-  long unsigned int new_rung = static_cast<long unsigned int>(floor(rng_.gaussian(rung, stdDev / RUNG_TO_RUNG_DIST) + 0.5));
+  long unsigned int new_rung = static_cast<long unsigned int>(floor(rng_.gaussian(rung, stdDev / rung_2_rung_dist) + 0.5));
   if (new_rung >= ladder_rungs.size())
     new_rung = ladder_rungs.size() - 1;
   std::size_t new_idx = static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(ladder_rungs[new_rung].size() - 1)));
@@ -69,7 +68,7 @@ unsigned int descartes_light::DescartesStateSpace<FloatType>::getDimension() con
 template <typename FloatType>
 double descartes_light::DescartesStateSpace<FloatType>::getMaximumExtent() const
 {
-    return RUNG_TO_RUNG_DIST * static_cast<double>(ladder_rungs_.size() + 1);
+    return rung_to_rung_dist_ * static_cast<double>(ladder_rungs_.size() + 1);
 }
 
 template <typename FloatType>
@@ -91,10 +90,6 @@ void descartes_light::DescartesStateSpace<FloatType>::enforceBounds(ompl::base::
   {
     state->as<StateType>()->vertex.second = ladder_rungs_[rung].size() - 1;
   }
-//    if (state->as<StateType>()->value < lowerBound_)
-//        state->as<StateType>()->value = lowerBound_;
-//    else if (state->as<StateType>()->value > upperBound_)
-//        state->as<StateType>()->value = upperBound_;
 }
 
 template <typename FloatType>
@@ -106,7 +101,6 @@ bool descartes_light::DescartesStateSpace<FloatType>::satisfiesBounds(const ompl
   if (state->as<StateType>()->vertex.second >= ladder_rungs_[rung].size())
     return false;
   return true;
-//    return state->as<StateType>()->value >= lowerBound_ && state->as<StateType>()->value <= upperBound_;
 }
 
 template <typename FloatType>
@@ -125,14 +119,12 @@ template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::serialize(void *serialization, const ompl::base::State *state) const
 {
     memcpy(serialization, &state->as<StateType>()->vertex, sizeof(std::pair<long unsigned int, long unsigned int>));
-//    memcpy(serialization, &state->as<StateType>()->value, sizeof(int));
 }
 
 template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::deserialize(ompl::base::State *state, const void *serialization) const
 {
     memcpy(&state->as<StateType>()->vertex, serialization, sizeof(std::pair<long unsigned int, long unsigned int>));
-//    memcpy(&state->as<StateType>()->value, serialization, sizeof(int));
 }
 
 template <typename FloatType>
@@ -150,9 +142,9 @@ double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::bas
     int rung_diff = static_cast<int>(rung1) - static_cast<int>(rung2);
     int idx_diff = static_cast<int>(idx1) - static_cast<int>(idx2);
     if (abs(rung_diff) == 0)
-      dist += RUNG_TO_RUNG_DIST;
+      dist += max_dist_ + distance_epsilon_;
     else if (abs(rung_diff) > 1)
-      dist += RUNG_TO_RUNG_DIST * abs(rung_diff);
+      dist += rung_to_rung_dist_ * abs(rung_diff) + IDX_TO_IDX_DIST * abs(idx_diff);
     if (abs(rung_diff) == 1)
     {
       if (min_rung == 0 || max_rung == ladder_rungs_.size() - 1)
@@ -166,11 +158,9 @@ double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::bas
         if (edge_res.first)
           dist += static_cast<double>(edge_res.second);
         else
-          dist += RUNG_TO_RUNG_DIST;
+          dist += rung_to_rung_dist_;
       }
     }
-    else
-      dist += IDX_TO_IDX_DIST * abs(idx_diff);
     if (max_rung != ladder_rungs_.size() - 1)
     {
       if (rung1 == max_rung)
@@ -179,7 +169,7 @@ double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::bas
         dist += graph_[ladder_rungs_[rung2][idx2]].sample.cost;
     }
     if (dist == 0)
-      dist += DISTANCE_EPSILON;
+      dist += distance_epsilon_;
     return dist;
 }
 
@@ -213,7 +203,7 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
     int rung_diff = static_cast<int>(rung1) - static_cast<int>(rung2);
     long unsigned int new_rung = rung1;
     long unsigned int new_idx = idx1;
-    if (abs(rung_diff) == 1)
+    if (abs(rung_diff) == 1)// && std::min(rung1, rung2) != 0 && std::max(rung1, rung2) != ladder_rungs_.size() - 1)
     {
       std::pair<long unsigned int, long unsigned int> new_vertex(rung1, idx1);
       state->as<StateType>()->vertex = new_vertex;
@@ -237,13 +227,12 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
       {
         new_rung = rung1 - 1;
       }
-  //    double maxD = t * distance(from, to);
       long unsigned int new_rung_size = ladder_rungs_[new_rung].size();
       bool found_point_under_max_dist = false;
       long unsigned int max_rung = std::max(rung1, new_rung);
       for (std::size_t i = 0; i < new_rung_size; i++)
       {
-        long unsigned int new_idx_test = i + idx1;
+        long unsigned int new_idx_test = i + idx2;
         if (new_idx_test >= new_rung_size)
           new_idx_test -= new_rung_size;
         if (rung1 == 0 || new_rung == 0 || rung1 == ladder_rungs_.size() - 1 || new_rung == ladder_rungs_.size() - 1 )
@@ -269,7 +258,7 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
           }
         }
         else
-          dist = RUNG_TO_RUNG_DIST;
+          dist = rung_to_rung_dist_;
         if (dist < max_dist_)
         {
           new_idx = new_idx_test;
@@ -285,8 +274,6 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
       state->as<StateType>()->vertex = new_vertex;
     }
   }
-//    state->as<StateType>()->value = (int)floor(from->as<StateType>()->value +
-//                                               (to->as<StateType>()->value - from->as<StateType>()->value) * t + 0.5);
 }
 
 template <typename FloatType>
@@ -305,45 +292,6 @@ template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::freeState(ompl::base::State *state) const
 {
     delete static_cast<StateType *>(state);
-}
-
-
-//double *descartes_light::DescartesStateSpace::getValueAddressAtIndex(State *state, const unsigned int index) const
-//{
-//    return index < dimension_ ? static_cast<StateType *>(state)->values + index : nullptr;
-//}
-
-template <typename FloatType>
-void descartes_light::DescartesStateSpace<FloatType>::registerProjections()
-{
-//    class DiscreteDefaultProjection : public ProjectionEvaluator
-//    {
-//    public:
-//        DiscreteDefaultProjection(const StateSpace *space) : ProjectionEvaluator(space)
-//        {
-//        }
-
-//        unsigned int getDimension() const override
-//        {
-//            return 1;
-//        }
-
-//        void defaultCellSizes() override
-//        {
-//            bounds_.resize(1);
-//            bounds_.low[0] = space_->as<DescartesStateSpace>()->lowerBound_;
-//            bounds_.high[0] = space_->as<DescartesStateSpace>()->upperBound_;
-//            cellSizes_.resize(1);
-//            cellSizes_[0] = 1.0;
-//        }
-
-//        void project(const State *state, Eigen::Ref<Eigen::VectorXd> projection) const override
-//        {
-//            projection(0) = state->as<DescartesStateSpace::StateType>()->value;
-//        }
-//    };
-
-//    registerDefaultProjection(std::make_shared<DiscreteDefaultProjection>(this));
 }
 
 template <typename FloatType>
@@ -383,7 +331,6 @@ bool descartes_light::DescartesMotionValidator<FloatType>::checkMotion(const omp
   std::size_t rung1 = s1->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first;
   std::size_t rung2 = s2->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first;
   return rung2 > rung1 && rung2 - rung1 == 1;
-//  return true;
 }
 
 template <typename FloatType>
@@ -391,18 +338,6 @@ bool descartes_light::DescartesMotionValidator<FloatType>::checkMotion(const omp
                                                                        const ompl::base::State* s2,
                                                                        std::pair<ompl::base::State*, double>& lastValid) const
 {
-//  std::size_t rung1 = s1->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first;
-//  std::size_t rung2 = s2->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first;
-//  if (rung2 <= rung1 || rung2 - rung1 != 1)
-//  {
-//    lastValid.first->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex =
-//        s1->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex;
-//    lastValid.second = 0.0;
-//    return false;
-//  }
-//  lastValid.first->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex =
-//      s2->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex;
-//  lastValid.second = 1.0;
   return true;
 }
 

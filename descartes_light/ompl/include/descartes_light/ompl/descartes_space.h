@@ -47,8 +47,6 @@ namespace descartes_light
         {
         public:
             /** \brief The value of the vertex */
-//            long unsigned int value; // vertex descriptor of floattype
-//            descartes_light::Vertex<FloatType> vertex;
           std::pair<long unsigned int, long unsigned int> vertex;
         };
 
@@ -57,8 +55,14 @@ namespace descartes_light
         DescartesStateSpace<FloatType>(descartes_light::BGLGraph<FloatType> graph,
                                        std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs,
                                        const std::vector<typename descartes_light::EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-                                       double max_dist)
-          : graph_(graph), ladder_rungs_(ladder_rungs), edge_eval_(std::move(edge_eval)), max_dist_(max_dist), stateBytes_(sizeof(long unsigned int))
+                                       const double max_dist,
+                                       const double rung_to_rung_dist = 100000)
+          : graph_(graph)
+          , ladder_rungs_(ladder_rungs)
+          , edge_eval_(std::move(edge_eval))
+          , max_dist_(max_dist)
+          , rung_to_rung_dist_(rung_to_rung_dist)
+          , stateBytes_(sizeof(std::pair<long unsigned int, long unsigned int>))
         {
             type_ = 14; // Larger than default types
             setName("Descartes" + getName());
@@ -68,41 +72,7 @@ namespace descartes_light
 
         bool isDiscrete() const override;
 
-//            /** \brief Increase the dimensionality of the state space by 1. Optionally, bounds can be specified for this
-//             * added dimension. setup() will need to be called after adding dimensions. */
-//            void addDimension(double minBound = 0.0, double maxBound = 0.0);
-
-//            /** \brief Increase the dimensionality of the state space by 1 and specify the name of this dimension.
-//             * Optionally, bounds can be specified for this added dimension. setup() will need to be called after adding
-//             * dimensions. This function is a wrapper for the previous definition of addDimension(). */
-//            void addDimension(const std::string &name, double minBound = 0.0, double maxBound = 0.0);
-
-//            /** \brief Set the bounds of this state space. This defines
-//                the range of the space in which sampling is performed. */
-//            void setBounds(const RealVectorBounds &bounds);
-
-//            /** \brief Set the bounds of this state space. The bounds for
-//                each dimension will be the same: [\e low, \e high]. */
-//            void setBounds(double low, double high);
-
-//            /** \brief Get the bounds for this state space */
-//            const RealVectorBounds &getBounds() const
-//            {
-//                return bounds_;
-//            }
-
         unsigned int getDimension() const override;
-
-//            /** \brief Each dimension can optionally have a name associated to it. If it does, this function returns
-//               that name.
-//                Return empty string otherwise */
-//            const std::string &getDimensionName(unsigned int index) const;
-
-//            /** \brief Get the index of a specific dimension, by name. Return -1 if name is not found */
-//            int getDimensionIndex(const std::string &name) const;
-
-//            /** \brief Set the name of a dimension */
-//            void setDimensionName(unsigned int index, const std::string &name);
 
         double getMaximumExtent() const override;
 
@@ -132,19 +102,35 @@ namespace descartes_light
 
         void freeState(ompl::base::State *state) const override;
 
-//        double *getValueAddressAtIndex(ompl::base::State *state, unsigned int index) const override;
-
         void printState(const ompl::base::State *state, std::ostream &out) const override;
 
         void printSettings(std::ostream &out) const override;
 
-        void registerProjections() override;
-
         void setup() override;
+
+        descartes_light::BGLGraph<FloatType> getGraph() const
+        {
+          return graph_;
+        }
 
         std::vector<std::vector<VertexDesc<FloatType>>> getLadderRungs() const
         {
           return ladder_rungs_;
+        }
+
+        const double getMaxDist() const
+        {
+          return max_dist_;
+        }
+
+        const double getRungToRungDist() const
+        {
+          return rung_to_rung_dist_;
+        }
+
+        const double getDistanceEpsilon() const
+        {
+          return distance_epsilon_;
         }
 
     protected:
@@ -155,7 +141,11 @@ namespace descartes_light
 
         const std::vector<typename descartes_light::EdgeEvaluator<FloatType>::ConstPtr> edge_eval_;
 
-        double max_dist_;
+        const double max_dist_;
+
+        const double rung_to_rung_dist_;
+
+        const double distance_epsilon_ = 0.000001;
 
     private:
         /** \brief The size of a state, in bytes */
@@ -166,19 +156,10 @@ namespace descartes_light
     class DescartesMotionValidator : public ompl::base::MotionValidator
     {
     public:
-//      DescartesMotionValidator(ompl::base::SpaceInformationPtr *si) : si_(si), valid_(0), invalid_(0)
-//      {
-//      }
-//      DescartesMotionValidator(const ompl::base::SpaceInformationPtr& si) : si_(si.get()), valid_(0), invalid_(0)
-//      {
-//      }
       DescartesMotionValidator(const ompl::base::SpaceInformationPtr& si)
         : MotionValidator(si.get())
       {
       }
-//      DescartesMotionValidator()
-//      {
-//      }
 
       bool checkMotion(const ompl::base::State* s1, const ompl::base::State* s2) const override;
 

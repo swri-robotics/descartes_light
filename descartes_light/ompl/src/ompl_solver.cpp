@@ -22,11 +22,14 @@ namespace descartes_light
 {
 // Explicit template instantiation
 // Full implementations
-template class BGLOMPLSVDESolver<double>;
-template class BGLOMPLSVDESolver<float>;
+template class BGLOMPLSolver<double>;
+template class BGLOMPLSolver<float>;
 
-template class BGLEfficientOMPLSVSESolver<double>;
-template class BGLEfficientOMPLSVSESolver<float>;
+template class BGLOMPLRRTSolver<double>;
+template class BGLOMPLRRTSolver<float>;
+
+template class BGLOMPLRRTConnectSolver<double>;
+template class BGLOMPLRRTConnectSolver<float>;
 
 template class DescartesStateSampler<double>;
 template class DescartesStateSampler<float>;
