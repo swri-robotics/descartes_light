@@ -18,10 +18,9 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleUniform(ompl::base
   std::size_t rung = static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(ladder_rungs.size() - 1)));
   // On this selected rung sample a random index
   std::size_t idx = static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(ladder_rungs[rung].size() - 1)));
-  // Create vertex with the new rung and index
-  std::pair<long unsigned int, long unsigned int> vertex(rung, idx);
   // Store new vertex to the returned state
-  state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex = vertex;
+  state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung = rung;
+  state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->idx = idx;
 }
 
 template <typename FloatType>
@@ -34,7 +33,7 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleUniformNear(ompl::
       space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getLadderRungs();
   // Find the rung we are trying to sample next to
   long unsigned int rung =
-      near->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first;
+      near->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
   // Randomly select if we should sample up or down a rung
   bool sample_up = rng_.uniformBool();
   long unsigned int new_rung;
@@ -47,10 +46,9 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleUniformNear(ompl::
   // Find new index on this new sampled rung
   std::size_t new_idx =
       static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(ladder_rungs[new_rung].size() - 1)));
-  // Create vertex with the newly sampled rung and index
-  std::pair<long unsigned int, long unsigned int> new_vertex(new_rung, new_idx);
   // Store new vertex to the returned state
-  state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex = new_vertex;
+  state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung = new_rung;
+  state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->idx = new_idx;
   // Ensure the new sample is within the ladder graph (it shouldn't be possible to be outside)
   space_->enforceBounds(state);
 }
@@ -67,7 +65,7 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleGaussian(ompl::bas
   const double rung_2_rung_dist = space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getRungToRungDist();
   // Find the rung we are trying to sample near
   double rung = static_cast<double>(
-      mean->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first);
+      mean->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung);
   // Determine new rung to be sampled on
   long unsigned int new_rung =
       static_cast<long unsigned int>(floor(rng_.gaussian(rung, stdDev / rung_2_rung_dist) + 0.5));
@@ -77,10 +75,9 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleGaussian(ompl::bas
   // Find new random index on this new sampled rung
   std::size_t new_idx =
       static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(ladder_rungs[new_rung].size() - 1)));
-  // Create vertex with the newly sampled rung and index
-  std::pair<long unsigned int, long unsigned int> new_vertex(new_rung, new_idx);
   // Store new vertex to the returned state
-  state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex = new_vertex;
+  state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung = new_rung;
+  state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->idx = new_idx;
   // Ensure the new sample is within the ladder graph (it shouldn't be possible to be outside)
   space_->enforceBounds(state);
 }
@@ -112,27 +109,27 @@ double descartes_light::DescartesStateSpace<FloatType>::getMeasure() const
 template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::enforceBounds(ompl::base::State* state) const
 {
-  long unsigned int rung = state->as<StateType>()->vertex.first;
+  long unsigned int rung = state->as<StateType>()->rung;
   // Ensure the rung is less than the number of rungs
   if (rung >= ladder_rungs_.size())
   {
     rung = ladder_rungs_.size() - 1;
-    state->as<StateType>()->vertex.first = rung;
+    state->as<StateType>()->rung = rung;
   }
   // Ensure index in the rung exists by checking the rung length
-  if (state->as<StateType>()->vertex.second >= ladder_rungs_[rung].size())
+  if (state->as<StateType>()->idx >= ladder_rungs_[rung].size())
   {
-    state->as<StateType>()->vertex.second = ladder_rungs_[rung].size() - 1;
+    state->as<StateType>()->idx = ladder_rungs_[rung].size() - 1;
   }
 }
 
 template <typename FloatType>
 bool descartes_light::DescartesStateSpace<FloatType>::satisfiesBounds(const ompl::base::State* state) const
 {
-  long unsigned int rung = state->as<StateType>()->vertex.first;
+  long unsigned int rung = state->as<StateType>()->rung;
   if (rung >= ladder_rungs_.size())
     return false;
-  if (state->as<StateType>()->vertex.second >= ladder_rungs_[rung].size())
+  if (state->as<StateType>()->idx >= ladder_rungs_[rung].size())
     return false;
   return true;
 }
@@ -141,27 +138,28 @@ template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::copyState(ompl::base::State* destination,
                                                                 const ompl::base::State* source) const
 {
-  destination->as<StateType>()->vertex = source->as<StateType>()->vertex;
+  destination->as<StateType>()->rung = source->as<StateType>()->rung;
+  destination->as<StateType>()->idx = source->as<StateType>()->idx;
 }
 
 template <typename FloatType>
 unsigned int descartes_light::DescartesStateSpace<FloatType>::getSerializationLength() const
 {
-  return sizeof(std::pair<long unsigned int, long unsigned int>);
+  return sizeof(long unsigned int) * 2;
 }
 
 template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::serialize(void* serialization,
                                                                 const ompl::base::State* state) const
 {
-  memcpy(serialization, &state->as<StateType>()->vertex, sizeof(std::pair<long unsigned int, long unsigned int>));
+  memcpy(serialization, &state->as<StateType>()->rung, sizeof(long unsigned int) * 2);
 }
 
 template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::deserialize(ompl::base::State* state,
                                                                   const void* serialization) const
 {
-  memcpy(&state->as<StateType>()->vertex, serialization, sizeof(std::pair<long unsigned int, long unsigned int>));
+  memcpy(&state->as<StateType>()->rung, serialization, sizeof(long unsigned int) * 2);
 }
 
 template <typename FloatType>
@@ -169,10 +167,10 @@ double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::bas
                                                                  const ompl::base::State* state2) const
 {
   // Get the rungs and indexes to be measure
-  long unsigned int rung1 = state1->as<StateType>()->vertex.first;
-  long unsigned int idx1 = state1->as<StateType>()->vertex.second;
-  long unsigned int rung2 = state2->as<StateType>()->vertex.first;
-  long unsigned int idx2 = state2->as<StateType>()->vertex.second;
+  long unsigned int rung1 = state1->as<StateType>()->rung;
+  long unsigned int idx1 = state1->as<StateType>()->idx;
+  long unsigned int rung2 = state2->as<StateType>()->rung;
+  long unsigned int idx2 = state2->as<StateType>()->idx;
 
   // Initialize the distance between states at 0
   double dist = 0;
@@ -242,10 +240,10 @@ template <typename FloatType>
 bool descartes_light::DescartesStateSpace<FloatType>::equalStates(const ompl::base::State* state1,
                                                                   const ompl::base::State* state2) const
 {
-  long unsigned int rung1 = state1->as<StateType>()->vertex.first;
-  long unsigned int idx1 = state1->as<StateType>()->vertex.second;
-  long unsigned int rung2 = state2->as<StateType>()->vertex.first;
-  long unsigned int idx2 = state2->as<StateType>()->vertex.second;
+  long unsigned int rung1 = state1->as<StateType>()->rung;
+  long unsigned int idx1 = state1->as<StateType>()->idx;
+  long unsigned int rung2 = state2->as<StateType>()->rung;
+  long unsigned int idx2 = state2->as<StateType>()->idx;
   if (rung1 == rung2 && idx1 == idx2)
     return true;
   return false;
@@ -259,20 +257,29 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
 {
   // Return the from state if t=0
   if (t == 0)
-    state->as<StateType>()->vertex = from->as<StateType>()->vertex;
+  {
+    state->as<StateType>()->rung = from->as<StateType>()->rung;
+    state->as<StateType>()->idx = from->as<StateType>()->idx;
+  }
   // Return the to state if t=1
   else if (t == 1)
-    state->as<StateType>()->vertex = to->as<StateType>()->vertex;
+  {
+    state->as<StateType>()->rung = to->as<StateType>()->rung;
+    state->as<StateType>()->idx = to->as<StateType>()->idx;
+  }
   // Return the to state if from=to
   else if (equalStates(from, to))
-    state->as<StateType>()->vertex = to->as<StateType>()->vertex;
+  {
+    state->as<StateType>()->rung = from->as<StateType>()->rung;
+    state->as<StateType>()->idx = from->as<StateType>()->idx;
+  }
   else
   {
     // Get the rungs and indexes to be measure
-    long unsigned int rung1 = from->as<StateType>()->vertex.first;
-    long unsigned int idx1 = from->as<StateType>()->vertex.second;
-    long unsigned int rung2 = to->as<StateType>()->vertex.first;
-    long unsigned int idx2 = to->as<StateType>()->vertex.second;
+    long unsigned int rung1 = from->as<StateType>()->rung;
+    long unsigned int idx1 = from->as<StateType>()->idx;
+    long unsigned int rung2 = to->as<StateType>()->rung;
+    long unsigned int idx2 = to->as<StateType>()->idx;
     int rung_diff = static_cast<int>(rung1) - static_cast<int>(rung2);
     long unsigned int new_rung = rung1;
     long unsigned int new_idx = idx1;
@@ -281,8 +288,8 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
     // loop in RRTConnect
     if (abs(rung_diff) == 1)
     {
-      std::pair<long unsigned int, long unsigned int> new_vertex(rung1, idx1);
-      state->as<StateType>()->vertex = new_vertex;
+      state->as<StateType>()->rung = rung1;
+      state->as<StateType>()->idx = idx1;
     }
     else
     {
@@ -367,12 +374,16 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
 
       // Create new vertex if a valid connection was found, otherwise return from state because no interpolation was
       // possible
-      std::pair<long unsigned int, long unsigned int> new_vertex;
       if (found_point_under_max_dist)
-        new_vertex = std::pair<long unsigned int, long unsigned int>(new_rung, new_idx);
+      {
+        state->as<StateType>()->rung = new_rung;
+        state->as<StateType>()->idx = new_idx;
+      }
       else
-        new_vertex = std::pair<long unsigned int, long unsigned int>(rung1, idx1);
-      state->as<StateType>()->vertex = new_vertex;
+      {
+        state->as<StateType>()->rung = rung1;
+        state->as<StateType>()->idx = idx1;
+      }
     }
   }
 }
@@ -412,8 +423,8 @@ void descartes_light::DescartesStateSpace<FloatType>::printState(const ompl::bas
   out << "DescartesState [";
   if (state != nullptr)
   {
-    out << "rung " << state->as<StateType>()->vertex.first;
-    out << " idx " << state->as<StateType>()->vertex.second;
+    out << "rung " << state->as<StateType>()->rung;
+    out << " idx " << state->as<StateType>()->idx;
   }
   else
     out << "nullptr";
@@ -431,8 +442,8 @@ bool descartes_light::DescartesMotionValidator<FloatType>::checkMotion(const omp
                                                                        const ompl::base::State* s2) const
 {
   // Make sure the motion is increasing in rung value by 1 to be valid
-  std::size_t rung1 = s1->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first;
-  std::size_t rung2 = s2->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first;
+  std::size_t rung1 = s1->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
+  std::size_t rung2 = s2->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
   return rung2 > rung1 && rung2 - rung1 == 1;
 }
 

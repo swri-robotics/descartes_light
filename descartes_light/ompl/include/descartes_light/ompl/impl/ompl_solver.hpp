@@ -40,10 +40,10 @@ void BGLOMPLSolver<FloatType>::initOMPL()
 
   // Create the start and goal states
   ompl::base::ScopedState<descartes_light::DescartesStateSpace<FloatType>> start(dss_), goal(dss_);
-  std::pair<long unsigned int, long unsigned int> start_v(0, 0);
-  std::pair<long unsigned int, long unsigned int> goal_v(mod_ladder_rungs.size() - 1, 0);
-  start->vertex = start_v;
-  goal->vertex = goal_v;
+  start->rung = 0;
+  start->idx = 0;
+  goal->rung = mod_ladder_rungs.size() - 1;
+  goal->idx = 0;
 
   // Set the start and goal states
   ss_->setStartAndGoalStates(start, goal);
@@ -103,10 +103,10 @@ SearchResult<FloatType> BGLOMPLSolver<FloatType>::ompl_search(std::shared_ptr<om
   {
     std::size_t rung = path_states[i + rung_offset]
                            ->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()
-                           ->vertex.first;
+                           ->rung;
     std::size_t idx = path_states[i + rung_offset]
                           ->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()
-                          ->vertex.second;
+                          ->idx;
     // If the rung matches the previous rung then move on to the next vertex.
     // Repeat points have no cost in OMPL, but don't make sense in the context of Descartes.
     if (rung == prev_rung)

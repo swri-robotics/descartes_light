@@ -46,8 +46,10 @@ public:
   class StateType : public ompl::base::State
   {
   public:
-    /** \brief The definition of the vertex (rung, idx) */
-    std::pair<long unsigned int, long unsigned int> vertex;
+    /** \brief The rung of the point of interest */
+    long unsigned int rung;
+    /** \brief The index of the point of interest */
+    long unsigned int idx;
   };
 
   /** \brief Constructor. The dimension of of the space needs to be specified. A space representing
@@ -63,7 +65,6 @@ public:
     , edge_eval_(std::move(edge_eval))
     , max_dist_(max_dist)
     , rung_to_rung_dist_(rung_to_rung_dist)
-    , stateBytes_(sizeof(std::pair<long unsigned int, long unsigned int>))
   {
     type_ = 14;  // Larger than default types
     setName("Descartes" + getName());
@@ -159,9 +160,6 @@ protected:
    * which is invalid for OMPL algorithms */
   const double distance_epsilon_ = 0.000001;
 
-private:
-  /** \brief The size of a state, in bytes */
-  std::size_t stateBytes_;
 };
 
 /** \brief A motion validator for the Descartes State Space */
