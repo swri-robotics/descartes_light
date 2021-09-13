@@ -1,7 +1,7 @@
 #ifndef DESCARTES_LIGHT_SOLVERS_BGL_IMPL_EVENT_VISITORS_HPP
 #define DESCARTES_LIGHT_SOLVERS_BGL_IMPL_EVENT_VISITORS_HPP
 
-#include <descartes_light/solvers/bgl/event_visitors.h>
+#include <descartes_light/bgl/event_visitors.h>
 
 namespace descartes_light
 {

@@ -89,5 +89,6 @@ macro(descartes_variables)
     endif()
   endif()
 
+  set(CXX_STANDARD_REQUIRED ON)
   set(DESCARTES_CXX_VERSION 14)
 endmacro()

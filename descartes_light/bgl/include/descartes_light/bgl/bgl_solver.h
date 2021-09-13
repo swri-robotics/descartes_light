@@ -23,8 +23,8 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <vector>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/solvers/bgl/boost_graph_types.h>
 #include <descartes_light/core/solver.h>
+#include <descartes_light/bgl/boost_graph_types.h>
 
 namespace descartes_light
 {

@@ -18,8 +18,8 @@
 #ifndef DESCARTES_LIGHT_SOLVERS_BGL_IMPL_DFS_SOLVER_HPP
 #define DESCARTES_LIGHT_SOLVERS_BGL_IMPL_DFS_SOLVER_HPP
 
-#include <descartes_light/solvers/bgl/bgl_dfs_solver.h>
-#include <descartes_light/solvers/bgl/impl/event_visitors.hpp>
+#include <descartes_light/bgl/bgl_dfs_solver.h>
+#include <descartes_light/bgl/impl/event_visitors.hpp>
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH

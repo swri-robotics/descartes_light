@@ -5,7 +5,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <fstream>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/solvers/bgl/utils.h>
+#include <descartes_light/bgl/utils.h>
 
 namespace descartes_light
 {

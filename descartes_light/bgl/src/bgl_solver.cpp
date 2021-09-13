@@ -15,10 +15,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-#include <descartes_light/solvers/bgl/impl/bgl_solver.hpp>
-#include <descartes_light/solvers/bgl/impl/bgl_dijkstra_solver.hpp>
-#include <descartes_light/solvers/bgl/impl/bgl_dfs_solver.hpp>
-#include <descartes_light/solvers/bgl/impl/utils.hpp>
+#include <descartes_light/bgl/impl/bgl_solver.hpp>
+#include <descartes_light/bgl/impl/bgl_dijkstra_solver.hpp>
+#include <descartes_light/bgl/impl/bgl_dfs_solver.hpp>
+#include <descartes_light/bgl/impl/utils.hpp>
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH

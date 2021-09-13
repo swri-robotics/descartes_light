@@ -1,7 +1,7 @@
 #ifndef DESCARTES_LIGHT_SOLVERS_BGL_EVENT_VISITORS
 #define DESCARTES_LIGHT_SOLVERS_BGL_EVENT_VISITORS
 
-#include <descartes_light/solvers/bgl/boost_graph_types.h>
+#include <descartes_light/bgl/boost_graph_types.h>
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH

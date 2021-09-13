@@ -24,8 +24,8 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <omp.h>
 DESCARTES_IGNORE_WARNINGS_POP
 
-#include <descartes_light/solvers/bgl/bgl_solver.h>
-#include <descartes_light/solvers/bgl/utils.h>
+#include <descartes_light/bgl/bgl_solver.h>
+#include <descartes_light/bgl/utils.h>
 #include <descartes_light/types.h>
 
 #define UNUSED(x) (void)(x)

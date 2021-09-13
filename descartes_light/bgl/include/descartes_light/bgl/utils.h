@@ -1,6 +1,6 @@
 #pragma once
 
-#include <descartes_light/solvers/bgl/boost_graph_types.h>
+#include <descartes_light/bgl/boost_graph_types.h>
 
 namespace descartes_light
 {
