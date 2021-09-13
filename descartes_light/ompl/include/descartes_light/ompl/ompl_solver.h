@@ -3,8 +3,10 @@
 
 #include <descartes_light/bgl/bgl_solver.h>
 #include <descartes_light/ompl/descartes_space.h>
+DESCARTES_IGNORE_WARNINGS_PUSH
 #include <ompl/base/Planner.h>
 #include <ompl/geometric/SimpleSetup.h>
+DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_light
 {
