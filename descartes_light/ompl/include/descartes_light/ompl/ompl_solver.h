@@ -9,8 +9,8 @@
 namespace descartes_light
 {
 /**
- * @brief BGL solver implementation that constructs vertices and edges in the build function and uses Dijkstra's
- * algorithm with a default visitor to search the graph
+ * @brief BGL solver implementation that constructs vertices in the build function and uses an ompl planner
+ * to find a valid path through the ladder graph given a maximum allowable cost and set allowed planning time
  */
 template <typename FloatType>
 class BGLOMPLSolver : public BGLSolverBaseSVDE<FloatType>
@@ -28,20 +28,31 @@ public:
   {
   }
 
+  /** @brief A search using an ompl planner */
   SearchResult<FloatType> ompl_search(std::shared_ptr<ompl::base::Planner> ompl_planner);
 
+  /** @brief Method to setup OMPL problem to be called after ladder graph is constructed */
   void initOMPL();
 
 protected:
+  /** @brief The maximum allowed cost for an edge connection */
   double max_dist_;
+
+  /** @brief Allowed planning time for algorithm to find a solution, will return before this if a solution is found */
   double planning_time_;
+
+  /** @brief Cost associated with moving an extra rung. Should be comparable to the maximum cost of a connection between adjacent rungs */
   double rung_to_rung_dist_;
+
+  /** @brief Descartes State Space, inherits from base state space in OMPL, created to give ompl a space to search */
   std::shared_ptr<descartes_light::DescartesStateSpace<FloatType>> dss_;
+
+  /** @brief Used for setting parameters for ompl planner and calling solve */
   ompl::geometric::SimpleSetupPtr ss_ {nullptr};
 };
+
 /**
- * @brief BGL solver implementation that constructs vertices and edges in the build function and uses Dijkstra's
- * algorithm with a default visitor to search the graph
+ * @brief OMPL solver implementation using RRT
  */
 template <typename FloatType>
 class BGLOMPLRRTSolver : public BGLOMPLSolver<FloatType>
@@ -55,6 +66,9 @@ public:
 using BGLOMPLRRTSolverF = BGLOMPLRRTSolver<float>;
 using BGLOMPLRRTSolverD = BGLOMPLRRTSolver<double>;
 
+/**
+ * @brief OMPL solver implementation using RRT Connect
+ */
 template <typename FloatType>
 class BGLOMPLRRTConnectSolver : public BGLOMPLSolver<FloatType>
 {

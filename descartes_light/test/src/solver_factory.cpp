@@ -30,10 +30,10 @@ template struct SolverFactory<BGLDepthFirstSVDESolver<double, boost::null_visito
 // BGL depth first search with early termination, static vertex dynamic edge
 template struct SolverFactory<BGLDepthFirstSVDESolverF>;
 template struct SolverFactory<BGLDepthFirstSVDESolverD>;
-
+// OMPL RRT solver, terminates once a valid path is found
 template struct SolverFactory<BGLOMPLRRTSolverF>;
 template struct SolverFactory<BGLOMPLRRTSolverD>;
-
+// OMPL RRT Connect solver, terminates once a valid path is found
 template struct SolverFactory<BGLOMPLRRTConnectSolverF>;
 template struct SolverFactory<BGLOMPLRRTConnectSolverD>;
 }  // namespace descartes_light

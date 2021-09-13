@@ -109,22 +109,24 @@ struct SolverFactory<BGLDepthFirstSVDESolver<FloatType, early_terminator<boost::
   }
 };
 
-// Boost ompl graph solver factory
+// Boost graph ompl RRT solver
 template <typename FloatType>
 struct SolverFactory<BGLOMPLRRTSolver<FloatType>>
 {
   typename Solver<FloatType>::Ptr create(long) const
   {
+    // Setup RRT planner with a max cost of 2.1 from vertex to vertex (minimum value in tests is 2.0) and 10 seconds to plan
     return std::make_shared<BGLOMPLRRTSolver<FloatType>>(2.1, 10.0, 1);
   }
 };
 
-// Boost ompl graph solver factory
+// Boost graph ompl RRT Connect solver
 template <typename FloatType>
 struct SolverFactory<BGLOMPLRRTConnectSolver<FloatType>>
 {
   typename Solver<FloatType>::Ptr create(long) const
   {
+    // Setup RRT Connect planner with a max cost of 2.1 from vertex to vertex (minimum value in tests is 2.0) and 10 seconds to plan
     return std::make_shared<BGLOMPLRRTConnectSolver<FloatType>>(2.1, 10.0, 1);
   }
 };
