@@ -41,14 +41,15 @@ protected:
   /** @brief Allowed planning time for algorithm to find a solution, will return before this if a solution is found */
   double planning_time_;
 
-  /** @brief Cost associated with moving an extra rung. Should be comparable to the maximum cost of a connection between adjacent rungs */
+  /** @brief Cost associated with moving an extra rung. Should be comparable to the maximum cost of a connection between
+   * adjacent rungs */
   double rung_to_rung_dist_;
 
   /** @brief Descartes State Space, inherits from base state space in OMPL, created to give ompl a space to search */
   std::shared_ptr<descartes_light::DescartesStateSpace<FloatType>> dss_;
 
   /** @brief Used for setting parameters for ompl planner and calling solve */
-  ompl::geometric::SimpleSetupPtr ss_ {nullptr};
+  ompl::geometric::SimpleSetupPtr ss_{ nullptr };
 };
 
 /**

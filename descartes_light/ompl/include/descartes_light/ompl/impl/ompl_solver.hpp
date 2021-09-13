@@ -24,17 +24,13 @@ void BGLOMPLSolver<FloatType>::initOMPL()
 
   // Created modified ladder rungs with added start and end locations to allow for a single start and goal state
   auto mod_ladder_rungs = std::move(ladder_rungs_);
-  std::vector<descartes_light::VertexDesc<FloatType>> blank_rung = {source_};
+  std::vector<descartes_light::VertexDesc<FloatType>> blank_rung = { source_ };
   mod_ladder_rungs.insert(mod_ladder_rungs.begin(), blank_rung);
   mod_ladder_rungs.push_back(blank_rung);
 
-
   // Construct Descartes state space that is to be searched
-  dss_ = std::make_shared<descartes_light::DescartesStateSpace<FloatType>>(graph_,
-                                                                           mod_ladder_rungs,
-                                                                           edge_eval_,
-                                                                           max_dist_,
-                                                                           rung_to_rung_dist_);
+  dss_ = std::make_shared<descartes_light::DescartesStateSpace<FloatType>>(
+      graph_, mod_ladder_rungs, edge_eval_, max_dist_, rung_to_rung_dist_);
 
   // Set the longest valid segment fraction (This isn't really used)
   dss_->setLongestValidSegmentFraction(0.5);
@@ -53,15 +49,11 @@ void BGLOMPLSolver<FloatType>::initOMPL()
   ss_->setStartAndGoalStates(start, goal);
 
   // Set state validity checker (always true because only valid states should exist in the ladder graph)
-  ss_->setStateValidityChecker([](const ompl::base::State* /*state*/)
-  {
-    return true;
-  });
+  ss_->setStateValidityChecker([](const ompl::base::State* /*state*/) { return true; });
 
   // Set motion validator to custom defined motion validator for the Descartes state space
   ss_->getSpaceInformation()->setMotionValidator(
-        std::make_shared<descartes_light::DescartesMotionValidator<FloatType>>(ss_->getSpaceInformation()));
-
+      std::make_shared<descartes_light::DescartesMotionValidator<FloatType>>(ss_->getSpaceInformation()));
 }
 
 template <typename FloatType>
@@ -87,7 +79,7 @@ SearchResult<FloatType> BGLOMPLSolver<FloatType>::ompl_search(std::shared_ptr<om
   ompl::geometric::PathGeometric path = ss_->getSolutionPath();
 
   // Convert solution to a vector of states to be evaluated and extracted
-  std::vector<ompl::base::State *> path_states = path.getStates();
+  std::vector<ompl::base::State*> path_states = path.getStates();
 
   // Initialize total cost to be 0
   FloatType cost = 0;
@@ -109,8 +101,12 @@ SearchResult<FloatType> BGLOMPLSolver<FloatType>::ompl_search(std::shared_ptr<om
   std::size_t prev_rung = 0;
   for (std::size_t i = 0; i < ladder_rungs_.size(); i++)
   {
-    std::size_t rung = path_states[i+rung_offset]->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.first;
-    std::size_t idx = path_states[i+rung_offset]->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->vertex.second;
+    std::size_t rung = path_states[i + rung_offset]
+                           ->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()
+                           ->vertex.first;
+    std::size_t idx = path_states[i + rung_offset]
+                          ->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()
+                          ->vertex.second;
     // If the rung matches the previous rung then move on to the next vertex.
     // Repeat points have no cost in OMPL, but don't make sense in the context of Descartes.
     if (rung == prev_rung)
