@@ -59,10 +59,7 @@ public:
       LadderGraph<FloatType> graph,
       const std::vector<typename descartes_light::EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
       const double max_dist)
-    : graph_(graph)
-    , edge_eval_(std::move(edge_eval))
-    , max_dist_(max_dist)
-    , rung_to_rung_dist_(max_dist * 1000)
+    : graph_(graph), edge_eval_(std::move(edge_eval)), max_dist_(max_dist), rung_to_rung_dist_(max_dist * 1000)
   {
     type_ = 14;  // Larger than default types
     setName("Descartes" + getName());
@@ -152,7 +149,6 @@ protected:
   /** @brief This is the minimum assigned cost for when a edge is evaulated to have no cost
    * which is invalid for OMPL algorithms */
   const double distance_epsilon_ = 0.000001;
-
 };
 
 /** \brief A motion validator for the Descartes State Space */

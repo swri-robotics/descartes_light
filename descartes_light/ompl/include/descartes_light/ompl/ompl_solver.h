@@ -23,10 +23,7 @@ public:
   LadderGraphOMPLSolver(double max_dist,
                         double planning_time,
                         unsigned num_threads = std::thread::hardware_concurrency())
-    : max_dist_(max_dist)
-    , planning_time_(planning_time)
-    , rung_to_rung_dist_(max_dist * 1000)
-    , num_threads_(num_threads)
+    : max_dist_(max_dist), planning_time_(planning_time), rung_to_rung_dist_(max_dist * 1000), num_threads_(num_threads)
   {
   }
 
@@ -38,7 +35,6 @@ public:
   SearchResult<FloatType> ompl_search(std::shared_ptr<ompl::base::Planner> ompl_planner);
 
 protected:
-
   LadderGraph<FloatType> graph_;
 
   /** @brief The maximum allowed cost for an edge connection */

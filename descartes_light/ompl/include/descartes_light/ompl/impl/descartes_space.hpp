@@ -32,8 +32,7 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleUniformNear(ompl::
   descartes_light::LadderGraph<FloatType> graph =
       space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getGraph();
   // Find the rung we are trying to sample next to
-  long unsigned int rung =
-      near->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
+  long unsigned int rung = near->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
   // Randomly select if we should sample up or down a rung
   bool sample_up = rng_.uniformBool();
   long unsigned int new_rung;
@@ -44,8 +43,7 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleUniformNear(ompl::
   else
     new_rung = rung - 1;
   // Find new index on this new sampled rung
-  std::size_t new_idx =
-      static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(graph.rungSize(rung) - 1)));
+  std::size_t new_idx = static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(graph.rungSize(rung) - 1)));
   // Store new vertex to the returned state
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung = new_rung;
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->idx = new_idx;
@@ -64,8 +62,7 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleGaussian(ompl::bas
   // Find the distance between rungs to account for high stddev
   const double rung_2_rung_dist = space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getRungToRungDist();
   // Find the rung we are trying to sample near
-  long unsigned int rung =
-      mean->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
+  long unsigned int rung = mean->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
   // Determine new rung to be sampled on
   long unsigned int new_rung =
       static_cast<long unsigned int>(floor(rng_.gaussian(static_cast<double>(rung), stdDev / rung_2_rung_dist) + 0.5));
@@ -73,8 +70,7 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleGaussian(ompl::bas
   if (new_rung >= graph.size())
     new_rung = graph.size() - 1;
   // Find new random index on this new sampled rung
-  std::size_t new_idx =
-      static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(graph.rungSize(rung) - 1)));
+  std::size_t new_idx = static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(graph.rungSize(rung) - 1)));
   // Store new vertex to the returned state
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung = new_rung;
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->idx = new_idx;
@@ -435,8 +431,8 @@ void descartes_light::DescartesStateSpace<FloatType>::printState(const ompl::bas
 template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::printSettings(std::ostream& out) const
 {
-  out << "Descartes state space '" << getName() << "' with " << graph_.size() << " rungs and "
-      << graph_.numVertices() << " vertices" << std::endl;
+  out << "Descartes state space '" << getName() << "' with " << graph_.size() << " rungs and " << graph_.numVertices()
+      << " vertices" << std::endl;
 }
 
 template <typename FloatType>

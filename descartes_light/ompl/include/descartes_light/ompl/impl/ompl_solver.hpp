@@ -101,10 +101,8 @@ BuildStatus LadderGraphOMPLSolver<FloatType>::buildImpl(
   auto& last_rung = graph_.getRung(graph_.size() - 1);
   last_rung.nodes.push_back(Node<FloatType>(first_sample));
 
-
   // Construct Descartes state space that is to be searched
-  dss_ = std::make_shared<descartes_light::DescartesStateSpace<FloatType>>(
-      graph_, edge_evaluators, max_dist_);
+  dss_ = std::make_shared<descartes_light::DescartesStateSpace<FloatType>>(graph_, edge_evaluators, max_dist_);
 
   // Set the longest valid segment fraction (This isn't really used)
   dss_->setLongestValidSegmentFraction(0.5);
@@ -180,18 +178,16 @@ SearchResult<FloatType> LadderGraphOMPLSolver<FloatType>::ompl_search(std::share
   result.cost = cost;
 
   // Convert ompl states into a vector of vertex descriptions
-//  std::vector<descartes_light::VertexDesc<FloatType>> vd_path;
+  //  std::vector<descartes_light::VertexDesc<FloatType>> vd_path;
   std::size_t rung_offset = 0;
   std::size_t prev_rung = 0;
   result.trajectory.reserve(graph_.size());
   for (std::size_t i = 0; i < graph_.size() - 2; i++)
   {
-    std::size_t rung = path_states[i + rung_offset]
-                           ->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()
-                           ->rung;
-    std::size_t idx = path_states[i + rung_offset]
-                          ->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()
-                          ->idx;
+    std::size_t rung =
+        path_states[i + rung_offset]->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
+    std::size_t idx =
+        path_states[i + rung_offset]->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->idx;
     // If the rung matches the previous rung then move on to the next vertex.
     // Repeat points have no cost in OMPL, but don't make sense in the context of Descartes.
     if (rung == prev_rung)
