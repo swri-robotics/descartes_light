@@ -12,12 +12,12 @@ template <typename FloatType>
 void descartes_light::DescartesStateSampler<FloatType>::sampleUniform(ompl::base::State* state)
 {
   // Get the ladder rung structure to have knowledge of the available sample space
-  std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs =
-      space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getLadderRungs();
+  descartes_light::LadderGraph<FloatType> graph =
+      space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getGraph();
   // Sample a random, valid rung
-  std::size_t rung = static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(ladder_rungs.size() - 1)));
+  std::size_t rung = static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(graph.size() - 1)));
   // On this selected rung sample a random index
-  std::size_t idx = static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(ladder_rungs[rung].size() - 1)));
+  std::size_t idx = static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(graph.rungSize(rung) - 1)));
   // Store new vertex to the returned state
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung = rung;
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->idx = idx;
@@ -29,8 +29,8 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleUniformNear(ompl::
                                                                           const double /*distance*/)
 {
   // Get the ladder rung structure to have knowledge of the available sample space
-  std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs =
-      space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getLadderRungs();
+  descartes_light::LadderGraph<FloatType> graph =
+      space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getGraph();
   // Find the rung we are trying to sample next to
   long unsigned int rung =
       near->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
@@ -39,13 +39,13 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleUniformNear(ompl::
   long unsigned int new_rung;
   // Sample up if either it was randomly selected to sample up OR we are forced to if it is sampling near the first rung
   // AND ensure we aren't sampling on the last rung
-  if ((sample_up || rung == 0) && rung != ladder_rungs.size() - 1)
+  if ((sample_up || rung == 0) && rung != graph.size() - 1)
     new_rung = rung + 1;
   else
     new_rung = rung - 1;
   // Find new index on this new sampled rung
   std::size_t new_idx =
-      static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(ladder_rungs[new_rung].size() - 1)));
+      static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(graph.rungSize(rung) - 1)));
   // Store new vertex to the returned state
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung = new_rung;
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->idx = new_idx;
@@ -59,22 +59,22 @@ void descartes_light::DescartesStateSampler<FloatType>::sampleGaussian(ompl::bas
                                                                        const double stdDev)
 {
   // Get the ladder rung structure to have knowledge of the available sample space
-  std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs =
-      space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getLadderRungs();
+  descartes_light::LadderGraph<FloatType> graph =
+      space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getGraph();
   // Find the distance between rungs to account for high stddev
   const double rung_2_rung_dist = space_->as<descartes_light::DescartesStateSpace<FloatType>>()->getRungToRungDist();
   // Find the rung we are trying to sample near
-  double rung = static_cast<double>(
-      mean->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung);
+  long unsigned int rung =
+      mean->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung;
   // Determine new rung to be sampled on
   long unsigned int new_rung =
-      static_cast<long unsigned int>(floor(rng_.gaussian(rung, stdDev / rung_2_rung_dist) + 0.5));
+      static_cast<long unsigned int>(floor(rng_.gaussian(static_cast<double>(rung), stdDev / rung_2_rung_dist) + 0.5));
   // Make sure we are inside the state space
-  if (new_rung >= ladder_rungs.size())
-    new_rung = ladder_rungs.size() - 1;
+  if (new_rung >= graph.size())
+    new_rung = graph.size() - 1;
   // Find new random index on this new sampled rung
   std::size_t new_idx =
-      static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(ladder_rungs[new_rung].size() - 1)));
+      static_cast<std::size_t>(rng_.uniformInt(0, static_cast<int>(graph.rungSize(rung) - 1)));
   // Store new vertex to the returned state
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->rung = new_rung;
   state->as<typename descartes_light::DescartesStateSpace<FloatType>::StateType>()->idx = new_idx;
@@ -97,13 +97,13 @@ unsigned int descartes_light::DescartesStateSpace<FloatType>::getDimension() con
 template <typename FloatType>
 double descartes_light::DescartesStateSpace<FloatType>::getMaximumExtent() const
 {
-  return rung_to_rung_dist_ * static_cast<double>(ladder_rungs_.size() + 1);
+  return rung_to_rung_dist_ * static_cast<double>(graph_.size());
 }
 
 template <typename FloatType>
 double descartes_light::DescartesStateSpace<FloatType>::getMeasure() const
 {
-  return static_cast<double>(ladder_rungs_.size());
+  return static_cast<double>(graph_.numVertices());
 }
 
 template <typename FloatType>
@@ -111,15 +111,15 @@ void descartes_light::DescartesStateSpace<FloatType>::enforceBounds(ompl::base::
 {
   long unsigned int rung = state->as<StateType>()->rung;
   // Ensure the rung is less than the number of rungs
-  if (rung >= ladder_rungs_.size())
+  if (rung >= graph_.size())
   {
-    rung = ladder_rungs_.size() - 1;
+    rung = graph_.size() - 1;
     state->as<StateType>()->rung = rung;
   }
   // Ensure index in the rung exists by checking the rung length
-  if (state->as<StateType>()->idx >= ladder_rungs_[rung].size())
+  if (state->as<StateType>()->idx >= graph_.rungSize(rung))
   {
-    state->as<StateType>()->idx = ladder_rungs_[rung].size() - 1;
+    state->as<StateType>()->idx = graph_.rungSize(rung) - 1;
   }
 }
 
@@ -127,9 +127,12 @@ template <typename FloatType>
 bool descartes_light::DescartesStateSpace<FloatType>::satisfiesBounds(const ompl::base::State* state) const
 {
   long unsigned int rung = state->as<StateType>()->rung;
-  if (rung >= ladder_rungs_.size())
+  if (rung >= graph_.size())
     return false;
-  if (state->as<StateType>()->idx >= ladder_rungs_[rung].size())
+  if ((rung == 0 && state->as<StateType>()->idx == 0) ||
+      (rung == graph_.size() - 1 && state->as<StateType>()->idx == 0))
+    return true;
+  if (state->as<StateType>()->idx >= graph_.rungSize(rung))
     return false;
   return true;
 }
@@ -203,14 +206,14 @@ double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::bas
   {
     // If the min rung is the zeroth rung or the last added rung, then the cost should be 0. These states were added to
     // give a valid start and goal for the OMPL problem and should not be accounted for in the cost.
-    if (min_rung == 0 || max_rung == ladder_rungs_.size() - 1)
+    if (min_rung == 0 || max_rung == graph_.size() - 1)
       dist = 0;
     else
     {
       // Perform edge evaluation. Use the min_rung - 1 edge evaluator because there was an extra rung added to the graph
       // to provide a valid start state for OMPL which is not accounted for in the edge evaluator.
       std::pair<bool, FloatType> edge_res = edge_eval_[static_cast<std::size_t>(min_rung - 1)]->evaluate(
-          *graph_[ladder_rungs_[rung1][idx1]].sample.state, *graph_[ladder_rungs_[rung2][idx2]].sample.state);
+          *graph_.getRung(rung1).nodes[idx1].sample.state, *graph_.getRung(rung2).nodes[idx2].sample.state);
 
       // If this is a valid connection then the cost is added or else the cost of 1 rung distance is given
       if (edge_res.first)
@@ -221,12 +224,12 @@ double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::bas
   }
   // Ensure that this isn't going to the last rung artificially added, then add the cost of the higher rung in the
   // connection
-  if (max_rung != ladder_rungs_.size() - 1)
+  if (max_rung != graph_.size() - 1)
   {
     if (rung1 == max_rung)
-      dist += graph_[ladder_rungs_[rung1][idx1]].sample.cost;
+      dist += graph_.getRung(rung1).nodes[idx1].sample.cost;
     else
-      dist += graph_[ladder_rungs_[rung2][idx2]].sample.cost;
+      dist += graph_.getRung(rung2).nodes[idx2].sample.cost;
   }
 
   // If a cost of zero was found, add the distance epsilon because OMPL requires that the distance between any 2
@@ -296,7 +299,7 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
       // If rungs are the same then try and sample up a rung if possible, otherwise sample down a rung
       if (rung_diff == 0)
       {
-        if (rung1 != ladder_rungs_.size() - 1)
+        if (rung1 != graph_.size() - 1)
           new_rung = rung1 + 1;
         else if (rung1 != 0)
           new_rung = rung1 - 1;
@@ -315,7 +318,7 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
       }
 
       // Determine length of new rung
-      long unsigned int new_rung_size = ladder_rungs_[new_rung].size();
+      long unsigned int new_rung_size = graph_.rungSize(new_rung);
 
       // Keep track to determine if we will return the from state or an actual new state
       bool found_point_under_max_dist = false;
@@ -334,7 +337,7 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
           new_idx_test -= new_rung_size;
 
         // If new rung is the first or last rung then we immediately know it has a cost of 0 and is valid
-        if (min_rung == 0 || max_rung == ladder_rungs_.size() - 1)
+        if (min_rung == 0 || max_rung == graph_.size() - 1)
         {
           new_idx = new_idx_test;
           found_point_under_max_dist = true;
@@ -343,21 +346,21 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
 
         // Cost evaluation
         std::pair<bool, FloatType> edge_res = edge_eval_[static_cast<std::size_t>(min_rung - 1)]->evaluate(
-            *graph_[ladder_rungs_[rung1][idx1]].sample.state,
-            *graph_[ladder_rungs_[new_rung][new_idx_test]].sample.state);
+            *graph_.getRung(rung1).nodes[idx1].sample.state,
+            *graph_.getRung(new_rung).nodes[new_idx_test].sample.state);
         double dist;
         // If this is a valid connection then the cost is added or else the cost of 1 rung distance is given
         if (edge_res.first)
         {
           dist = static_cast<double>(edge_res.second);
-          if (max_rung != ladder_rungs_.size() - 1)
+          if (max_rung != graph_.size() - 1)
           {
             // Ensure that this isn't going to the last rung artificially added, then add the cost of the higher rung in
             // the connection
             if (rung1 == max_rung)
-              dist += graph_[ladder_rungs_[rung1][idx1]].sample.cost;
+              dist += graph_.getRung(rung1).nodes[idx1].sample.cost;
             else
-              dist += graph_[ladder_rungs_[new_rung][new_idx_test]].sample.cost;
+              dist += graph_.getRung(new_rung).nodes[new_idx_test].sample.cost;
           }
         }
         else
@@ -409,10 +412,8 @@ void descartes_light::DescartesStateSpace<FloatType>::freeState(ompl::base::Stat
 template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::setup()
 {
-  if (ladder_rungs_.size() == 0)
-    throw ompl::Exception("Ladder rungs cannot be empty");
-  if (ladder_rungs_.size() == 1)
-    throw ompl::Exception("Ladder rungs cannot be length 1");
+  if (graph_.size() < 2)
+    throw ompl::Exception("Ladder rungs need to be at least of length 2");
   ompl::base::StateSpace::setup();
 }
 
@@ -434,7 +435,8 @@ void descartes_light::DescartesStateSpace<FloatType>::printState(const ompl::bas
 template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::printSettings(std::ostream& out) const
 {
-  out << "Descartes state space '" << getName() << "' with " << ladder_rungs_.size() << " rungs " << std::endl;
+  out << "Descartes state space '" << getName() << "' with " << graph_.size() << " rungs and "
+      << graph_.numVertices() << " vertices" << std::endl;
 }
 
 template <typename FloatType>

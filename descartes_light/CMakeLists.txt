@@ -15,6 +15,7 @@ find_package(ompl REQUIRED)
 
 add_subdirectory(core)
 add_subdirectory(bgl)
+add_subdirectory(ompl)
 
 if(DESCARTES_ENABLE_TESTING)
   enable_testing()

@@ -1,7 +1,7 @@
 find_package(ompl REQUIRED)
 
 add_library(${PROJECT_NAME}_ompl src/ompl_solver.cpp)
-target_link_libraries((${PROJECT_NAME}_ompl PUBLIC ${PROJECT_NAME} ${OMPL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME}_ompl PUBLIC ${PROJECT_NAME} ${OMPL_LIBRARIES})
 target_cxx_version(${PROJECT_NAME}_ompl PUBLIC VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME}_ompl PUBLIC ${DESCARTES_COMPILE_OPTIONS})
 target_compile_definitions(${PROJECT_NAME}_ompl PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})

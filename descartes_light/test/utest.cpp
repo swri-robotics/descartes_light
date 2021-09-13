@@ -101,10 +101,10 @@ using NonOptimalImplementations = ::testing::Types<BGLDepthFirstSVSESolverF,
                                                    BGLDepthFirstSVDESolverD,
                                                    BGLDepthFirstSVDESolver<float, boost::null_visitor>,
                                                    BGLDepthFirstSVDESolver<double, boost::null_visitor>,
-                                                   BGLOMPLRRTSolverF,
-                                                   BGLOMPLRRTSolverD,
-                                                   BGLOMPLRRTConnectSolverF,
-                                                   BGLOMPLRRTConnectSolverD>;
+                                                   LadderGraphOMPLRRTSolverF,
+                                                   LadderGraphOMPLRRTSolverD,
+                                                   LadderGraphOMPLRRTConnectSolverF,
+                                                   LadderGraphOMPLRRTConnectSolverD>;
 
 TYPED_TEST_CASE(NonOptimalSolverFixture, NonOptimalImplementations);
 

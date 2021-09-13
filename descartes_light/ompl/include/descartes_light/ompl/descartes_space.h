@@ -7,7 +7,8 @@
 #include <string>
 #include <map>
 
-#include <descartes_light/bgl/bgl_solver.h>
+#include <descartes_light/solvers/ladder_graph/ladder_graph.h>
+#include <descartes_light/core/solver.h>
 
 using namespace ompl::base;
 
@@ -55,16 +56,13 @@ public:
   /** \brief Constructor. The dimension of of the space needs to be specified. A space representing
       the Descartes State Space will be instantiated */
   DescartesStateSpace<FloatType>(
-      descartes_light::BGLGraph<FloatType> graph,
-      std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs,
+      LadderGraph<FloatType> graph,
       const std::vector<typename descartes_light::EdgeEvaluator<FloatType>::ConstPtr>& edge_eval,
-      const double max_dist,
-      const double rung_to_rung_dist = 100000)
+      const double max_dist)
     : graph_(graph)
-    , ladder_rungs_(ladder_rungs)
     , edge_eval_(std::move(edge_eval))
     , max_dist_(max_dist)
-    , rung_to_rung_dist_(rung_to_rung_dist)
+    , rung_to_rung_dist_(max_dist * 1000)
   {
     type_ = 14;  // Larger than default types
     setName("Descartes" + getName());
@@ -132,9 +130,7 @@ public:
 
   void setup() override;
 
-  descartes_light::BGLGraph<FloatType> getGraph() const { return graph_; }
-
-  std::vector<std::vector<VertexDesc<FloatType>>> getLadderRungs() const { return ladder_rungs_; }
+  LadderGraph<FloatType> getGraph() const { return graph_; }
 
   double getMaxDist() const { return max_dist_; }
 
@@ -143,10 +139,7 @@ public:
   double getDistanceEpsilon() const { return distance_epsilon_; }
 
 protected:
-  /** \brief Boost graph ladder, used to help with edge and vertex cost evaluation */
-  descartes_light::BGLGraph<FloatType> graph_;
-  /** @brief Ladder graph representation of the graph vertices, used for creating edge connections */
-  std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs_;
+  LadderGraph<FloatType> graph_;
   /** @brief Edge evaluator used to evaluate the cost of edges */
   const std::vector<typename descartes_light::EdgeEvaluator<FloatType>::ConstPtr> edge_eval_;
   /** @brief Maximum allowed cost for an edge to be valid */

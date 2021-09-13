@@ -31,9 +31,9 @@ template struct SolverFactory<BGLDepthFirstSVDESolver<double, boost::null_visito
 template struct SolverFactory<BGLDepthFirstSVDESolverF>;
 template struct SolverFactory<BGLDepthFirstSVDESolverD>;
 // OMPL RRT solver, terminates once a valid path is found
-template struct SolverFactory<BGLOMPLRRTSolverF>;
-template struct SolverFactory<BGLOMPLRRTSolverD>;
+template struct SolverFactory<LadderGraphOMPLRRTSolverF>;
+template struct SolverFactory<LadderGraphOMPLRRTSolverD>;
 // OMPL RRT Connect solver, terminates once a valid path is found
-template struct SolverFactory<BGLOMPLRRTConnectSolverF>;
-template struct SolverFactory<BGLOMPLRRTConnectSolverD>;
+template struct SolverFactory<LadderGraphOMPLRRTConnectSolverF>;
+template struct SolverFactory<LadderGraphOMPLRRTConnectSolverD>;
 }  // namespace descartes_light
