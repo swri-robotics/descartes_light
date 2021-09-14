@@ -105,7 +105,7 @@ BuildStatus LadderGraphOMPLSolver<FloatType>::buildImpl(
   dss_ = std::make_shared<descartes_light::DescartesStateSpace<FloatType>>(graph_, edge_evaluators, max_dist_);
 
   // Set the longest valid segment fraction (This isn't really used)
-  dss_->setLongestValidSegmentFraction(0.5);
+  dss_->setLongestValidSegmentFraction(0.9);
 
   // Initialize the simple setup
   ss_ = std::make_shared<ompl::geometric::SimpleSetup>(dss_);

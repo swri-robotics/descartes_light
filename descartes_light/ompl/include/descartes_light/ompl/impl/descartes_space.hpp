@@ -1,8 +1,8 @@
 #ifndef DESCARTES_LIGHT_SOLVERS_OMPL_IMPL_DESCARTES_SPACE_HPP
 #define DESCARTES_LIGHT_SOLVERS_OMPL_IMPL_DESCARTES_SPACE_HPP
 
-#include "descartes_light/ompl/descartes_space.h"
-#include "ompl/util/Exception.h"
+#include <descartes_light/ompl/descartes_space.h>
+#include <ompl/util/Exception.h>
 #include <limits>
 #include <cstdlib>
 
@@ -93,7 +93,7 @@ unsigned int descartes_light::DescartesStateSpace<FloatType>::getDimension() con
 template <typename FloatType>
 double descartes_light::DescartesStateSpace<FloatType>::getMaximumExtent() const
 {
-  return rung_to_rung_dist_ * static_cast<double>(graph_.size());
+  return rung_to_rung_dist_ * static_cast<double>(graph_.size() - 1);
 }
 
 template <typename FloatType>
@@ -165,6 +165,10 @@ template <typename FloatType>
 double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::base::State* state1,
                                                                  const ompl::base::State* state2) const
 {
+  // If the states are equal then the distance is 0
+  if (equalStates(state1, state2))
+    return 0.0;
+
   // Get the rungs and indexes to be measure
   long unsigned int rung1 = state1->as<StateType>()->rung;
   long unsigned int idx1 = state1->as<StateType>()->idx;
@@ -172,11 +176,7 @@ double descartes_light::DescartesStateSpace<FloatType>::distance(const ompl::bas
   long unsigned int idx2 = state2->as<StateType>()->idx;
 
   // Initialize the distance between states at 0
-  double dist = 0;
-
-  // IF the states are equal then the distance is 0
-  if (rung1 == rung2 && idx1 == idx2)
-    return dist;
+  double dist = 0.0;
 
   // Determine the higher and lower value rungs to ensure we properly use the edge and vertex cost evaluators
   // The cost of the edge depends on the first rung and the cost of the vertex if from the vertex arrived at
@@ -243,9 +243,7 @@ bool descartes_light::DescartesStateSpace<FloatType>::equalStates(const ompl::ba
   long unsigned int idx1 = state1->as<StateType>()->idx;
   long unsigned int rung2 = state2->as<StateType>()->rung;
   long unsigned int idx2 = state2->as<StateType>()->idx;
-  if (rung1 == rung2 && idx1 == idx2)
-    return true;
-  return false;
+  return rung1 == rung2 && idx1 == idx2;
 }
 
 template <typename FloatType>
@@ -409,7 +407,8 @@ template <typename FloatType>
 void descartes_light::DescartesStateSpace<FloatType>::setup()
 {
   if (graph_.size() < 2)
-    throw ompl::Exception("Ladder rungs need to be at least of length 2");
+    throw ompl::Exception("Graph needs to be a size > 1 (provided a graph of size " + std::to_string(graph_.size()) +
+                          ")");
   ompl::base::StateSpace::setup();
 }
 
