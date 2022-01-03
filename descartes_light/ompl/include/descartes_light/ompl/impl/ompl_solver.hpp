@@ -96,7 +96,7 @@ BuildStatus LadderGraphOMPLSolver<FloatType>::buildImpl(
   graph_.insertRung(graph_.size());
   auto& first_rung = graph_.getRung(0);
   first_rung.nodes.reserve(1);
-  auto& first_sample = trajectory.front()->sample().front();
+  auto& first_sample = graph_.getRung(1).nodes.front();
   first_rung.nodes.push_back(Node<FloatType>(first_sample));
   auto& last_rung = graph_.getRung(graph_.size() - 1);
   last_rung.nodes.push_back(Node<FloatType>(first_sample));
@@ -201,6 +201,9 @@ SearchResult<FloatType> LadderGraphOMPLSolver<FloatType>::ompl_search(std::share
     }
     prev_rung = rung;
   }
+
+
+  CONSOLE_BRIDGE_logDebug("Descartes OMPL finished with a final cost of %0.4f.", cost);
 
   return result;
 }

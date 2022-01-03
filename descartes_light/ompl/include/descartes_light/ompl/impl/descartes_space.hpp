@@ -327,8 +327,8 @@ void descartes_light::DescartesStateSpace<FloatType>::interpolate(const ompl::ba
         // Start and index of rung2 so that indices of lower values are not favored
         long unsigned int new_idx_test = i + idx2;
         // Circle back to 0 once we exceed rung size limits
-        if (new_idx_test >= new_rung_size)
-          new_idx_test -= new_rung_size;
+        while (new_idx_test >= new_rung_size)
+          new_idx_test -= new_rung_size; // TODO: Fix in scenario that
 
         // If new rung is the first or last rung then we immediately know it has a cost of 0 and is valid
         if (min_rung == 0 || max_rung == graph_.size() - 1)
