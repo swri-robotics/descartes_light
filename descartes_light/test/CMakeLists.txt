@@ -1,6 +1,6 @@
 # Utilities Library
 add_library(${PROJECT_NAME}_test_utils src/utils.cpp src/solver_factory.cpp)
-target_link_libraries(${PROJECT_NAME}_test_utils PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_bgl)
+target_link_libraries(${PROJECT_NAME}_test_utils PUBLIC ${PROJECT_NAME} ${PROJECT_NAME}_bgl ${PROJECT_NAME}_ompl)
 target_cxx_version(${PROJECT_NAME}_test_utils PUBLIC VERSION ${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME}_test_utils PUBLIC ${DESCARTES_COMPILE_OPTIONS})
 target_compile_definitions(${PROJECT_NAME}_test_utils PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
@@ -11,6 +11,8 @@ target_clang_tidy(
   CHECKS ${DEFAULT_CLANG_TIDY_CHECKS})
 target_include_directories(${PROJECT_NAME}_test_utils PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                              "$<INSTALL_INTERFACE:include>")
+
+find_package(ompl REQUIRED)
 
 install(
   TARGETS ${PROJECT_NAME}_test_utils
@@ -29,6 +31,7 @@ target_link_libraries(
   ${PROJECT_NAME}_utest
   PRIVATE ${PROJECT_NAME}
           ${PROJECT_NAME}_bgl
+          ${PROJECT_NAME}_ompl
           ${PROJECT_NAME}_test_utils
           GTest::GTest
           GTest::Main)

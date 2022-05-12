@@ -6,6 +6,8 @@
 #include <descartes_light/bgl/bgl_dfs_solver.h>
 
 const static unsigned N_THREADS = 1;
+#include <descartes_light/ompl/ompl_solver.h>
+#include <descartes_light/ompl/descartes_space.h>
 
 namespace descartes_light
 {
@@ -104,6 +106,30 @@ struct SolverFactory<BGLDepthFirstSVDESolver<FloatType, early_terminator<boost::
   typename Solver<FloatType>::Ptr create(long n_waypoints) const
   {
     return std::make_shared<BGLDepthFirstSVDESolver<FloatType, Visitors>>(Visitors(n_waypoints - 1), N_THREADS);
+  }
+};
+
+// Boost graph ompl RRT solver
+template <typename FloatType>
+struct SolverFactory<LadderGraphOMPLRRTSolver<FloatType>>
+{
+  typename Solver<FloatType>::Ptr create(long) const
+  {
+    // Setup RRT planner with a max cost of 2.1 from vertex to vertex (minimum value in tests is 2.0) and 10 seconds to
+    // plan
+    return std::make_shared<LadderGraphOMPLRRTSolver<FloatType>>(2.1, 10.0, 1);
+  }
+};
+
+// Boost graph ompl RRT Connect solver
+template <typename FloatType>
+struct SolverFactory<LadderGraphOMPLRRTConnectSolver<FloatType>>
+{
+  typename Solver<FloatType>::Ptr create(long) const
+  {
+    // Setup RRT Connect planner with a max cost of 2.1 from vertex to vertex (minimum value in tests is 2.0) and 10
+    // seconds to plan
+    return std::make_shared<LadderGraphOMPLRRTConnectSolver<FloatType>>(2.1, 10.0, 1);
   }
 };
 

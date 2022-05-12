@@ -13,6 +13,7 @@
   <depend>libconsole-bridge-dev</depend>
   <depend>eigen</depend>
   <depend>libomp-dev</depend>
+  <depend>ompl</depend>
   <build_depend>ros_industrial_cmake_boilerplate</build_depend>
   <build_depend>boost</build_depend>
 

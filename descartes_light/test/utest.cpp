@@ -3,6 +3,8 @@
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
 #include <descartes_light/bgl/bgl_dijkstra_solver.h>
 #include <descartes_light/bgl/bgl_dfs_solver.h>
+#include <descartes_light/ompl/ompl_solver.h>
+#include <descartes_light/ompl/descartes_space.h>
 #include <descartes_light/test/utils.h>
 #include <descartes_light/test/solver_factory.h>
 
@@ -15,6 +17,10 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <numeric>
 #include <vector>
 DESCARTES_IGNORE_WARNINGS_POP
+
+#include <ompl/base/StateSpace.h>
+#include <ompl/base/ScopedState.h>
+#include <ompl/geometric/SimpleSetup.h>
 
 using namespace descartes_light;
 
@@ -94,7 +100,11 @@ using NonOptimalImplementations = ::testing::Types<BGLDepthFirstSVSESolverF,
                                                    BGLDepthFirstSVDESolverF,
                                                    BGLDepthFirstSVDESolverD,
                                                    BGLDepthFirstSVDESolver<float, boost::null_visitor>,
-                                                   BGLDepthFirstSVDESolver<double, boost::null_visitor>>;
+                                                   BGLDepthFirstSVDESolver<double, boost::null_visitor>,
+                                                   LadderGraphOMPLRRTSolverF,
+                                                   LadderGraphOMPLRRTSolverD,
+                                                   LadderGraphOMPLRRTConnectSolverF,
+                                                   LadderGraphOMPLRRTConnectSolverD>;
 
 TYPED_TEST_CASE(NonOptimalSolverFixture, NonOptimalImplementations);
 
