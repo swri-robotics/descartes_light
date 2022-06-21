@@ -12,7 +12,12 @@ initialize_code_coverage(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 
 add_subdirectory(core)
-add_subdirectory(bgl)
+
+option(DESCARTES_BUILD_BGL "Build Boost graph library based components" ON)
+if(DESCARTES_BUILD_BGL)
+  message("Building Boost graph library implementations")
+  add_subdirectory(bgl)
+endif()
 
 if(DESCARTES_ENABLE_TESTING)
   enable_testing()
@@ -21,8 +26,5 @@ if(DESCARTES_ENABLE_TESTING)
 endif()
 
 # Package configuration
-install(EXPORT ${PROJECT_NAME}-targets NAMESPACE "descartes::" DESTINATION lib/cmake/${PROJECT_NAME})
-export(EXPORT ${PROJECT_NAME}-targets NAMESPACE "descartes::"
-       FILE ${CMAKE_CURRENT_BINARY_DIR}/${PROJECT_NAME}-targets.cmake)
 install(FILES "${CMAKE_CURRENT_LIST_DIR}/cmake/descartes_light_macros.cmake" DESTINATION lib/cmake/${PROJECT_NAME})
-configure_package()
+configure_package(NAMESPACE descartes)

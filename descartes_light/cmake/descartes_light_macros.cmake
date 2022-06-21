@@ -1,5 +1,5 @@
 #
-# @file descartes_light_macros.cmake @brief Common Tesseract CMake Macros
+# @file descartes_light_macros.cmake @brief Common CMake Macros
 #
 # @author Levi Armstrong @date October 15, 2019 @version TODO @bug No known bugs
 #
