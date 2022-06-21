@@ -12,7 +12,12 @@ initialize_code_coverage(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 add_code_coverage_all_targets(ENABLE ${DESCARTES_ENABLE_CODE_COVERAGE})
 
 add_subdirectory(core)
-add_subdirectory(bgl)
+
+option(DESCARTES_BUILD_BGL "Build Boost graph library based components" ON)
+if(DESCARTES_BUILD_BGL)
+  message("Building Boost graph library implementations")
+  add_subdirectory(bgl)
+endif()
 
 if(DESCARTES_ENABLE_TESTING)
   enable_testing()
