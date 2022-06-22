@@ -28,3 +28,36 @@ endif()
 # Package configuration
 install(FILES "${CMAKE_CURRENT_LIST_DIR}/cmake/descartes_light_macros.cmake" DESTINATION lib/cmake/${PROJECT_NAME})
 configure_package(NAMESPACE descartes)
+
+if(DESCARTES_PACKAGE)
+  set(LINUX_DEPENDS "libconsole-bridge-dev" "libeigen3-dev" "libomp-dev")
+  set(WINDOWS_DEPENDS
+      "console_bridge"
+      "Eigen3"
+      "boost"
+      "omp")
+  if(DESCARTES_BUILD_BGL)
+    list(APPEND LINUX_DEPENDS "libboost-graph-dev")
+    list(APPEND WINDOW_DEPENDS "boost_graph")
+  endif()
+
+  cpack(
+    VERSION
+    ${pkg_extracted_version}
+    MAINTAINER
+    <https://github.com/ros-industrial-consortium/tesseract>
+    VENDOR
+    "Southwest Research Institute"
+    DESCRIPTION
+    ${pkg_extracted_description}
+    LICENSE_FILE
+    ${CMAKE_CURRENT_LIST_DIR}/../LICENSE.Apache-2.0
+    README_FILE
+    ${CMAKE_CURRENT_LIST_DIR}/../README.md
+    PACKAGE_PREFIX
+    ${DESCARTES_PACKAGE_PREFIX}
+    LINUX_DEPENDS
+    ${LINUX_DEPENDS}
+    WINDOWS_DEPENDS
+    ${WINDOWS_DEPENDS})
+endif()
