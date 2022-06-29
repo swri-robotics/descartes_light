@@ -42,10 +42,10 @@ add_gtest_discover_tests(${PROJECT_NAME}_utest)
 add_dependencies(run_tests ${PROJECT_NAME}_utest)
 
 install(
-  TARGETS ${PROJECT_NAME}_test_utils ${PROJECT_NAME}_utest
-  RUNTIME DESTINATION bin/tests
-  LIBRARY DESTINATION lib/test
-  ARCHIVE DESTINATION lib/test)
+  TARGETS ${PROJECT_NAME}_test_utils
+  RUNTIME DESTINATION bin
+  LIBRARY DESTINATION lib
+  ARCHIVE DESTINATION lib)
 
 # Benchmarks
 add_subdirectory(benchmarks)
