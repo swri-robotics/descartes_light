@@ -1,0 +1,98 @@
+name: Windows-2019
+
+on:
+  push:
+    tags:
+      - '*'
+
+  # allow manually starting this workflow
+  workflow_dispatch:
+
+env:
+  VCPKG_PKGS: >-
+    boost-graph eigen3 console-bridge
+
+jobs:
+  windows_ci:
+    name: Windows-2019
+    runs-on: windows-2019
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@master
+      with:
+        path: workspace/src/descartes_light
+
+    - name: checkout-vcpkg
+      uses: actions/checkout@master
+      with:
+        path: vcpkg
+        repository: microsoft/vcpkg
+
+    - name: bootstrap-vcpkg
+      working-directory: vcpkg
+      run: bootstrap-vcpkg.bat
+
+    - name: vcpkg-dry-run
+      working-directory: vcpkg
+      shell: cmd
+      run: |
+        vcpkg install --dry-run --triplet x64-windows ${{ env.VCPKG_PKGS }} > vcpkg_dry_run.txt
+
+    - name: cache-vcpkg-archives
+      if: startsWith(github.ref, 'refs/tags/v') != true
+      id: cache-vcpkg-archives
+      uses: pat-s/always-upload-cache@master
+      with:
+        path: C:\Users\runneradmin\AppData\Local\vcpkg\archives
+        key: ${{ runner.os }}-x64-vcpkg-${{ hashFiles('vcpkg/vcpkg_dry_run.txt') }}-main
+
+    - name: install-depends
+      shell: cmd
+      run: |
+        vcpkg integrate install
+        python -m pip install vcstool -q
+        python -m pip install colcon-common-extensions -q
+        python -m pip install ninja -q
+        vcpkg install --triplet x64-windows ${{ env.VCPKG_PKGS }}
+
+    - name: configure-msvc
+      uses: ilammy/msvc-dev-cmd@master
+      with:
+        arch: x64
+
+    - name: build-workspace
+      shell: cmd
+      working-directory: workspace
+      run: |
+        vcs import src < src/descartes_light/dependencies.rosinstall
+        colcon build --event-handlers console_direct+ --cmake-args -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DDESCARTES_PACKAGE=ON
+
+    - name: run-test
+      working-directory: workspace
+      shell: cmd
+      run: |
+        colcon test --event-handlers console_direct+ --return-code-on-test-failure
+        colcon test-result --verbose
+
+    - name: Create artifacts directory
+      run: |
+        mkdir artifacts
+
+    - name: Package
+      working-directory: workspace/build/descartes_light
+      run: |
+        cpack --config CPackConfig.cmake
+        cp ./*.nupkg ${{ github.workspace }}/artifacts
+        cp ./*.tar.xz ${{ github.workspace }}/artifacts
+
+    - name: Upload NuGet
+      uses: actions/upload-artifact@master
+      with:
+        name: nuget_package
+        path: ${{ github.workspace }}/artifacts/*.nupkg
+
+    - name: Upload archive
+      uses: actions/upload-artifact@master
+      with:
+        name: archive_package
+        path: ${{ github.workspace }}/artifacts/*.tar.xz
