@@ -32,7 +32,7 @@ jobs:
 
       - name: Build
         run: |
-          colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release -DDESCARTES_ENABLE_TESTING=ON -DDESCARTES_ENABLE_CLANG_TIDY=ON
+          colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON -DDESCARTES_ENABLE_CLANG_TIDY=ON
           if [ $? -ne 0 ]; then exit 1; fi
 
       - name: Test
