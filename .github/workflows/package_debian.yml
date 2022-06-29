@@ -11,7 +11,8 @@ on:
 jobs:
   ci:
     name: Package-Debian
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
+    container: ubuntu:focal
     steps:
       - name: Checkout repository
         uses: actions/checkout@master
@@ -20,11 +21,11 @@ jobs:
 
       - name: Install dependencies
         run: |
-          sudo apt update -q
-          sudo apt install -q -y clang-tidy python3 python3-pip
-          sudo pip3 install -q --upgrade pip
-          sudo pip3 install -q colcon-common-extensions rosdep vcstool
-          sudo rosdep init -q
+          apt update -q
+          apt install -q -y clang-tidy python3 python3-pip git
+          pip3 install -q --upgrade pip
+          pip3 install -q colcon-common-extensions rosdep vcstool
+          rosdep init -q
           rosdep update -q
           vcs import src < src/descartes_light/dependencies.rosinstall
           rosdep install --from-paths src --ignore-src -r -y -q
