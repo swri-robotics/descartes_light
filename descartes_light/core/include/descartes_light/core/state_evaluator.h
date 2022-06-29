@@ -42,7 +42,10 @@ public:
   StateEvaluator(StateEvaluator&&) noexcept = default;
   StateEvaluator& operator=(StateEvaluator&&) noexcept = default;
 
-  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>& solution) const = 0;
+  virtual std::pair<bool, FloatType> evaluate(const State<FloatType>& solution) const
+  {
+    return std::make_pair<bool, FloatType>(true, static_cast<FloatType>(0.0));
+  };
 };
 
 using StateEvaluatorF = StateEvaluator<float>;
