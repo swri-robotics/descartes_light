@@ -50,8 +50,7 @@ jobs:
       shell: cmd
       run: |
         vcpkg integrate install
-        python -m pip install vcstool -q
-        python -m pip install colcon-common-extensions -q
+        python -m pip install vcstool colcon-common-extensions ninja -q
         vcpkg install --triplet x64-windows ${{ env.VCPKG_PKGS }}
 
     - name: configure-msvc
@@ -64,7 +63,7 @@ jobs:
       shell: cmd
       run: |
         vcs import src < src/descartes_light/dependencies.rosinstall
-        colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON
+        colcon build --event-handlers console_direct+ --cmake-args -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON
         if %ERRORLEVEL% GEQ 1 exit 1
 
     - name: run-test
