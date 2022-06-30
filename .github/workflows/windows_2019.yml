@@ -71,5 +71,7 @@ jobs:
       working-directory: workspace
       shell: cmd
       run: |
-        colcon test --event-handlers console_direct+ --return-code-on-test-failure
+        colcon test --event-handlers console_direct+
+        if %ERRORLEVEL% GEQ 1 exit 1
         colcon test-result --verbose
+        if %ERRORLEVEL% GEQ 1 exit 1
