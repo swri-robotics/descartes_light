@@ -66,13 +66,7 @@ jobs:
       run: |
         vcs import src < src/descartes_light/dependencies.rosinstall
         colcon build --event-handlers console_direct+ --cmake-args -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DCMAKE_BUILD_TYPE=Release -DDESCARTES_PACKAGE=ON
-
-    - name: run-test
-      working-directory: workspace
-      shell: cmd
-      run: |
-        colcon test --event-handlers console_direct+ --return-code-on-test-failure
-        colcon test-result --verbose
+        if %ERRORLEVEL% GEQ 1 exit 1
 
     - name: Create artifacts directory
       run: |
