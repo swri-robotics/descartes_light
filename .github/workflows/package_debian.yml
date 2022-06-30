@@ -36,11 +36,6 @@ jobs:
           colcon build --event-handlers console_direct+ --cmake-args -DCMAKE_BUILD_TYPE=Release -DDESCARTES_PACKAGE=ON
           if [ $? -ne 0 ]; then exit 1; fi
 
-      - name: Test
-        run: |
-          colcon test --event-handlers console_direct+ --return-code-on-test-failure
-          colcon test-result
-
       - name: Create artifacts directory
         run: |
           mkdir artifacts
