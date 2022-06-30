@@ -37,5 +37,7 @@ jobs:
 
       - name: Test
         run: |
-          colcon test --event-handlers console_direct+ --return-code-on-test-failure
-          colcon test-result
+          colcon test --event-handlers console_direct+
+          if [ $? -ne 0 ]; then exit 1; fi
+          colcon test-result --verbose
+          if [ $? -ne 0 ]; then exit 1; fi
