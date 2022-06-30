@@ -70,6 +70,7 @@ jobs:
       working-directory: workspace
       shell: cmd
       run: |
+        call install/setup.bat
         colcon test --event-handlers console_direct+
         if %ERRORLEVEL% GEQ 1 exit 1
         colcon test-result --verbose
