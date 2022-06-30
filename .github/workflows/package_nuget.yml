@@ -50,9 +50,7 @@ jobs:
       shell: cmd
       run: |
         vcpkg integrate install
-        python -m pip install vcstool -q
-        python -m pip install colcon-common-extensions -q
-        python -m pip install ninja -q
+        python -m pip install vcstool colcon-common-extensions ninja -q
         vcpkg install --triplet x64-windows ${{ env.VCPKG_PKGS }}
 
     - name: configure-msvc
