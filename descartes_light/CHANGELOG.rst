@@ -2,8 +2,8 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.3.1 (2022-06-30)
+------------------
 * Added default state evaluator that treats all states equally (`#94 <https://github.com/swri-robotics/descartes_light/issues/94>`_)
   * Added default state evaluator that treats all states equally
   * Removed solution input parameter to pass checks
