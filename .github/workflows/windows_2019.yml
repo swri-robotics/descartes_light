@@ -72,6 +72,10 @@ jobs:
       run: |
         call install/setup.bat
         set PATH=%PATH%;C:/vcpkg/installed/x64-windows-release/bin
+        set test_error=0
+        cmd /c "cd build\descartes_light\test && ctest -C Release --output-on-failure" || set test_error=1
+        exit /b %test_error%
+
         colcon test --event-handlers console_direct+
         if %ERRORLEVEL% GEQ 1 exit 1
         colcon test-result --verbose
