@@ -62,8 +62,9 @@ jobs:
       working-directory: workspace
       shell: cmd
       run: |
+        set CXXFLAGS=%CXXFLAGS% -DEIGEN_DONT_ALIGN=1 -DEIGEN_DONT_VECTORIZE=1
         vcs import src < src/descartes_light/dependencies.rosinstall
-        colcon build --event-handlers console_direct+ --cmake-args -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-release -DEIGEN_DONT_ALIGN=1 -DEIGEN_DONT_VECTORIZE=1 -DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON
+        colcon build --event-handlers console_direct+ --cmake-args -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-release -DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON
         if %ERRORLEVEL% GEQ 1 exit 1
 
     - name: run-test
