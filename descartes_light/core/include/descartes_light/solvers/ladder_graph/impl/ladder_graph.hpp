@@ -127,6 +127,19 @@ void LadderGraph<FloatType>::clear()
   rungs_.clear();
 }
 
+template <typename FloatType>
+std::string LadderGraph<FloatType>::printString()
+{
+    std::stringstream ss;
+    ss << std::endl << "Rung\t(Nodes)\t|# Outgoing Edges|" << std::endl;
+    for (std::size_t i = 0; i < rungs_.size(); i++)
+    {
+        Rung<FloatType> rung = rungs_[i];
+        ss << i << "\t(" << rung.nodes.size() << ")\t|" << rung.numEdges() << "|" << std::endl;
+    }
+    return ss.str();
+}
+
 }  // namespace descartes_light
 
 #endif  // DESCARTES_LIGHT_IMPL_LADDER_GRAPH_HPP

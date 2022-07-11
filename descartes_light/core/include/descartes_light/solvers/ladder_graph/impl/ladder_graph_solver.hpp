@@ -188,6 +188,8 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
   std::sort(status.failed_vertices.begin(), status.failed_vertices.end());
   std::sort(status.failed_edges.begin(), status.failed_edges.end());
 
+  CONSOLE_BRIDGE_logDebug(graph_.printString().c_str());
+
   reportFailedVertices(status.failed_vertices);
   reportFailedEdges(status.failed_edges);
 

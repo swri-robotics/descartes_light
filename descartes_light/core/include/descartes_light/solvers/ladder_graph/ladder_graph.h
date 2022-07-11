@@ -73,6 +73,14 @@ struct Rung
 
   /** @brief A vector of joint solutions */
   std::vector<Node<FloatType>> nodes;
+
+  std::size_t numEdges()
+  {
+      std::size_t num_edges = 0;
+      for (const auto& node : nodes)
+          num_edges += node.edges.size();
+      return num_edges;
+  }
 };
 
 using RungF = Rung<float>;
@@ -147,6 +155,8 @@ public:
    * @brief Clears all existing rungs & associated data
    */
   void clear();
+
+  std::string printString();
 
 private:
   std::vector<Rung<FloatType>> rungs_;
