@@ -37,7 +37,7 @@ jobs:
       working-directory: vcpkg
       shell: cmd
       run: |
-        mkdir vcpkg_cache
+        mkdir %VCPKG_DEFAULT_BINARY_CACHE%
         vcpkg install --dry-run --triplet x64-windows-release ${{ env.VCPKG_PKGS }} > vcpkg_dry_run.txt
 
     - name: cache-vcpkg-archives
