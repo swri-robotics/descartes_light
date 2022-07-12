@@ -11,6 +11,7 @@ on:
 env:
   VCPKG_PKGS: >-
     boost-graph eigen3 console-bridge
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}\vcpkg_cache
 
 jobs:
   windows_ci:
@@ -36,6 +37,7 @@ jobs:
       working-directory: vcpkg
       shell: cmd
       run: |
+        mkdir vcpkg_cache
         vcpkg install --dry-run --triplet x64-windows-release ${{ env.VCPKG_PKGS }} > vcpkg_dry_run.txt
 
     - name: cache-vcpkg-archives
@@ -43,7 +45,7 @@ jobs:
       id: cache-vcpkg-archives
       uses: pat-s/always-upload-cache@v3
       with:
-        path: C:\Users\runneradmin\AppData\Local\vcpkg\archives
+        path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
         key: ${{ runner.os }}-x64-windows-release-vcpkg-${{ hashFiles('vcpkg/vcpkg_dry_run.txt') }}-main
 
     - name: install-depends
