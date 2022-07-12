@@ -11,6 +11,7 @@ on:
 env:
   VCPKG_PKGS: >-
     boost-graph eigen3 console-bridge
+  VCPKG_DEFAULT_BINARY_CACHE: ${{ github.workspace }}\vcpkg_cache
 
 jobs:
   windows_ci:
@@ -36,6 +37,7 @@ jobs:
       working-directory: vcpkg
       shell: cmd
       run: |
+        mkdir %VCPKG_DEFAULT_BINARY_CACHE%
         vcpkg install --dry-run --triplet x64-windows-release ${{ env.VCPKG_PKGS }} > vcpkg_dry_run.txt
 
     - name: cache-vcpkg-archives
@@ -43,11 +45,12 @@ jobs:
       id: cache-vcpkg-archives
       uses: pat-s/always-upload-cache@v3
       with:
-        path: C:\Users\runneradmin\AppData\Local\vcpkg\archives
+        path: ${{ env.VCPKG_DEFAULT_BINARY_CACHE }}
         key: ${{ runner.os }}-x64-windows-release-vcpkg-${{ hashFiles('vcpkg/vcpkg_dry_run.txt') }}-main
 
     - name: install-depends
       shell: cmd
+      working-directory: vcpkg
       run: |
         vcpkg integrate install
         python -m pip install vcstool colcon-common-extensions ninja -q
@@ -63,20 +66,17 @@ jobs:
       shell: cmd
       run: |
         set CXXFLAGS=%CXXFLAGS% -DEIGEN_DONT_ALIGN=1 -DEIGEN_DONT_VECTORIZE=1
+        set CMAKE_PREFIX_PATH=%GITHUB_WORKSPACE%\vcpkg\installed\x64-windows-release
+        set PATH=%PATH%;%GITHUB_WORKSPACE%\vcpkg\installed\x64-windows-release\bin
         vcs import src < src/descartes_light/dependencies.rosinstall
-        colcon build --event-handlers console_direct+ --cmake-args -G "Ninja" -DCMAKE_TOOLCHAIN_FILE=C:/vcpkg/scripts/buildsystems/vcpkg.cmake -DVCPKG_TARGET_TRIPLET=x64-windows-release -DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON
+        colcon build --event-handlers console_direct+ --cmake-args -G "Ninja" -DCMAKE_BUILD_TYPE=Release -DDESCARTES_ENABLE_TESTING=ON -DVCPKG_APPLOCAL_DEPS=OFF
         if %ERRORLEVEL% GEQ 1 exit 1
 
     - name: run-test
       working-directory: workspace
       shell: cmd
       run: |
-        call install/setup.bat
-        set PATH=%PATH%;C:/vcpkg/installed/x64-windows-release/bin
-        set test_error=0
-        cmd /c "cd build\descartes_light\test && ctest -VV -C Release --output-on-failure" || set test_error=1
-        exit /b %test_error%
-
+        set PATH=%PATH%;%GITHUB_WORKSPACE%\vcpkg\installed\x64-windows-release\bin
         colcon test --event-handlers console_direct+
         if %ERRORLEVEL% GEQ 1 exit 1
         colcon test-result --verbose
