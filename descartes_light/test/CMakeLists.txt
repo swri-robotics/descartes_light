@@ -41,11 +41,5 @@ target_code_coverage(${PROJECT_NAME}_utest ALL ENABLE ${DESCARTES_ENABLE_CODE_CO
 add_gtest_discover_tests(${PROJECT_NAME}_utest)
 add_dependencies(run_tests ${PROJECT_NAME}_utest)
 
-install(
-  TARGETS ${PROJECT_NAME}_test_utils ${PROJECT_NAME}_utest
-  RUNTIME DESTINATION bin/tests
-  LIBRARY DESTINATION lib/test
-  ARCHIVE DESTINATION lib/test)
-
 # Benchmarks
 add_subdirectory(benchmarks)

@@ -1,4 +1,4 @@
-name: Xenial-Build
+name: Ubuntu-Xenial
 
 on:
   push:
@@ -10,10 +10,10 @@ on:
 
 jobs:
   industrial_ci:
-    name: Kinetic
+    name: Ubuntu-Xenial
     runs-on: ubuntu-latest
     env:
-      CI_NAME: Xenial-Build
+      CI_NAME: Ubuntu-Xenial
       OS_NAME: ubuntu
       OS_CODE_NAME: xenial
       ROS_DISTRO: kinetic
