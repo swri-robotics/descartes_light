@@ -19,7 +19,7 @@ jobs:
         path: workspace/src/descartes_light
 
     - name: vcpkg build
-      uses: johnwason/vcpkg-action@v1
+      uses: johnwason/vcpkg-action@v2
       with:
         pkgs: >-
           boost-graph eigen3 console-bridge
