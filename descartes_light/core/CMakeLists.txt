@@ -51,7 +51,6 @@ add_library(
   src/solvers/ladder_graph/ladder_graph_dag_search.cpp)
 target_link_libraries(${PROJECT_NAME} PUBLIC Eigen3::Eigen OpenMP::OpenMP_CXX console_bridge::console_bridge)
 target_cxx_version(${PROJECT_NAME} PUBLIC VERSION ${DESCARTES_CXX_VERSION})
-target_compile_options(${PROJECT_NAME} PUBLIC -std=c++${DESCARTES_CXX_VERSION})
 target_compile_options(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_OPTIONS})
 target_compile_definitions(${PROJECT_NAME} PUBLIC ${DESCARTES_COMPILE_DEFINITIONS})
 target_clang_tidy(
