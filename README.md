@@ -13,7 +13,6 @@ This package is intented to be a simple ladder graph building library. The core 
 
 Platform             | CI Status
 ---------------------|:---------
-Linux (Xenial)       | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Xenial-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
 Linux (Bionic)       | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Bionic-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
 Linux (Focal)        | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Focal-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
 Windows              | [![Build Status](https://github.com/swri-robotics/descartes_light/workflows/Windows-Build/badge.svg)](https://github.com/swri-robotics/descartes_light/actions)
