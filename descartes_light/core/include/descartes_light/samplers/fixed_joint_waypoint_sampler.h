@@ -31,6 +31,8 @@ public:
 
   std::vector<StateSample<FloatType>> sample() const override;
 
+  virtual std::ostream& format(std::ostream& out) const override;
+
 private:
   typename State<FloatType>::ConstPtr fixed_joint_position_;
 };
