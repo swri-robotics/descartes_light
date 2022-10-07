@@ -19,7 +19,7 @@ jobs:
         path: workspace/src/descartes_light
 
     - name: vcpkg build
-      uses: johnwason/vcpkg-action@v2
+      uses: johnwason/vcpkg-action@v3
       with:
         pkgs: >-
           boost-graph eigen3 console-bridge
@@ -33,7 +33,7 @@ jobs:
         python -m pip install vcstool colcon-common-extensions ninja -q
 
     - name: configure-msvc
-      uses: ilammy/msvc-dev-cmd@master
+      uses: ilammy/msvc-dev-cmd@v1
       with:
         arch: x64
 
