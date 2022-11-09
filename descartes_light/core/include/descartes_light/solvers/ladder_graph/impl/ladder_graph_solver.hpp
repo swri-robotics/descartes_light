@@ -26,6 +26,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <algorithm>
 #include <Eigen/Geometry>
 #include <chrono>
+#include <iostream>
 DESCARTES_IGNORE_WARNINGS_POP
 
 #include <descartes_light/solvers/ladder_graph/ladder_graph_solver.h>
@@ -130,6 +131,18 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
   double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build vertices.", duration);
 
+  if (!status.failed_vertices.empty())
+  {
+    CONSOLE_BRIDGE_logDebug("Failed vertices and positions: ");
+    for (auto&& vert_idx : status.failed_vertices)
+    {
+      auto pos = trajectory[vert_idx];
+      std::stringstream s;
+      s << vert_idx << ": " << *pos;
+
+      CONSOLE_BRIDGE_logDebug("%s", s.str().c_str());
+    }
+  }
   // Build Edges
   cnt = 0;
   start_time = Clock::now();
@@ -188,7 +201,12 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
   std::sort(status.failed_vertices.begin(), status.failed_vertices.end());
   std::sort(status.failed_edges.begin(), status.failed_edges.end());
 
-  CONSOLE_BRIDGE_logDebug(graph_.printString().c_str());
+  // CONSOLE_BRIDGE_logDebug has a limited buffer size and can't handle outputting a large graph.
+  if(console_bridge::getLogLevel() <= console_bridge::CONSOLE_BRIDGE_LOG_DEBUG)
+  {
+    std::cout << graph_.printString();
+    // spdlog::debug(graph_.printString());  // spdlog would work better than cout (and console_bridge...)
+  } 
 
   reportFailedVertices(status.failed_vertices);
   reportFailedEdges(status.failed_edges);
