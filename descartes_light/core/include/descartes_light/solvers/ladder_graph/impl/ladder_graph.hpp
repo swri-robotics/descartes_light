@@ -19,6 +19,7 @@
 #define DESCARTES_LIGHT_IMPL_LADDER_GRAPH_HPP
 
 #include <descartes_light/solvers/ladder_graph/ladder_graph.h>
+#include <iomanip>
 
 namespace descartes_light
 {
@@ -130,14 +131,47 @@ void LadderGraph<FloatType>::clear()
 template <typename FloatType>
 std::string LadderGraph<FloatType>::printString()
 {
-    std::stringstream ss;
-    ss << std::endl << "Rung\t(Nodes)\t|# Outgoing Edges|" << std::endl;
-    for (std::size_t i = 0; i < rungs_.size(); i++)
+  std::stringstream ss;
+  ss << "\nRung\t(Nodes)\t|# Outgoing Edges|\n";
+
+  std::vector<std::size_t> failed_edges;
+  for (std::size_t i = 0; i < rungs_.size(); i++)
+  {
+    Rung<FloatType> rung = rungs_[i];
+    ss << i << "\t(" << rung.nodes.size() << ")\t|" << rung.numEdges() << "|\n";
+
+    if (rung.numEdges() <= 0 && rung.nodes.size() > 0 && i < rungs_.size() - 1)
     {
-        Rung<FloatType> rung = rungs_[i];
-        ss << i << "\t(" << rung.nodes.size() << ")\t|" << rung.numEdges() << "|" << std::endl;
+      failed_edges.push_back(i);
     }
-    return ss.str();
+  }
+
+  auto rungs_size = rungs_.size();
+  if (!failed_edges.empty())
+  {
+    ss << "\nFailed edges: \n";
+    for (auto failed_id : failed_edges)
+    {
+      Rung<FloatType> rung1 = rungs_[failed_id];
+      if (rung1.nodes.empty())
+        continue;
+      Node<FloatType> node1 = rung1.nodes.front();
+      typename State<FloatType>::ConstPtr state1 = node1.sample.state;
+
+      Rung<FloatType> rung2 = rungs_[failed_id + 1];
+      if (rung2.nodes.empty())
+        continue;
+      Node<FloatType> node2 = rung2.nodes.front();
+      typename State<FloatType>::ConstPtr state2 = node2.sample.state;
+      ss << "Rung # " << failed_id << "\n";
+      for (Eigen::Index i = 0; i < state1->values.rows(); i++)
+      {
+        ss << std::setprecision(4) << std::fixed << "\t" << state1->values[i] << "\t|\t" << state2->values[i] << "\n";
+      }
+    }
+  }
+  ss << std::endl;
+  return ss.str();
 }
 
 }  // namespace descartes_light
