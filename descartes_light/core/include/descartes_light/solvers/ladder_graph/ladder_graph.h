@@ -173,7 +173,6 @@ public:
       }
     }
 
-    auto rungs_size = ladder_graph.rungs_.size();
     if (!failed_edges.empty())
     {
       out << "\nFailed edges: \n";
