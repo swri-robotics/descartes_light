@@ -148,6 +148,7 @@ BuildStatus BGLSolverBaseSVDE<FloatType>::buildImpl(
 
   // Build Vertices
   ladder_rungs_.resize(trajectory.size());
+  long cnt = 0;
 
   std::chrono::time_point<Clock> start_time = Clock::now();
 #pragma omp parallel for num_threads(BGLSolverBase <FloatType>::num_threads_)
