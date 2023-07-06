@@ -77,10 +77,10 @@ struct Rung
 
   std::size_t getEdgeCount()
   {
-      std::size_t num_edges = 0;
-      for (const auto& node : nodes)
-          num_edges += node.edges.size();
-      return num_edges;
+    std::size_t num_edges = 0;
+    for (const auto& node : nodes)
+      num_edges += node.edges.size();
+    return num_edges;
   }
 };
 
@@ -193,7 +193,8 @@ public:
         out << "Rung # " << failed_id << "\n";
         for (Eigen::Index i = 0; i < state1->values.rows(); i++)
         {
-          out << std::setprecision(4) << std::fixed << "\t" << state1->values[i] << "\t|\t" << state2->values[i] << "\n";
+          out << std::setprecision(4) << std::fixed << "\t" << state1->values[i] << "\t|\t" << state2->values[i]
+              << "\n";
         }
       }
     }

@@ -35,7 +35,6 @@ std::vector<StateSample<FloatType>> FixedJointWaypointSampler<FloatType>::sample
   return { StateSample<FloatType>{ fixed_joint_position_, static_cast<FloatType>(0.0) } };
 }
 
-
 }  // namespace descartes_light
 
 #endif  // DESCARTES_SAMPLERS_SAMPLERS_IMPL_FIXED_JOINT_WAYPOINT_SAMPLER_HPP

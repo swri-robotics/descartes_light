@@ -202,10 +202,10 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
   std::sort(status.failed_edges.begin(), status.failed_edges.end());
 
   // CONSOLE_BRIDGE_logDebug has a limited buffer size and can't handle outputting a large graph.
-  if(console_bridge::getLogLevel() <= console_bridge::CONSOLE_BRIDGE_LOG_DEBUG)
+  if (console_bridge::getLogLevel() <= console_bridge::CONSOLE_BRIDGE_LOG_DEBUG)
   {
     std::cout << graph_;
-  } 
+  }
 
   reportFailedVertices(status.failed_vertices);
   reportFailedEdges(status.failed_edges);
