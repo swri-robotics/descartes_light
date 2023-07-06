@@ -25,6 +25,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <cassert>
 #include <vector>
 #include <Eigen/Geometry>
+#include <iomanip>
 DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_core
@@ -74,7 +75,7 @@ struct Rung
   /** @brief A vector of joint solutions */
   std::vector<Node<FloatType>> nodes;
 
-  std::size_t numEdges()
+  std::size_t getEdgeCount()
   {
       std::size_t num_edges = 0;
       for (const auto& node : nodes)
@@ -156,7 +157,49 @@ public:
    */
   void clear();
 
-  std::string printString();
+  friend std::ostream& operator<<(std::ostream& out, const LadderGraph<FloatType>& ladder_graph)
+  {
+    out << "\nRung\t(Nodes)\t|# Outgoing Edges|\n";
+
+    std::vector<std::size_t> failed_edges;
+    for (std::size_t i = 0; i < ladder_graph.rungs_.size(); i++)
+    {
+      Rung<FloatType> rung = ladder_graph.rungs_[i];
+      out << i << "\t(" << rung.nodes.size() << ")\t|" << rung.getEdgeCount() << "|\n";
+
+      if (rung.getEdgeCount() <= 0 && rung.nodes.size() > 0 && i < ladder_graph.rungs_.size() - 1)
+      {
+        failed_edges.push_back(i);
+      }
+    }
+
+    auto rungs_size = ladder_graph.rungs_.size();
+    if (!failed_edges.empty())
+    {
+      out << "\nFailed edges: \n";
+      for (auto failed_id : failed_edges)
+      {
+        Rung<FloatType> rung1 = ladder_graph.rungs_[failed_id];
+        if (rung1.nodes.empty())
+          continue;
+        Node<FloatType> node1 = rung1.nodes.front();
+        typename State<FloatType>::ConstPtr state1 = node1.sample.state;
+
+        Rung<FloatType> rung2 = ladder_graph.rungs_[failed_id + 1];
+        if (rung2.nodes.empty())
+          continue;
+        Node<FloatType> node2 = rung2.nodes.front();
+        typename State<FloatType>::ConstPtr state2 = node2.sample.state;
+        out << "Rung # " << failed_id << "\n";
+        for (Eigen::Index i = 0; i < state1->values.rows(); i++)
+        {
+          out << std::setprecision(4) << std::fixed << "\t" << state1->values[i] << "\t|\t" << state2->values[i] << "\n";
+        }
+      }
+    }
+    out << "\n";
+    return out;
+  }
 
 private:
   std::vector<Rung<FloatType>> rungs_;

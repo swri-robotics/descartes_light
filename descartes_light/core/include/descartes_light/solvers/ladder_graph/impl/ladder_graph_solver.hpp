@@ -204,8 +204,7 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
   // CONSOLE_BRIDGE_logDebug has a limited buffer size and can't handle outputting a large graph.
   if(console_bridge::getLogLevel() <= console_bridge::CONSOLE_BRIDGE_LOG_DEBUG)
   {
-    std::cout << graph_.printString();
-    // spdlog::debug(graph_.printString());  // spdlog would work better than cout (and console_bridge...)
+    std::cout << graph_;
   } 
 
   reportFailedVertices(status.failed_vertices);

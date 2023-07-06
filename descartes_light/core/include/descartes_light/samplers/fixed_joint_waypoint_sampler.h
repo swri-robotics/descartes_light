@@ -31,7 +31,12 @@ public:
 
   std::vector<StateSample<FloatType>> sample() const override;
 
-  virtual std::ostream& format(std::ostream& out) const override;
+  friend std::ostream& operator<<(std::ostream& out, const FixedJointWaypointSampler<FloatType>& wps)
+  {
+      out << wps.fixed_joint_position_->values;
+      return out;
+  }
+
 
 private:
   typename State<FloatType>::ConstPtr fixed_joint_position_;
