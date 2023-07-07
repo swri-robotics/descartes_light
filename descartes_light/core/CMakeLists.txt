@@ -44,7 +44,7 @@ add_library(
   src/state_evaluators/euclidean_distance_state_evaluator.cpp
   src/state_evaluators/normalized_state_evaluator.cpp
   # Samplers
-  src/samplers/fixed_joint_pose_sampler.cpp
+  src/samplers/fixed_joint_waypoint_sampler.cpp
   # Solvers
   src/solvers/ladder_graph/ladder_graph_solver.cpp
   src/solvers/ladder_graph/ladder_graph.cpp

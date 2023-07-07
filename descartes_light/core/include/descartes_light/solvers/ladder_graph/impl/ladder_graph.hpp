@@ -19,6 +19,7 @@
 #define DESCARTES_LIGHT_IMPL_LADDER_GRAPH_HPP
 
 #include <descartes_light/solvers/ladder_graph/ladder_graph.h>
+#include <iomanip>
 
 namespace descartes_light
 {
