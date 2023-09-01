@@ -66,12 +66,22 @@ target_code_coverage(
 target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                   "$<INSTALL_INTERFACE:include>")
 
-install(
-  TARGETS ${PROJECT_NAME}
-  EXPORT ${PROJECT_NAME}-targets
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
 # Install headers
 install(DIRECTORY include/ DESTINATION include/)
+
+# Package component configuration
+configure_component(
+  COMPONENT core
+  NAMESPACE descartes
+  TARGETS ${PROJECT_NAME}
+  DEPENDENCIES Eigen3 console_bridge OpenMP
+  CFG_EXTRAS cmake/core-macros.cmake cmake/core-extras.cmake)
+
+if(DESCARTES_PACKAGE)
+  cpack_component(
+    COMPONENT core
+    VERSION ${pkg_extracted_version}
+    DESCRIPTION "Descartes Light core component"
+    LINUX_DEPENDS "libconsole-bridge-dev" "libeigen3-dev" "libomp-dev"
+    WINDOWS_DEPENDS "console_bridge" "Eigen3" "omp")
+endif()

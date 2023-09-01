@@ -23,3 +23,19 @@ install(
 
 # Install headers
 install(DIRECTORY include/ DESTINATION include/)
+
+configure_component(
+  COMPONENT bgl
+  NAMESPACE descartes
+  TARGETS ${PROJECT_NAME}_bgl
+  DEPENDENCIES "descartes_light COMPONENTS core" "Boost COMPONENTS graph")
+
+if(DESCARTES_PACKAGE)
+  cpack_component(
+    COMPONENT kdl
+    VERSION ${pkg_extracted_version}
+    DESCRIPTION "Descrates Light boost graph implementation"
+    COMPONENT_DEPENDS core
+    LINUX_DEPENDS "libboost-graph-dev"
+    WINDOWS_DEPENDS "boost_graph")
+endif()
