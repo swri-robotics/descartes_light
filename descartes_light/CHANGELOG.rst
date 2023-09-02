@@ -2,6 +2,11 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Install headers with component name
+* Contributors: Levi Armstrong
+
 0.4.0 (2023-09-02)
 ------------------
 * Update RICB and leverage components
