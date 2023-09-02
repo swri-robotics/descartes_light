@@ -67,7 +67,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC "$<BUILD_INTERFACE:${CMAKE_CUR
                                                   "$<INSTALL_INTERFACE:include>")
 
 # Install headers
-install(DIRECTORY include/ DESTINATION include/)
+install(DIRECTORY include/ DESTINATION include/ COMPONENT core)
 
 # Package component configuration
 configure_component(

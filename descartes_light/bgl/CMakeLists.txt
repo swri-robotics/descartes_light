@@ -14,15 +14,8 @@ target_code_coverage(${PROJECT_NAME}_bgl ALL ENABLE ${DESCARTES_ENABLE_CODE_COVE
 target_include_directories(${PROJECT_NAME}_bgl PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                       "$<INSTALL_INTERFACE:include>")
 
-install(
-  TARGETS ${PROJECT_NAME}_bgl
-  EXPORT ${PROJECT_NAME}-targets
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
 # Install headers
-install(DIRECTORY include/ DESTINATION include/)
+install(DIRECTORY include/ DESTINATION include/ COMPONENT bgl)
 
 configure_component(
   COMPONENT bgl
