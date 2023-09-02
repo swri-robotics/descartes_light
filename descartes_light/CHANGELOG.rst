@@ -2,8 +2,8 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.2 (2023-09-02)
+------------------
 * Fix debian source package
 * Contributors: Levi Armstrong
 
