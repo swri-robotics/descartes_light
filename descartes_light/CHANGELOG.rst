@@ -2,8 +2,8 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.1 (2023-09-02)
+------------------
 * Install headers with component name
 * Contributors: Levi Armstrong
 
