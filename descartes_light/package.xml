@@ -4,8 +4,8 @@
   <version>0.4.0</version>
   <description>The descartes_light package</description>
   <author>Jon Meyer</author>
+  <maintainer email="levi.armstrong@gmail.com">Levi Armstrong</maintainer>
   <maintainer email="michael.ripperger@swri.org">Michael Ripperger</maintainer>
-  <maintainer email="levi.armstrong@swri.org">Levi Armstrong</maintainer>
   <license>Apache 2.0</license>
 
   <buildtool_depend>cmake</buildtool_depend>
