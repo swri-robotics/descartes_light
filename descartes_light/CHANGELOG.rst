@@ -2,8 +2,8 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.0 (2023-09-02)
+------------------
 * Update RICB and leverage components
 * Ladder graph logging (`#105 <https://github.com/swri-robotics/descartes_light/issues/105>`_)
   * More detailed log of descartes ladder graph creation
