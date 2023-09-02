@@ -82,6 +82,10 @@ if(DESCARTES_PACKAGE)
     COMPONENT core
     VERSION ${pkg_extracted_version}
     DESCRIPTION "Descartes Light core component"
-    LINUX_DEPENDS "libconsole-bridge-dev" "libeigen3-dev" "libomp-dev"
+    LINUX_DEPENDS
+      "libconsole-bridge-dev"
+      "libeigen3-dev"
+      "libomp-dev"
+      "ros-industrial-cmake-boilerplate"
     WINDOWS_DEPENDS "console_bridge" "Eigen3" "omp")
 endif()

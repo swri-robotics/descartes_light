@@ -25,7 +25,7 @@ configure_component(
 
 if(DESCARTES_PACKAGE)
   cpack_component(
-    COMPONENT kdl
+    COMPONENT bgl
     VERSION ${pkg_extracted_version}
     DESCRIPTION "Descrates Light boost graph implementation"
     COMPONENT_DEPENDS core
