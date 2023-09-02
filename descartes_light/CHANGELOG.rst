@@ -2,6 +2,50 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Update RICB and leverage components
+* Ladder graph logging (`#105 <https://github.com/swri-robotics/descartes_light/issues/105>`_)
+  * More detailed log of descartes ladder graph creation
+  * Add format() and operator<< methods for waypoint sampler
+  This makes it easier to get info on which sampler failed
+  * Better failed vertex output
+  * Output one sampled position when an edge fails
+  Messy but code completion wouldn't work without being extra redundant in declarations.  Outputting 1 state is enough to pose the robot and see where it was trying to go.  It would be better to pull the original cartesian target pose out but that would be more difficult.
+  * Changed printing to use ostream across Descartes logging
+  * Fixed incorrect name of source file
+  * Clang formatting
+  * Fix new clang tidy warning
+  * Fix bgl clang tidy warning
+  * Fixed an accidental bug because I wasn't building with debug before
+  * Updated printout to include a std::end so it actually prints
+  * Revert unneeded clang tidy fix
+  ---------
+  Co-authored-by: Douglas Smith <douglas.smith@swri.org>
+* Fixes  CXX version compilation issues of dependant projects (`#98 <https://github.com/swri-robotics/descartes_light/issues/98>`_)
+  Co-authored-by: Roelof Oomen <roelof@LT-ROELOF.isogroup.local>
+* Update/windows build (`#95 <https://github.com/swri-robotics/descartes_light/issues/95>`_)
+  * Added test depends for gtest
+  * Simplified clang-format job
+  * Minor update to cmake format job
+  * Updated windows build
+  * Revised Ubuntu jobs
+  * Use containers
+  * Build in debug
+  * Renamed CI files
+  * Updated xenial CI name
+  * Updated install of test library
+  * Updated install location of benchmarks executable
+  * Make install process non-interactive to avoid hang-ups in locale configuration
+  * Remove testing from binary package jobs; add check to nuget build
+  * Added colcon test result checks
+  * Reintroduce Ninja
+  * Simplify python installs
+  * Remove second install of test library
+  Co-authored-by: Michael Ripperger <michael.ripperger@swri.org>
+  Co-authored-by: John Wason <wason@wasontech.com>
+* Contributors: Levi Armstrong, Roelof, Tyler Marr
+
 0.3.1 (2022-06-30)
 ------------------
 * Added default state evaluator that treats all states equally (`#94 <https://github.com/swri-robotics/descartes_light/issues/94>`_)
