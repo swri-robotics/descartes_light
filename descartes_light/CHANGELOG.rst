@@ -2,6 +2,11 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix debian source package
+* Contributors: Levi Armstrong
+
 0.4.1 (2023-09-02)
 ------------------
 * Install headers with component name
