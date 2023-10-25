@@ -60,7 +60,13 @@ public:
    */
   virtual typename std::vector<StateSample<FloatType>> sample() const = 0;
 
-  friend std::ostream& operator<<(std::ostream& os, const WaypointSampler<FloatType>& /*wps*/) { return os; }
+  virtual void print(std::ostream& os) const {os << "";}
+
+  friend std::ostream& operator<<(std::ostream& os, const WaypointSampler<FloatType>& wps)
+  {
+    wps.print(os);
+    return os;
+  }
 };
 
 using WaypointSamplerF = WaypointSampler<float>;
