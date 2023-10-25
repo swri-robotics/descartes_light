@@ -140,7 +140,11 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
       std::stringstream s;
       s << vert_idx << ": " << *pos;
 
-      CONSOLE_BRIDGE_logDebug("%s", s.str().c_str());
+      if (console_bridge::getLogLevel() == console_bridge::LogLevel::CONSOLE_BRIDGE_LOG_DEBUG)
+      {
+        std::cout << s.str().c_str() << std::endl;
+      }
+
     }
   }
   // Build Edges
