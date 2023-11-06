@@ -60,7 +60,7 @@ public:
    */
   virtual typename std::vector<StateSample<FloatType>> sample() const = 0;
 
-  virtual void print(std::ostream& os) const {os << "";}
+  virtual void print(std::ostream&) const {}
 
   friend std::ostream& operator<<(std::ostream& os, const WaypointSampler<FloatType>& wps)
   {
