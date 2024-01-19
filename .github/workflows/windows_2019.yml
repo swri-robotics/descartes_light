@@ -19,11 +19,12 @@ jobs:
         path: workspace/src/descartes_light
 
     - name: vcpkg build
-      uses: johnwason/vcpkg-action@v4
+      uses: johnwason/vcpkg-action@v6
       with:
         pkgs: boost-graph eigen3 console-bridge gtest
         triplet: x64-windows-release
         token: ${{ github.token }}
+        github-binarycache: true
 
     - name: install-depends
       shell: cmd
