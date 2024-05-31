@@ -140,6 +140,8 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
       std::stringstream s;
       s << vert_idx << ": " << *pos;
 
+      // WARNING: CONSOLE_BRIDGE_logDebug has a limited buffer size of 1024 char, see
+      // https://github.com/ros/console_bridge/blob/7048ab4539736416fa423fd0a30744d4902333a9/src/console.cpp#L116C14-L11
       CONSOLE_BRIDGE_logDebug("%s", s.str().c_str());
     }
   }
