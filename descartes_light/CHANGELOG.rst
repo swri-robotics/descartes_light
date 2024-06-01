@@ -2,6 +2,11 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Improve logging (`#110 <https://github.com/swri-robotics/descartes_light/issues/110>`_)
+* Contributors: Tyler Marr
+
 0.4.2 (2023-09-02)
 ------------------
 * Fix debian source package
