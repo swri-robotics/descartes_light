@@ -2,8 +2,8 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.3 (2024-06-01)
+------------------
 * Improve logging (`#110 <https://github.com/swri-robotics/descartes_light/issues/110>`_)
 * Contributors: Tyler Marr
 
