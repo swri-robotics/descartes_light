@@ -11,11 +11,9 @@ This package is intented to be a simple ladder graph building library. The core 
 
 ## Build Status
 
-Platform             | CI Status
----------------------|:---------
-Linux (Bionic)       | [![Build Status](https://github.com/swri-robotics/descartes_light/actions/workflows/ubuntu_bionic.yml/badge.svg)](https://github.com/swri-robotics/descartes_light/actions/workflows/ubuntu_bionic.yml)
-Linux (Focal)        | [![Build Status](https://github.com/swri-robotics/descartes_light/actions/workflows/ubuntu_focal.yml/badge.svg)](https://github.com/swri-robotics/descartes_light/actions/workflows/ubuntu_focal.yml)
-Windows              | [![Build Status](https://github.com/swri-robotics/descartes_light/actions/workflows/windows_2019.yml/badge.svg)](https://github.com/swri-robotics/descartes_light/actions/workflows/windows_2019.yml)
-Lint  (Clang-Format) | [![Build Status](https://github.com/swri-robotics/descartes_light/actions/workflows/clang_format.yml/badge.svg)](https://github.com/swri-robotics/descartes_light/actions/workflows/clang_format.yml)
-Lint  (CMake-Format) | [![Build Status](https://github.com/swri-robotics/descartes_light/actions/workflows/cmake_format.yml/badge.svg)](https://github.com/swri-robotics/descartes_light/actions/workflows/cmake_format.yml)
-
+Platform                     | CI Status
+-----------------------------|:---------
+Ubuntu (Focal, Jammy, Noble) | [![Build Status](https://github.com/swri-robotics/descartes_light/actions/workflows/ubuntu.yml/badge.svg)](https://github.com/swri-robotics/descartes_light/actions/workflows/ubuntu.yml)
+Windows (2019, 2022)         | [![Build Status](https://github.com/swri-robotics/descartes_light/actions/workflows/windows.yml/badge.svg)](https://github.com/swri-robotics/descartes_light/actions/workflows/windows.yml)
+Lint  (Clang-Format)         | [![Build Status](https://github.com/swri-robotics/descartes_light/actions/workflows/clang_format.yml/badge.svg)](https://github.com/swri-robotics/descartes_light/actions/workflows/clang_format.yml)
+Lint  (CMake-Format)         | [![Build Status](https://github.com/swri-robotics/descartes_light/actions/workflows/cmake_format.yml/badge.svg)](https://github.com/swri-robotics/descartes_light/actions/workflows/cmake_format.yml)
