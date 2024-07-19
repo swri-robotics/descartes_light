@@ -1,0 +1,63 @@
+name: Windows [2019, 2022]
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: '0 5 * * *'
+
+jobs:
+  ci:
+    name: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-2019, windows-2022]
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        path: target_ws/src
+
+    - name: Setup cmake
+      uses: jwlawson/actions-setup-cmake@v2
+      with:
+        cmake-version: '3.28.x'
+
+    - name: vcpkg build
+      uses: johnwason/vcpkg-action@v6
+      with:
+        pkgs: console-bridge eigen3 boost-graph gtest
+        triplet: x64-windows-release
+        extra-args: --clean-after-build
+        token: ${{ github.token }}
+        cache-key: ci-${{ matrix.os }}
+        github-binarycache: true
+        revision: 2024.01.12
+
+    - name: configure-msvc
+      uses: ilammy/msvc-dev-cmd@v1
+      with:
+        arch: x64
+
+    - name: update environment
+      shell: bash
+      run: |
+        echo "PATH=${{ env.PATH }};$GITHUB_WORKSPACE\vcpkg\installed\x64-windows-release\bin" >> "$GITHUB_ENV"
+        echo "CMAKE_PREFIX_PATH=$GITHUB_WORKSPACE\vcpkg\installed\x64-windows-release" >> "$GITHUB_ENV"
+
+    - name: Build and Tests
+      uses: tesseract-robotics/colcon-action@v9
+      with:
+        ccache-prefix: ${{ matrix.os }}
+        rosdep-enabled: false
+        add-ros-ppa: false
+        vcs-file: dependencies.repos
+        upstream-args: --cmake-args -G "Ninja" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DCMAKE_BUILD_TYPE=Release
+        target-path: target_ws/src
+        target-args: --cmake-args -G "Ninja" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DCMAKE_BUILD_TYPE=Release -DDESCARTES_ENABLE_TESTING=ON
+        run-tests: true

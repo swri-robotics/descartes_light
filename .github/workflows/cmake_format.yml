@@ -5,12 +5,10 @@ on:
     branches:
       - master
   pull_request:
-  schedule:
-    - cron: '0 5 * * *'
 
 jobs:
   cmake_lang:
-    name: Format
+    name: CMake-Format
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@master
