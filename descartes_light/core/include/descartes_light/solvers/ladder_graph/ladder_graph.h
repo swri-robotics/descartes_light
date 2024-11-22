@@ -253,10 +253,14 @@ public:
         Node<FloatType> node2 = rung2.nodes.front();
         typename State<FloatType>::ConstPtr state2 = node2.sample.state;
         out << "Rung # " << failed_id << "\n";
+        out << "\tNode 1\t|\tNode 2\t|\tDiff (Node2 - Node1)\n";
+        out << "\t---------------------------------------\n";
         for (Eigen::Index i = 0; i < state1->values.rows(); i++)
         {
-            out << std::setprecision(4) << std::fixed << "\t" << state1->values[i] << "\t|\t" << state2->values[i] 
-              << "\t|\t" << state2->values[i] - state1->values[i] << "\n";
+            out << std::setprecision(4) << std::fixed 
+          << "\t" << state1->values[i] 
+          << "\t|\t" << state2->values[i] 
+          << "\t|\t" << state2->values[i] - state1->values[i] << "\n";
         }
         out << "\tTotal L2 Norm: " << (state2->values - state1->values).norm() << "\n";
       }
