@@ -166,7 +166,7 @@ public:
 
     out << "digraph ladder {\n";
     out << "  rankdir=LR;\n";
-    out << "  node [shape=circle];\n";
+    out << "  node [shape=box];\n";
 
     // Create subgraphs for each rung
     for (size_t rung_idx = 0; rung_idx < rungs_.size(); ++rung_idx) {
