@@ -26,7 +26,7 @@ DESCARTES_IGNORE_WARNINGS_PUSH
 #include <vector>
 #include <Eigen/Geometry>
 #include <iomanip>
-#include <fstream>
+#include <iosfwd>
 DESCARTES_IGNORE_WARNINGS_POP
 
 namespace descartes_core
@@ -158,67 +158,7 @@ public:
    */
   void clear();
 
-  void toDotGraph(std::string filepath, const std::vector<unsigned>& path = std::vector<unsigned>()) const
-  {
-    std::ofstream out(filepath);
-    if (!out)
-      return;
-
-    out << "digraph ladder {\n";
-    out << "  rankdir=LR;\n";
-    out << "  node [shape=box];\n";
-
-    // Create subgraphs for each rung
-    for (size_t rung_idx = 0; rung_idx < rungs_.size(); ++rung_idx) {
-      out << "  subgraph cluster_" << rung_idx << " {\n";
-      out << "    label=\"Rung " << rung_idx << "\";\n";
-      out << "    style=dotted;\n";
-      
-      const auto& rung = rungs_[rung_idx];
-      for (size_t node_idx = 0; node_idx < rung.nodes.size(); ++node_idx) {
-        std::string node_name = "r" + std::to_string(rung_idx) + "n" + std::to_string(node_idx);
-        
-        // Fix: Properly escape quotes and handle label closing
-        out << "    " << node_name << " [label=\"" << node_idx;
-        if (rung.nodes[node_idx].sample.cost >= 0)
-          out << "\\nCost: " << rung.nodes[node_idx].sample.cost;
-
-        out << "\\nState: ";
-        if (rung.nodes[node_idx].sample.state)
-          for (Eigen::Index i = 0; i < rung.nodes[node_idx].sample.state->values.size(); ++i)
-            out << std::fixed << std::setprecision(3) << rung.nodes[node_idx].sample.state->values[i] << " ";
-        
-        if (!path.empty() && rung_idx < path.size() && path[rung_idx] == node_idx)
-          out << "\",color=green,style=filled];\n";
-        else
-          out << "\"];\n";
-      }
-      out << "  }\n";
-
-      // Create edges to next rung
-      if (rung_idx < rungs_.size() - 1) {
-        for (size_t node_idx = 0; node_idx < rung.nodes.size(); ++node_idx) {
-          const auto& node = rung.nodes[node_idx];
-          std::string from_node = "r" + std::to_string(rung_idx) + "n" + std::to_string(node_idx);
-          
-          for (const auto& edge : node.edges) {
-            std::string to_node = "r" + std::to_string(rung_idx + 1) + "n" + std::to_string(edge.idx);
-            // Fix: Properly format edge labels
-            if (!path.empty() && rung_idx + 1 < path.size() && 
-                path[rung_idx] == node_idx && path[rung_idx + 1] == edge.idx)
-              out << "  " << from_node << " -> " << to_node 
-                  << " [label=\"" << edge.cost << "\",color=green,penwidth=2.0];\n";
-            else
-              out << "  " << from_node << " -> " << to_node 
-                  << " [label=\"" << edge.cost << "\"];\n";
-          }
-        }
-      }
-    }
-
-    out << "}\n";
-    out.close();
-  }
+  void toDotGraph(std::string filepath, const std::vector<unsigned>& path = std::vector<unsigned>()) const;
 
   friend std::ostream& operator<<(std::ostream& out, const LadderGraph<FloatType>& ladder_graph)
   {
