@@ -28,7 +28,7 @@ jobs:
 
       - name: Create artifacts directory
         run: |
-          bash -c "mkdir artifacts && pwd && ll"
+          bash -c "mkdir artifacts && pwd && ls"
 
       - name: Install dependencies
         run: |
