@@ -44,21 +44,21 @@ jobs:
 
       - name: Create artifacts directory
         run: |
-          mkdir ${{ github.workspace }}/artifacts && pwd
+          mkdir $GITHUB_WORKSPACE/artifacts && pwd
 
       - name: Package
         working-directory: target_ws/build/descartes_light
         run: |
           cpack --config CPackConfig.cmake
-          cp ./*.deb ${{ github.workspace }}/artifacts
-          cp ./*.tar.xz ${{ github.workspace }}/artifacts
+          cp ./*.deb $GITHUB_WORKSPACE/artifacts
+          cp ./*.tar.xz $GITHUB_WORKSPACE/artifacts
 
       - uses: actions/upload-artifact@v4
         with:
           name: debian_package
-          path: ${{ github.workspace }}/artifacts/*.deb
+          path: $GITHUB_WORKSPACE/artifacts/*.deb
 
       - uses: actions/upload-artifact@v4
         with:
           name: archive_package
-          path: ${{ github.workspace }}/artifacts/*.tar.xz
+          path: $GITHUB_WORKSPACE/artifacts/*.tar.xz
