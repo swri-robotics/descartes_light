@@ -44,7 +44,7 @@ jobs:
 
       - name: Create artifacts directory
         run: |
-          mkdir $GITHUB_WORKSPACE/artifacts && pwd
+          mkdir $GITHUB_WORKSPACE/artifacts
 
       - name: Package
         working-directory: target_ws/build/descartes_light
@@ -52,6 +52,7 @@ jobs:
           cpack --config CPackConfig.cmake
           cp ./*.deb $GITHUB_WORKSPACE/artifacts
           cp ./*.tar.xz $GITHUB_WORKSPACE/artifacts
+          bash -c "cd $GITHUB_WORKSPACE/artifacts && ls"
 
       - uses: actions/upload-artifact@v4
         with:
