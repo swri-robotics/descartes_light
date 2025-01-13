@@ -48,18 +48,19 @@ jobs:
 
       - name: Package
         working-directory: target_ws/build/descartes_light
+        shell: bash
         run: |
           cpack --config CPackConfig.cmake
           cp ./*.deb $GITHUB_WORKSPACE/artifacts
           cp ./*.tar.xz $GITHUB_WORKSPACE/artifacts
-          bash -c "cd $GITHUB_WORKSPACE/artifacts && ls"
+          cd $GITHUB_WORKSPACE/artifacts && ls
 
       - uses: actions/upload-artifact@v4
         with:
           name: debian_package
-          path: $GITHUB_WORKSPACE/artifacts/*.deb
+          path: ${{ github.workspace }}/artifacts/*.deb
 
       - uses: actions/upload-artifact@v4
         with:
           name: archive_package
-          path: $GITHUB_WORKSPACE/artifacts/*.tar.xz
+          path: ${{ github.workspace }}/artifacts/*.tar.xz
