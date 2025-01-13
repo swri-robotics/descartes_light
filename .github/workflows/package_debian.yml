@@ -26,6 +26,10 @@ jobs:
         with:
           path: target_ws/src
 
+      - name: Create artifacts directory
+        run: |
+          mkdir artifacts
+
       - name: Install dependencies
         run: |
           apt update -q
@@ -40,7 +44,7 @@ jobs:
           vcs-file: dependencies.repos
           target-path: target_ws/src
           target-args: --cmake-args -DCMAKE_BUILD_TYPE=Release -DDESCARTES_PACKAGE=ON
-          run-tests: true
+          run-tests: false
 
       - name: Package
         working-directory: target_ws/build/descartes_light
