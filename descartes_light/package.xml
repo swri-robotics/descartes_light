@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package format="2">
   <name>descartes_light</name>
-  <version>0.4.3</version>
+  <version>0.4.4</version>
   <description>The descartes_light package</description>
   <author>Jon Meyer</author>
   <maintainer email="levi.armstrong@gmail.com">Levi Armstrong</maintainer>

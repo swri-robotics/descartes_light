@@ -2,8 +2,8 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.4 (2025-01-14)
+------------------
 * Add ability to save graph as a dot graph (`#114 <https://github.com/swri-robotics/descartes_light/issues/114>`_)
 * Contributors: Tyler Marr
 
