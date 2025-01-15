@@ -39,5 +39,5 @@ jobs:
           rosdep-enabled: true
           vcs-file: dependencies.repos
           target-path: target_ws/src
-          target-args: --cmake-args -DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON -DDESCARTES_ENABLE_CLANG_TIDY=ON
+          target-args: --cmake-args -DCMAKE_BUILD_TYPE=Debug -DDESCARTES_ENABLE_TESTING=ON -DDESCARTES_ENABLE_CLANG_TIDY=ON -DDESCARTES_PACKAGE=ON
           run-tests: true
