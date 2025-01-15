@@ -12,16 +12,6 @@ target_clang_tidy(
 target_include_directories(${PROJECT_NAME}_test_utils PUBLIC "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>"
                                                              "$<INSTALL_INTERFACE:include>")
 
-install(
-  TARGETS ${PROJECT_NAME}_test_utils
-  EXPORT ${PROJECT_NAME}-targets
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
-
-# Install headers
-install(DIRECTORY include/ DESTINATION include/)
-
 # Unit Tests
 find_gtest()
 add_executable(${PROJECT_NAME}_utest utest.cpp)
