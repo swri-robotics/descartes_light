@@ -2,6 +2,11 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Enable package build in CI
+* Contributors: Levi Armstrong
+
 0.4.5 (2025-01-14)
 ------------------
 
