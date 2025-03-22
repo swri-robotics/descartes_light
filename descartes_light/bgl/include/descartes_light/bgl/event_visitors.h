@@ -1,8 +1,8 @@
 #ifndef DESCARTES_LIGHT_SOLVERS_BGL_EVENT_VISITORS
 #define DESCARTES_LIGHT_SOLVERS_BGL_EVENT_VISITORS
 
+#include <chrono>
 #include <descartes_light/bgl/boost_graph_types.h>
-
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
 #include <boost/graph/visitors.hpp>
@@ -27,6 +27,54 @@ struct early_terminator : public boost::base_visitor<early_terminator<EventType>
   void operator()(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g);
 
   const long last_rung_idx_;
+};
+
+/**
+ * @brief Event visitor that terminates the search when a vertex in the last rung of the graph is found
+ * to be below the provided cost threshold
+ * @details Throws the vertex descriptor that is the termination of the path a valid vertex in the last rung
+ * is found
+ */
+template <typename FloatType, typename EventType>
+struct distance_terminator : public boost::base_visitor<distance_terminator<FloatType, EventType>>
+{
+  /** @brief Event filter typedef defining the events for which this visitor can be used */
+  typedef EventType event_filter;
+
+  distance_terminator(long last_rung_idx, FloatType distance_threshold);
+
+  void operator()(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g);
+
+  const FloatType distance_threshold_;
+  const long last_rung_idx_;
+};
+
+
+/**
+ * @brief The timeout_exception class
+ */
+class timeout_exception : public std::runtime_error {
+public:
+  using std::runtime_error::runtime_error;
+};
+
+
+/**
+ * @brief Event visitor that terminates the once a time threshold is met
+ * @details How will this throw an end descriptor
+ */
+template <typename FloatType, typename EventType>
+struct time_terminator : public boost::base_visitor<time_terminator<FloatType, EventType>>
+{
+  /** @brief Event filter typedef defining the events for which this visitor can be used */
+  typedef EventType event_filter;
+
+  time_terminator(double time_threshold);
+
+  void operator()(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g);
+
+  const std::chrono::time_point<std::chrono::steady_clock> start_time_;
+  const double time_threshold_;
 };
 
 /**

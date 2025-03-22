@@ -54,6 +54,21 @@ static VertexDesc<FloatType> solveDFS(BGLGraph<FloatType>& graph,
     if (target != ladder_rungs.back().end() && graph[*target].distance < std::numeric_limits<FloatType>::max())
       throw *target;
   }
+  catch(const descartes_light::timeout_exception& te)
+  {
+    // If this has to be called in two places, make it a function.
+    auto target = std::min_element(ladder_rungs.back().begin(),
+                                   ladder_rungs.back().end(),
+                                   [&](const VertexDesc<FloatType>& a, const VertexDesc<FloatType>& b) {
+                                     return graph[a].distance < graph[b].distance;
+                                   });
+
+    // Check that the identified lowest cost vertex is valid and has a cost less than inf
+    if (target != ladder_rungs.back().end() && graph[*target].distance < std::numeric_limits<FloatType>::max())
+      throw *target;
+
+  }
+
   catch (const VertexDesc<FloatType>& target)
   {
     return target;
