@@ -19,6 +19,7 @@
 
 #include <descartes_light/descartes_macros.h>
 DESCARTES_IGNORE_WARNINGS_PUSH
+#include <chrono>
 #include <console_bridge/console.h>
 #include <fstream>
 #include <omp.h>
