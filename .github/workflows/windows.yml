@@ -1,4 +1,4 @@
-name: Windows [2019, 2022]
+name: Windows [2022]
 
 on:
   push:
