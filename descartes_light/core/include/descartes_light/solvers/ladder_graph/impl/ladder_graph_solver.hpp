@@ -110,6 +110,8 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
           }
         }
       }
+      // The state evaluator will filter samples so capacity should be reduced when finished
+      r.nodes.shrink_to_fit();
     }
     else
     {
