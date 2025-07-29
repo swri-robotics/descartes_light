@@ -2,6 +2,9 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+
 0.4.7 (2025-07-29)
 ------------------
 * Add shrink_to_fit call to rung nodes after filtering
