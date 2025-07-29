@@ -2,6 +2,12 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Add shrink_to_fit call to rung nodes after filtering
+* Add missing <chrono> import to bgl_solver.hpp for MSVC (`#120 <https://github.com/swri-robotics/descartes_light/issues/120>`_)
+* Contributors: John Wason, Levi Armstrong
+
 0.4.6 (2025-01-16)
 ------------------
 * Enable package build in CI
