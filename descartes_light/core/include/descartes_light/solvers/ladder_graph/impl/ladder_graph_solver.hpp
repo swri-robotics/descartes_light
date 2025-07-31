@@ -93,12 +93,16 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
     if (!samples.empty())
     {
       auto& r = graph_.getRung(static_cast<size_t>(i));
-      r.nodes.reserve(samples.size());
+      thread_local std::vector<Node<FloatType>> local_nodes;
+      local_nodes.clear();
+      if (local_nodes.capacity() < samples.size())
+        local_nodes.reserve(samples.size());
+
       for (auto& sample : samples)
       {
         if (state_evaluators.empty())
         {
-          r.nodes.push_back(Node<FloatType>(sample));
+          local_nodes.emplace_back(sample);
         }
         else
         {
@@ -106,12 +110,12 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
           if (results.first)
           {
             sample.cost += results.second;
-            r.nodes.push_back(Node<FloatType>(sample));
+            local_nodes.emplace_back(sample);
           }
         }
       }
-      // The state evaluator will filter samples so capacity should be reduced when finished
-      r.nodes.shrink_to_fit();
+      // Excess capacity should not be copied so call to shrink_to_fit is not necessary here
+      r.nodes = local_nodes;
     }
     else
     {
@@ -160,6 +164,8 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
     for (std::size_t j = 0; j < from.nodes.size(); ++j)
     {
       auto& from_node = from.nodes[j];
+      thread_local std::vector<Edge<FloatType>> local_edges;
+      local_edges.clear();
       for (std::size_t k = 0; k < to.nodes.size(); ++k)
       {
         // Consider the edge:
@@ -169,15 +175,12 @@ BuildStatus LadderGraphSolver<FloatType>::buildImpl(
         if (results.first)
         {
           found = true;
-          from_node.edges.emplace_back(results.second, k);
+          local_edges.emplace_back(results.second, k);
         }
       }
 
-      // Since we are using emplace_back (or push_back) it doubles the capacity everytime the
-      // capacity is reached so this could be huge when solving large ladder graph problems.
-      // So shrink the capacity to fit
-      // @todo Should max possible size be reserved first
-      from_node.edges.shrink_to_fit();
+      // Excess capacity should not be copied so call to shrink_to_fit is not necessary here
+      from_node.edges = local_edges;
     }
 
     if (!found)
