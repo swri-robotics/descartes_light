@@ -36,11 +36,19 @@ template <typename FloatType>
 std::pair<bool, FloatType> EuclideanDistanceEdgeEvaluator<FloatType>::evaluate(const State<FloatType>& start,
                                                                                const State<FloatType>& end) const
 {
-  Eigen::Matrix<FloatType, Eigen::Dynamic, 1> diff = end - start;
+  // Leverage `thread_local` declaration to reduce number of allocations
+  thread_local Eigen::Matrix<FloatType, Eigen::Dynamic, 1> diff;
+
+  // Allocates only if size changes (once per thread typically)
+  if (diff.size() != end.values.size())
+    diff.resize(end.values.size());
+
+  // No new allocation; evaluates into existing buffer
+  diff.noalias() = end.values - start.values;
+
   if (scale_.size() == diff.size())
-  {
     diff.array() *= scale_;
-  }
+
   return std::make_pair(true, diff.squaredNorm());
 }
 
