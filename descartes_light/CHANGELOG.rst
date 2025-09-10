@@ -2,8 +2,8 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.9 (2025-09-10)
+------------------
 * Improve memory allocations in eculidean_distance_edge_evaluator
 * Contributors: Levi Armstrong
 
