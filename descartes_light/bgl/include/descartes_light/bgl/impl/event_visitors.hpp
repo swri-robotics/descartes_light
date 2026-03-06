@@ -19,6 +19,33 @@ void early_terminator<EventType>::operator()(VertexDesc<FloatType> u, const BGLG
 }
 
 template <typename FloatType, typename EventType>
+distance_terminator<FloatType, EventType>::distance_terminator(long last_rung_idx, FloatType distance_threshold) : distance_threshold_(distance_threshold),
+                                                                                                                        last_rung_idx_(last_rung_idx)
+{
+}
+
+template <typename FloatType,typename EventType>
+void distance_terminator<FloatType, EventType>::operator()(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g)
+{
+  if (g[u].rung_idx == last_rung_idx_ && g[u].distance < distance_threshold_)
+    throw u;
+}
+
+template <typename FloatType, typename EventType>
+time_terminator<FloatType, EventType>::time_terminator(double time_threshold) : time_threshold_(time_threshold)
+{
+  start_time_ = std::chrono::steady_clock::now();
+}
+
+template <typename FloatType, typename EventType>
+void time_terminator<FloatType, EventType>::operator()(VertexDesc<FloatType> u, const BGLGraph<FloatType>& g)
+{
+  //if (time_threshold_ < std::chrono::duration<double>(std::chrono::steady_clock::now() - start_time_).count())
+    throw false;
+}
+
+
+template <typename FloatType, typename EventType>
 add_all_edges_dynamically<FloatType, EventType>::add_all_edges_dynamically(
     std::vector<typename EdgeEvaluator<FloatType>::ConstPtr> edge_eval,
     std::vector<std::vector<VertexDesc<FloatType>>> ladder_rungs)
