@@ -78,3 +78,10 @@ jobs:
           -DOpenMP_libomp_LIBRARY=${{ matrix.config.homebrew_root }}/opt/libomp/lib/libomp.dylib
         run-tests-args: --merge-install
         
+    - name: collect logs
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: ci-mac-logs-${{ matrix.config.runner }}
+        path: ./**/*.log
+        retention-days: 7
