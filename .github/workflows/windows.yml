@@ -23,22 +23,14 @@ jobs:
       with:
         path: target_ws/src
 
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: '3.28.x'
-
     - name: vcpkg build
-      uses: johnwason/vcpkg-action@v6
+      uses: johnwason/vcpkg-action@v8
       with:
         pkgs: console-bridge eigen3 boost-graph gtest
         triplet: x64-windows-release
         extra-args: --clean-after-build
         token: ${{ github.token }}
         cache-key: ci-${{ matrix.os }}
-        github-binarycache: true
-        revision: 2024.01.12
-
     - name: configure-msvc
       uses: ilammy/msvc-dev-cmd@v1
       with:
