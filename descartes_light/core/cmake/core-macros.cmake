@@ -60,15 +60,28 @@ macro(descartes_variables)
   if(NOT DESCARTES_ENABLE_TESTING AND NOT DESCARTES_ENABLE_TESTING_ALL)
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       set(DESCARTES_COMPILE_OPTIONS
-          -mno-avx
           -Wall
           -Wextra
           -Wconversion
           -Wsign-conversion
           -Wno-sign-compare)
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      execute_process(COMMAND uname -p OUTPUT_VARIABLE CMAKE_SYSTEM_NAME2)
+      if(NOT
+         CMAKE_SYSTEM_NAME2
+         MATCHES
+         "aarch64"
+         AND NOT
+             CMAKE_SYSTEM_NAME2
+             MATCHES
+             "armv7l"
+         AND NOT
+             CMAKE_SYSTEM_NAME2
+             MATCHES
+             "unknown")
+        set(DESCARTES_COMPILE_OPTIONS -mno-avx)
+      endif()
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*")
       set(DESCARTES_COMPILE_OPTIONS
-          -mno-avx
           -Wall
           -Wextra
           -Winconsistent-missing-override
@@ -83,15 +96,28 @@ macro(descartes_variables)
   else()
     if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
       set(DESCARTES_COMPILE_OPTIONS
-          -mno-avx
           -Werror=all
           -Werror=extra
           -Werror=conversion
           -Werror=sign-conversion
           -Wno-sign-compare)
-    elseif(CMAKE_CXX_COMPILER_ID STREQUAL "Clang")
+      execute_process(COMMAND uname -p OUTPUT_VARIABLE CMAKE_SYSTEM_NAME2)
+      if(NOT
+         CMAKE_SYSTEM_NAME2
+         MATCHES
+         "aarch64"
+         AND NOT
+             CMAKE_SYSTEM_NAME2
+             MATCHES
+             "armv7l"
+         AND NOT
+             CMAKE_SYSTEM_NAME2
+             MATCHES
+             "unknown")
+        set(DESCARTES_COMPILE_OPTIONS -mno-avx)
+      endif()
+    elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*")
       set(DESCARTES_COMPILE_OPTIONS
-          -mno-avx
           -Werror=all
           -Werror=extra
           -Werror=inconsistent-missing-override

@@ -199,6 +199,7 @@ BuildStatus BGLSolverBaseSVDE<FloatType>::buildImpl(
     }
 #endif
   }
+  UNUSED(cnt);
   double duration = std::chrono::duration<double>(Clock::now() - start_time).count();
   CONSOLE_BRIDGE_logDebug("Descartes took %0.4f seconds to build vertices.", duration);
 
