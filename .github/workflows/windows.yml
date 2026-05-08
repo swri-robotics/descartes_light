@@ -26,7 +26,7 @@ jobs:
     - name: vcpkg build
       uses: johnwason/vcpkg-action@v8
       with:
-        pkgs: console-bridge eigen3 boost-graph gtest
+        pkgs: console-bridge eigen3 boost-graph gtest boost-preprocessor boost-format
         triplet: x64-windows-release
         extra-args: --clean-after-build
         token: ${{ github.token }}

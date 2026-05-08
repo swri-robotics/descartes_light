@@ -37,7 +37,7 @@ jobs:
     - name: vcpkg build
       uses: johnwason/vcpkg-action@v8
       with:
-        pkgs: console-bridge eigen3 boost-graph gtest
+        pkgs: console-bridge eigen3 boost-graph gtest boost-preprocessor boost-format
         triplet: ${{ matrix.config.vcpkg_triplet }}
         extra-args: --clean-after-build --overlay-triplets=${{ github.workspace }}/target_ws/src/.github/workflows/vcpkg_triplets
         token: ${{ github.token }}
