@@ -23,22 +23,14 @@ jobs:
       with:
         path: target_ws/src
 
-    - name: Setup cmake
-      uses: jwlawson/actions-setup-cmake@v2
-      with:
-        cmake-version: '3.28.x'
-
     - name: vcpkg build
-      uses: johnwason/vcpkg-action@v6
+      uses: johnwason/vcpkg-action@v8
       with:
-        pkgs: console-bridge eigen3 boost-graph gtest
+        pkgs: console-bridge eigen3 boost-graph gtest boost-preprocessor boost-format
         triplet: x64-windows-release
         extra-args: --clean-after-build
         token: ${{ github.token }}
         cache-key: ci-${{ matrix.os }}
-        github-binarycache: true
-        revision: 2024.01.12
-
     - name: configure-msvc
       uses: ilammy/msvc-dev-cmd@v1
       with:
@@ -61,3 +53,10 @@ jobs:
         target-path: target_ws/src
         target-args: --cmake-args -G "Ninja" -DVCPKG_TARGET_TRIPLET=x64-windows-release -DCMAKE_BUILD_TYPE=Release -DDESCARTES_ENABLE_TESTING=ON
         run-tests: true
+    - name: collect logs
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: ci-win-logs-win2022
+        path: ./**/*.log
+        retention-days: 7

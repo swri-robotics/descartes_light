@@ -1,0 +1,87 @@
+name: Mac OSX
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  schedule:
+    - cron: '0 5 * * *'
+
+jobs:
+  build-macos:
+    strategy:
+      fail-fast: false
+      matrix:
+        config:
+          - runner: macos-15-intel
+            vcpkg_triplet: x64-osx-dynamic-release
+            arch: x64
+            homebrew_root: /usr/local
+          - runner: macos-15
+            vcpkg_triplet: arm64-osx-dynamic-release
+            arch: arm64
+            homebrew_root: /opt/homebrew
+    runs-on: ${{ matrix.config.runner }}
+    steps:
+    - uses: actions/checkout@v6
+      with:
+        path: target_ws/src
+    - uses: actions/setup-python@v6
+      id: setup-python
+      with:
+        python-version: '3.12'
+    - name: brew
+      run: |
+        brew install libomp cmake automake autoconf autoconf-archive libtool gcc ninja    
+    - name: vcpkg build
+      uses: johnwason/vcpkg-action@v8
+      with:
+        pkgs: console-bridge eigen3 boost-graph gtest boost-preprocessor boost-format
+        triplet: ${{ matrix.config.vcpkg_triplet }}
+        extra-args: --clean-after-build --overlay-triplets=${{ github.workspace }}/target_ws/src/.github/workflows/vcpkg_triplets
+        token: ${{ github.token }}
+        cache-key: osx-${{ matrix.config.arch }}-vcpkg
+        revision: master
+    - name: update environment
+      shell: bash
+      run: |
+        echo "DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$GITHUB_WORKSPACE/vcpkg/installed/${{ matrix.config.vcpkg_triplet }}/lib" >> "$GITHUB_ENV"
+        echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$GITHUB_WORKSPACE/vcpkg/installed/${{ matrix.config.vcpkg_triplet }}" >> "$GITHUB_ENV"
+    - name: Build and Tests
+      uses: tesseract-robotics/colcon-action@v14
+      with:
+        ccache-prefix: ci-mac-build-${{ matrix.config.name }}
+        vcs-file: dependencies.repos
+        rosdep-enabled: false
+        upstream-args: >-
+          --merge-install
+          --cmake-args -G "Ninja" -DVCPKG_TARGET_TRIPLET=${{ matrix.config.vcpkg_triplet }} -DCMAKE_BUILD_TYPE=Release
+          -DVCPKG_APPLOCAL_DEPS=OFF \
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 \
+          -DOpenMP_CXX_INCLUDE_DIR=${{ matrix.config.homebrew_root }}/opt/libomp/include \
+          -DOpenMP_C_INCLUDE_DIR=${{ matrix.config.homebrew_root }}/opt/libomp/include \
+          -DOpenMP_CXX_LIB_NAMES=libomp -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp" \
+          -DOpenMP_C_LIB_NAMES=libomp -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp" \
+          -DOpenMP_libomp_LIBRARY=${{ matrix.config.homebrew_root }}/opt/libomp/lib/libomp.dylib
+        target-path: target_ws/src
+        target-args: >-
+          --merge-install
+          --cmake-args -G "Ninja" -DVCPKG_TARGET_TRIPLET=${{ matrix.config.vcpkg_triplet }} 
+          -DCMAKE_BUILD_TYPE=Release -DDESCARTES_ENABLE_TESTING=ON \
+          -DVCPKG_APPLOCAL_DEPS=OFF \
+          -DCMAKE_OSX_DEPLOYMENT_TARGET=12.0 \
+          -DOpenMP_CXX_INCLUDE_DIR=${{ matrix.config.homebrew_root }}/opt/libomp/include \
+          -DOpenMP_C_INCLUDE_DIR=${{ matrix.config.homebrew_root }}/opt/libomp/include \
+          -DOpenMP_CXX_LIB_NAMES=libomp -DOpenMP_CXX_FLAGS="-Xpreprocessor -fopenmp" \
+          -DOpenMP_C_LIB_NAMES=libomp -DOpenMP_C_FLAGS="-Xpreprocessor -fopenmp" \
+          -DOpenMP_libomp_LIBRARY=${{ matrix.config.homebrew_root }}/opt/libomp/lib/libomp.dylib
+        run-tests-args: --merge-install
+        
+    - name: collect logs
+      if: failure()
+      uses: actions/upload-artifact@v7
+      with:
+        name: ci-mac-logs-${{ matrix.config.runner }}
+        path: ./**/*.log
+        retention-days: 7
