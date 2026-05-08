@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.5.0...3.99)
 
 # Extract package name and version
 find_package(ros_industrial_cmake_boilerplate REQUIRED)
