@@ -2,6 +2,12 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Fix Mac build flags
+* Add Mac action (`#126 <https://github.com/swri-robotics/descartes_light/issues/126>`_)
+* Contributors: John Wason
+
 0.4.9 (2025-09-10)
 ------------------
 * Improve memory allocations in eculidean_distance_edge_evaluator
