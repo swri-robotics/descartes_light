@@ -2,8 +2,8 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.10 (2026-05-28)
+-------------------
 * Fix Mac build flags
 * Add Mac action (`#126 <https://github.com/swri-robotics/descartes_light/issues/126>`_)
 * Contributors: John Wason
