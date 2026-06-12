@@ -65,21 +65,6 @@ macro(descartes_variables)
           -Wconversion
           -Wsign-conversion
           -Wno-sign-compare)
-      execute_process(COMMAND uname -p OUTPUT_VARIABLE CMAKE_SYSTEM_NAME2)
-      if(NOT
-         CMAKE_SYSTEM_NAME2
-         MATCHES
-         "aarch64"
-         AND NOT
-             CMAKE_SYSTEM_NAME2
-             MATCHES
-             "armv7l"
-         AND NOT
-             CMAKE_SYSTEM_NAME2
-             MATCHES
-             "unknown")
-        set(DESCARTES_COMPILE_OPTIONS -mno-avx)
-      endif()
     elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*")
       set(DESCARTES_COMPILE_OPTIONS
           -Wall
@@ -101,21 +86,6 @@ macro(descartes_variables)
           -Werror=conversion
           -Werror=sign-conversion
           -Wno-sign-compare)
-      execute_process(COMMAND uname -p OUTPUT_VARIABLE CMAKE_SYSTEM_NAME2)
-      if(NOT
-         CMAKE_SYSTEM_NAME2
-         MATCHES
-         "aarch64"
-         AND NOT
-             CMAKE_SYSTEM_NAME2
-             MATCHES
-             "armv7l"
-         AND NOT
-             CMAKE_SYSTEM_NAME2
-             MATCHES
-             "unknown")
-        set(DESCARTES_COMPILE_OPTIONS -mno-avx)
-      endif()
     elseif(CMAKE_CXX_COMPILER_ID MATCHES ".*Clang.*")
       set(DESCARTES_COMPILE_OPTIONS
           -Werror=all
