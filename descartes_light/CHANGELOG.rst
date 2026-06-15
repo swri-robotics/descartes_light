@@ -2,8 +2,8 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Forthcoming
------------
+0.4.11 (2026-06-15)
+-------------------
 * Remove -mno-avx gcc compiler flag
 * Contributors: John Wason
 
