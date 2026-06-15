@@ -2,6 +2,11 @@
 Changelog for package descartes_light
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+Forthcoming
+-----------
+* Remove -mno-avx gcc compiler flag
+* Contributors: John Wason
+
 0.4.10 (2026-05-28)
 -------------------
 * Fix Mac build flags
