@@ -8,6 +8,11 @@ on:
   schedule:
     - cron: '0 5 * * *'
 
+# Supersede in-progress pull-request runs; queue everything else so two runs on one ref never race.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   build-macos:
     strategy:
@@ -49,9 +54,9 @@ jobs:
         echo "DYLD_LIBRARY_PATH=$DYLD_LIBRARY_PATH:$GITHUB_WORKSPACE/vcpkg/installed/${{ matrix.config.vcpkg_triplet }}/lib" >> "$GITHUB_ENV"
         echo "CMAKE_PREFIX_PATH=$CMAKE_PREFIX_PATH:$GITHUB_WORKSPACE/vcpkg/installed/${{ matrix.config.vcpkg_triplet }}" >> "$GITHUB_ENV"
     - name: Build and Tests
-      uses: tesseract-robotics/colcon-action@v14
+      uses: tesseract-robotics/colcon-action@v15
       with:
-        ccache-prefix: ci-mac-build-${{ matrix.config.name }}
+        ccache-prefix: ci-mac-build-${{ matrix.config.arch }}
         vcs-file: dependencies.repos
         rosdep-enabled: false
         upstream-args: >-
